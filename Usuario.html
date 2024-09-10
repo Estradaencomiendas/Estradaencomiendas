@@ -270,9 +270,9 @@
             // Mostrar imagen según el estado y configurar tamaños específicos
             let statusImage = packageData.status === 'Pagado' ? 'Pagado.png' :
                               packageData.status === 'En Proceso de Pago' ? 'Procesando Pago.png' :
-                              packageData.status === 'Paquete Retirado' ? 'images/retired.png' :
-                              packageData.status === 'En Ruta' ? 'images/en-route.png' :
-                              packageData.status === 'Paquete No Retirado' ? 'images/not-collected.png' : 'images/in-process.png';
+                              packageData.status === 'Paquete Retirado' ? 'retired.png' :
+                              packageData.status === 'En Ruta' ? 'en-route.png' :
+                              packageData.status === 'Paquete No Retirado' ? 'not-collected.png' : 'in-process.png';
 
             const imageClass = packageData.status === 'Pagado' ? 'status-image-paid' :
                                packageData.status === 'En Proceso de Pago' ? 'status-image-processing' : 'status-image';
