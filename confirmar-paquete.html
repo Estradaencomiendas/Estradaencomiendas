@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Paquete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> <!-- Biblioteca para QR Code -->
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        /* Imagen de fondo con 50% de transparencia */
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5; /* 50% de transparencia */
+            background-image: url('19197378.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* Asegura que esté detrás del contenido */
+            border-radius: 20px;
+        }
+
+        .logo {
+            width: 150px; /* Tamaño del logo ajustado */
+            margin: 0 auto 20px; /* Centrado del logo */
+            display: block;
+        }
+
+        .title-wrapper {
+            background-color: rgba(255, 255, 255, 0.9);
+            display: inline-block;
+            padding: 5px 10px; /* Ajuste del tamaño del marco */
+            border-radius: 5px; /* Ajuste del radio del borde */
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 22px; /* Tamaño del título ajustado */
+            color: #333;
+            font-weight: bold;
+            margin: 0; /* Eliminación del margen extra */
+        }
+
+        #package-details {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        #qrcode {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .status-buttons {
+            margin-top: 20px;
+        }
+
+        .status-buttons button {
+            font-size: 18px;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 5px;
+            cursor: pointer;
+            outline: none;
+            opacity: 0.85; /* Aplicar transparencia */
+            transition: opacity 0.3s ease;
+        }
+
+        .status-buttons button:hover {
+            opacity: 1; /* Restablecer opacidad en hover */
+        }
+
+        .retired {
+            background-color: #28a745; /* Verde */
+        }
+
+        .not-collected {
+            background-color: #dc3545; /* Rojo */
+        }
+
+        .problem {
+            background-color: #ffc107; /* Amarillo */
+            color: #000; /* Texto en negro para contraste */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Imagen de fondo con 50% de transparencia -->
+        <div class="background-image"></div>
+
+        <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
+
+        <div class="title-wrapper">
+            <h1>Confirmar Paquete</h1>
+        </div>
+
+        <div id="package-details"></div>
+        <div id="qrcode"></div>
+
+        <div class="status-buttons">
+            <button class="retired" id="package-delivered">Paquete Retirado</button>
+            <button class="not-collected" id="package-not-collected">Paquete No Retirado</button>
+            <button class="problem" id="report-problem">Hubo un Problema</button>
+        </div>
+    </div>
+
+    <script>
+        function loadPackageDetails(trackingNumber) {
+            let packages = JSON.parse(localStorage.getItem('packages')) || [];
+            const packageData = packages.find(pkg => pkg.trackingNumber === trackingNumber);
+
+            if (packageData) {
+                document.getElementById('package-details').innerHTML = `
+                    <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
+                    <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
+                    <p><span>Nombre de la Página:</span> ${packageData.nombrePaquete}</p>
+                    <p><span>Destino:</span> ${packageData.destino}</p>
+                    <p><span>Fecha de Envío:</span> ${packageData.fechaEnvio}</p>
+                    <p><span>Fecha de Entrega:</span> ${packageData.diaEntrega}</p>
+                    <p><span>Valor:</span> $${packageData.valor}</p>
+                `;
+
+                // Generar el código QR
+                new QRCode(document.getElementById("qrcode"), {
+                    text: packageData.trackingNumber,
+                    width: 128,
+                    height: 128,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } else {
+                document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
+            }
+        }
+
+        // Cargar los detalles del paquete si hay un número de seguimiento en sessionStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const trackingNumber = sessionStorage.getItem('trackingNumber');
+            if (trackingNumber) {
+                loadPackageDetails(trackingNumber);
+            }
+        });
+
+        // Función para mostrar una confirmación antes de actualizar el estado
+        function confirmStatusUpdate(message, status) {
+            if (confirm(message)) {
+                updatePackageStatus(status);
+            }
+        }
+
+        document.getElementById('package-delivered').addEventListener('click', function() {
+            confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como retirado?', 'Paquete Retirado');
+        });
+
+        document.getElementById('package-not-collected').addEventListener('click', function() {
+            confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como NO retirado?', 'Paquete No Retirado');
+        });
+
+        document.getElementById('report-problem').addEventListener('click', function() {
+            const trackingNumber = sessionStorage.getItem('trackingNumber');
+            if (trackingNumber) {
+                window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
+            } else {
+                alert('No se encontró información del paquete.');
+            }
+        });
+
+        function updatePackageStatus(status) {
+            let packages = JSON.parse(localStorage.getItem('packages')) || [];
+            const trackingNumber = sessionStorage.getItem('trackingNumber');
+            const packageData = packages.find(pkg => pkg.trackingNumber === trackingNumber);
+
+            if (packageData) {
+                packageData.status = status;
+                localStorage.setItem('packages', JSON.stringify(packages));
+                sessionStorage.setItem('packageStatus', status);
+                window.location.href = 'Encargado de ruta.html';
+            } else {
+                alert('No se encontró información del paquete.');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuario</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- Font Awesome -->
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        h1 {
+            font-size: 22px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: calc(100% - 40px);
+            padding: 8px 10px 8px 40px;
+            border: 2px solid #EDE309;
+            border-radius: 10px;
+            background-color: #E8E8E8;
+            color: #333;
+            font-size: 14px;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .action-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .package-container {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .package-info {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .package-info h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .package-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+        }
+
+        .status-retired {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-not-collected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-in-route {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-in-process {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-paid {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        /* Tamaño específico para imágenes */
+        .status-image {
+            width: 360px;
+            height: auto;
+        }
+
+        .status-image-paid {
+            width: 125px;
+            height: auto;
+        }
+
+        .status-image-processing {
+            width: 125px;
+            height: auto;
+        }
+
+        .package-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-button-small {
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .add-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .resend-button {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .resend-button:hover {
+            background-color: #c82333;
+        }
+
+        @media screen and (max-width: 768px) {
+            .status-image {
+                width: 220px;
+                height: auto;
+            }
+
+            .status-image-paid {
+                width: 100px;
+                height: auto;
+            }
+
+            .status-image-processing {
+                width: 225px;
+                height: auto;
+            }
+
+            .package-info h3 {
+                font-size: 18px;
+            }
+
+            .package-info p {
+                font-size: 14px;
+            }
+
+            .action-button-small {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Buscar Paquete</h1>
+        <div class="input-wrapper">
+            <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
+        </div>
+
+        <div class="button-group">
+            <button class="action-button" id="search-button">
+                <i class="fas fa-search"></i>
+                Buscar Paquete
+            </button>
+            <button class="action-button" id="qr-scan-button">
+                <i class="fas fa-qrcode"></i>
+                Escanear Paquete
+            </button>
+        </div>
+
+        <!-- Contenedores para mostrar paquetes -->
+        <div id="package-list">
+            <!-- Aquí se insertarán dinámicamente los paquetes -->
+        </div>
+    </div>
+
+    <script>
+        let currentPackageData = null;
+
+        // Función para cargar los paquetes desde localStorage
+        function loadPackages() {
+            return JSON.parse(localStorage.getItem('packages')) || [];
+        }
+
+        // Guardar paquetes en localStorage
+        function savePackages(packages) {
+            localStorage.setItem('packages', JSON.stringify(packages));
+        }
+
+        // Función para agregar paquetes al contenedor
+        function addPackageToContainer(packageData) {
+            const packageList = document.getElementById('package-list');
+            const statusClass = packageData.status === 'Pagado' ? 'status-paid' :
+                                packageData.status === 'Paquete Retirado' ? 'status-retired' :
+                                packageData.status === 'En Proceso de Pago' ? 'status-in-process' :
+                                packageData.status === 'Paquete No Retirado' ? 'status-not-collected' :
+                                packageData.status === 'En Ruta' ? 'status-in-route' : 'status-in-route';
+
+            let actionButton = '';
+            if (packageData.status === 'Paquete Retirado') {
+                actionButton = `<button class="action-button-small add-button" onclick="addToMyShipments('${packageData.trackingNumber}')">Agregar</button>`;
+            } else if (packageData.status === 'Paquete No Retirado') {
+                actionButton = `<button class="action-button-small resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>`;
+            }
+
+            // Mostrar imagen según el estado y configurar tamaños específicos
+            let statusImage = packageData.status === 'Pagado' ? 'Pagado.png' :
+                              packageData.status === 'En Proceso de Pago' ? 'Procesando Pago.png' :
+                              packageData.status === 'Paquete Retirado' ? 'images/retired.png' :
+                              packageData.status === 'En Ruta' ? 'images/en-route.png' :
+                              packageData.status === 'Paquete No Retirado' ? 'images/not-collected.png' : 'images/in-process.png';
+
+            const imageClass = packageData.status === 'Pagado' ? 'status-image-paid' :
+                               packageData.status === 'En Proceso de Pago' ? 'status-image-processing' : 'status-image';
+
+            const packageHtml = `
+                <div class="package-container" id="package-${packageData.trackingNumber}">
+                    <img src="${statusImage}" class="${imageClass}" alt="Estado">
+                    <div class="package-info">
+                        <h3>${packageData.trackingNumber}</h3>
+                        <p>Cliente: ${packageData.nombreCliente}</p>
+                        <p>Destino: ${packageData.destino}</p>
+                        <p>Fecha de Envío: ${packageData.fechaEnvio}</p>
+                        <p>Fecha de Entrega: ${packageData.diaEntrega}</p>
+                        <p>Valor: $${packageData.valor}</p>
+                    </div>
+                    <span class="status ${statusClass}">${packageData.status || 'En Ruta'}</span>
+                    <div class="package-actions">${actionButton}</div>
+                </div>
+            `;
+
+            packageList.innerHTML += packageHtml;
+        }
+
+        // Evento para buscar paquete
+        document.getElementById('search-button').addEventListener('click', function() {
+            const trackingNumber = document.getElementById('tracking-number').value.trim();
+            if (trackingNumber) {
+                const packages = loadPackages();
+                const packageData = packages.find(pkg => pkg.trackingNumber === trackingNumber);
+
+                if (packageData) {
+                    // Recargar el estado desde myShipments en caso de que se haya actualizado
+                    const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
+                    const updatedPackage = myShipments.find(pkg => pkg.trackingNumber === trackingNumber);
+
+                    if (updatedPackage) {
+                        packageData.status = updatedPackage.status; // Actualizar el estado
+                        savePackages(packages); // Guardar los cambios
+                    }
+
+                    if (!isTrackingNumberInList(trackingNumber)) {
+                        addPackageToContainer(packageData);
+                    } else {
+                        alert('Este paquete ya ha sido agregado.');
+                    }
+                } else {
+                    alert('No se encontraron datos para el número de seguimiento ingresado.');
+                }
+            } else {
+                alert('Por favor, ingrese el número de seguimiento.');
+            }
+        });
+
+        // Función para agregar paquetes a 'Mis Envíos'
+        function addToMyShipments(trackingNumber) {
+            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
+            const packages = loadPackages();
+            const packageData = packages.find(pkg => pkg.trackingNumber === trackingNumber);
+
+            if (!myShipments.find(pkg => pkg.trackingNumber === trackingNumber)) {
+                myShipments.push(packageData);
+                localStorage.setItem('myShipments', JSON.stringify(myShipments));
+                alert('Paquete agregado exitosamente a Mis Envíos.');
+            } else {
+                alert('Este paquete ya ha sido agregado.');
+            }
+        }
+
+        // Verificar si el paquete ya está en el contenedor
+        function isTrackingNumberInList(trackingNumber) {
+            return document.getElementById(`package-${trackingNumber}`) !== null;
+        }
+    </script>
+</body>
+</html>

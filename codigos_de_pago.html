@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Códigos de Pago</title>
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            max-width: 1400px;
+            width: 100%;
+            margin: 20px auto;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: auto;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 15px;
+            white-space: normal;
+        }
+
+        th {
+            background-color: #f39204;
+            color: white;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #f7f7f7;
+            color: #333;
+            border: 1px solid #EDE309;
+            word-wrap: break-word;
+        }
+
+        .status-paid {
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .pay-button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            font-size: 15px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .pay-button:hover {
+            background-color: #218838;
+        }
+
+        .delete-history-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .delete-history-button:hover {
+            background-color: #c82333;
+        }
+
+        .paid-row {
+            background-color: #d4edda !important;
+        }
+
+        /* Estilo para el cuadro de búsqueda */
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-box input {
+            width: 300px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        .search-box button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .search-box button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Códigos de Pago</h1>
+
+        <!-- Cuadro de búsqueda -->
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Buscar por Código de Pago o Nombre de Página">
+            <button id="search-button">Buscar</button>
+        </div>
+
+        <table id="payment-table">
+            <thead>
+                <tr>
+                    <th>Número de Seguimiento</th>
+                    <th>Nombre de la Clienta</th>
+                    <th>Nombre de la Página</th>
+                    <th>Destino</th>
+                    <th>Valor</th>
+                    <th>Fecha de Envío</th>
+                    <th>Fecha de Entrega</th>
+                    <th>Código de Pago</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="payment-table-body">
+                <!-- Los datos se llenarán dinámicamente aquí -->
+            </tbody>
+        </table>
+
+        <button id="mark-paid" class="pay-button">Pagado</button>
+        <button id="delete-history" class="delete-history-button">Borrar Historial</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPaymentCodes();
+        });
+
+        function loadPaymentCodes() {
+            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
+            
+            // Filtrar solo los paquetes que tienen un código de pago asignado
+            const shipmentsWithPaymentCode = myShipments.filter(pkg => pkg.paymentCode);
+
+            displayShipments(shipmentsWithPaymentCode);
+        }
+
+        function displayShipments(shipments) {
+            const paymentTableBody = document.getElementById('payment-table-body');
+            paymentTableBody.innerHTML = ''; // Limpiar la tabla antes de agregar los paquetes
+
+            if (shipments.length === 0) {
+                paymentTableBody.innerHTML = '<tr><td colspan="9">No hay paquetes con código de pago asignado.</td></tr>';
+                return;
+            }
+
+            shipments.forEach(pkg => {
+                const rowClass = pkg.status === 'Pagado' ? 'paid-row' : ''; // Aplicar clase si está pagado
+                paymentTableBody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td>${pkg.trackingNumber}</td>
+                        <td>${pkg.nombreCliente}</td>
+                        <td>${pkg.nombrePaquete}</td>
+                        <td>${pkg.destino}</td>
+                        <td>$${pkg.valor}</td>
+                        <td>${pkg.fechaEnvio}</td>
+                        <td>${pkg.diaEntrega}</td>
+                        <td>${pkg.paymentCode}</td>
+                        <td>${pkg.status}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('search-button').addEventListener('click', function() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
+
+            // Filtrar paquetes que coincidan con el código de pago o el nombre de la página
+            const filteredShipments = myShipments.filter(pkg => 
+                (pkg.paymentCode.toLowerCase().includes(searchInput) || 
+                pkg.nombrePaquete.toLowerCase().includes(searchInput))
+            );
+
+            displayShipments(filteredShipments);
+        });
+
+        document.getElementById('mark-paid').addEventListener('click', function() {
+            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
+            const paymentCode = myShipments.length > 0 ? myShipments[0].paymentCode : null;
+
+            // Cambiar el estado a "Pagado" para todos los paquetes con el mismo código de pago
+            if (paymentCode) {
+                myShipments.forEach(pkg => {
+                    if (pkg.paymentCode === paymentCode) {
+                        pkg.status = 'Pagado';
+                    }
+                });
+
+                localStorage.setItem('myShipments', JSON.stringify(myShipments));
+
+                // Recargar la tabla para aplicar la clase .paid-row a las filas pagadas
+                loadPaymentCodes();
+            }
+        });
+
+        document.getElementById('delete-history').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas borrar todo el historial de pagos? Esta acción no se puede deshacer.')) {
+                localStorage.removeItem('myShipments');
+                document.getElementById('payment-table-body').innerHTML = ''; // Limpiar la tabla
+            }
+        });
+    </script>
+</body>
+</html>

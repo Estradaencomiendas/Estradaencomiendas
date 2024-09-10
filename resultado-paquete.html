@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Paquete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> <!-- Biblioteca para QR Code -->
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        img {
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            max-width: 240px;
+        }
+
+        #package-details {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        #qrcode {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .status-buttons {
+            margin-top: 20px;
+        }
+
+        .status-buttons button {
+            font-size: 18px;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .retired {
+            background-color: #28a745; /* Verde */
+        }
+
+        .not-collected {
+            background-color: #dc3545; /* Rojo */
+        }
+
+        .problem {
+            background-color: #ffc107; /* Amarillo */
+            color: #000; /* Texto en negro para contraste */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>Confirmar Paquete</h1>
+
+        <div id="package-details"></div>
+        <div id="qrcode"></div>
+
+        <div class="status-buttons">
+            <button class="retired" id="package-delivered">Paquete Retirado</button>
+            <button class="not-collected" id="package-not-collected">Paquete No Retirado</button>
+            <button class="problem" id="report-problem">Hubo un Problema</button>
+        </div>
+    </div>
+
+    <script>
+        function loadPackageDetails(trackingNumber) {
+            let packages = JSON.parse(localStorage.getItem('packages')) || [];
+            const packageData = packages.find(pkg => pkg.trackingNumber === trackingNumber);
+
+            if (packageData) {
+                document.getElementById('package-details').innerHTML = `
+                    <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
+                    <p><span>Nombre:</span> ${packageData.nombre}</p>
+                    <p><span>Destino:</span> ${packageData.destino}</p>
+                    <p><span>Fecha de Envío:</span> ${packageData.fechaEnvio}</p>
+                    <p><span>Fecha de Entrega:</span> ${packageData.diaEntrega}</p>
+                    <p><span>Valor:</span> $${packageData.valor}</p>
+                `;
+
+                // Generar el código QR
+                new QRCode(document.getElementById("qrcode"), {
+                    text: packageData.trackingNumber,
+                    width: 128,
+                    height: 128,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } else {
+                document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
+            }
+        }
+
+        // Cargar los detalles del paquete si hay un número de seguimiento en sessionStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const trackingNumber = sessionStorage.getItem('trackingNumber');
+            if (trackingNumber) {
+                loadPackageDetails(trackingNumber);
+            }
+        });
+
+        document.getElementById('package-delivered').addEventListener('click', function() {
+            updatePackageStatus('Paquete Retirado', 'Paqueteretirado');
+        });
+
+        document.getElementById('package-not-collected').addEventListener('click', function() {
+            updatePackageStatus('Paquete No Retirado', 'Paquetenoretirado');
+        });
+
+        document.getElementById('report-problem').addEventListener('click', function() {
+            const trackingNumber = sessionStorage.getItem('trackingNumber');
+            if (trackingNumber) {
+                window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
+            } else {
+                alert('No se encontró información del paquete.');
+            }
+        });
+
+        function updatePackageStatus(status, storageKey) {
+            let packages = JSON.parse(localStorage.getItem('packages')) || [];
+            const trackingNumber = sessionStorage.getItem('trackingNumber');
+            const packageData = packages.find(pkg => pkg.trackingNumber === trackingNumber);
+
+            if (packageData) {
+                localStorage.setItem(storageKey, JSON.stringify(packageData));
+                packageData.status = status;
+                localStorage.setItem('packages', JSON.stringify(packages));
+                sessionStorage.setItem('packageStatus', status);
+                window.location.href = 'resultado-paquete.html';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depósitos Bancarios Administrador</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: auto;
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+            background-image: url('8292057.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            border-radius: 15px;
+        }
+
+        .logo {
+            width: 150px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f39204;
+            color: white;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #f7f7f7;
+            color: #333;
+            border: 1px solid #EDE309;
+        }
+
+        .view-button {
+            background-color: #007bff;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .view-button:hover {
+            background-color: #0056b3;
+        }
+
+        .delete-history-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .delete-history-button:hover {
+            background-color: #c82333;
+        }
+
+        /* Estilo para el estado pagado */
+        .paid-status {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="background-image"></div>
+
+        <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
+        <h1>Depósitos Bancarios</h1>
+
+        <table id="bank-deposits-table">
+            <thead>
+                <tr>
+                    <th>Número de Seguimiento</th>
+                    <th>Nombre de la Clienta</th>
+                    <th>Nombre de la Página</th>
+                    <th>Destino</th>
+                    <th>Valor</th>
+                    <th>Fecha de Envío</th>
+                    <th>Fecha de Entrega</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="bank-deposits-table-body">
+                <!-- Los datos se llenarán dinámicamente aquí -->
+            </tbody>
+        </table>
+
+        <button id="delete-history" class="delete-history-button">Borrar Historial</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBankDeposits();
+        });
+
+        function loadBankDeposits() {
+            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
+
+            const bankDepositsTableBody = document.getElementById('bank-deposits-table-body');
+            bankDepositsTableBody.innerHTML = ''; // Limpiar la tabla antes de agregar los depósitos
+
+            if (myShipments.length === 0) {
+                bankDepositsTableBody.innerHTML = '<tr><td colspan="9">No hay depósitos bancarios almacenados.</td></tr>';
+                return;
+            }
+
+            // Mostrar todos los paquetes relacionados con depósitos bancarios, ya sea en proceso o pagados
+            const bankDeposits = myShipments.filter(pkg => pkg.status === 'Depósito Bancario en Proceso' || pkg.status === 'Pagado');
+
+            if (bankDeposits.length === 0) {
+                bankDepositsTableBody.innerHTML = '<tr><td colspan="9">No hay depósitos bancarios en proceso o pagados.</td></tr>';
+                return;
+            }
+
+            // Iterar sobre cada depósito y mostrar los detalles
+            bankDeposits.forEach(shipment => {
+                const trackingNumber = shipment.trackingNumber || 'Sin Número';
+                const nombreCliente = shipment.nombreCliente || 'Cliente Desconocido';
+                const nombrePaquete = shipment.nombrePaquete || 'Nombre Desconocido';
+                const destino = shipment.destino || 'Destino Desconocido';
+                let valor = parseFloat(shipment.valor) || 0.00; 
+                const fechaEnvio = shipment.fechaEnvio || 'No Disponible';
+                const fechaEntrega = shipment.diaEntrega || 'No Disponible';
+                const status = shipment.status || 'Pendiente';
+                const statusClass = status === 'Pagado' ? 'paid-status' : '';
+
+                bankDepositsTableBody.innerHTML += `
+                    <tr>
+                        <td>${trackingNumber}</td>
+                        <td>${nombreCliente}</td>
+                        <td>${nombrePaquete}</td>
+                        <td>${destino}</td>
+                        <td>$${valor.toFixed(2)}</td>
+                        <td>${fechaEnvio}</td>
+                        <td>${fechaEntrega}</td>
+                        <td class="${statusClass}">${status}</td>
+                        <td><button class="view-button" onclick="viewBankDetails('${trackingNumber}')">Ver</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function viewBankDetails(trackingNumber) {
+            sessionStorage.setItem('trackingNumber', trackingNumber);
+            window.location.href = 'informacion_bancaria.html';
+        }
+
+        document.getElementById('delete-history').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas borrar todo el historial de depósitos? Esta acción no se puede deshacer.')) {
+                localStorage.removeItem('myShipments');
+                document.getElementById('bank-deposits-table-body').innerHTML = ''; // Limpiar la tabla
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recepción de Paquetes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            background-image: url('4843463.jpg'); /* Imagen de fondo */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .logo {
+            width: 200px; /* Tamaño del logo */
+            margin-bottom: 20px;
+        }
+
+        .title-wrapper {
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco detrás del texto */
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        form {
+            background-color: rgba(255, 255, 255, 0.7); /* Más transparencia para los campos */
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-input-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .form-input-wrapper input {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 2px solid #EDE309;
+            border-radius: 10px;
+            background-color: #f7f7f7;
+            color: #333;
+            font-size: 17px;
+            font-weight: bold;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .form-input-wrapper input:focus {
+            border-color: #F39204;
+        }
+
+        .form-input-small-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .dollar-sign {
+            font-size: 18px;
+            margin-right: 5px;
+            color: black;
+        }
+
+        .form-input-small {
+            width: 100px;
+            padding: 12px;
+            border: 2px solid #EDE309;
+            border-radius: 10px;
+            background-color: #f7f7f7;
+            color: black;
+            font-size: 17px;
+            font-weight: bold;
+            text-align: right;
+            outline: none;
+        }
+
+        .form-input-small:focus {
+            border-color: #F39204;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #F39204, #EDE309);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background: linear-gradient(135deg, #EDE309, #F39204);
+        }
+
+        /* Estilo para la etiqueta de la fecha */
+        .date-label {
+            text-align: left;
+            width: 100%;
+            color: #333;
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo de Estrada Encomiendas -->
+        <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
+        
+        <div class="title-wrapper">
+            <h1>Recepción de Paquetes</h1>
+        </div>
+
+        <form id="package-form">
+            <div class="form-input-wrapper">
+                <input type="text" id="nombreCliente" placeholder="Nombre de la Clienta" required>
+            </div>
+
+            <div class="form-input-wrapper">
+                <input type="text" id="nombrePaquete" placeholder="Nombre de la Página" required>
+            </div>
+
+            <div class="form-input-wrapper">
+                <input type="text" id="destino" placeholder="Destino" required>
+            </div>
+
+            <!-- Fecha de Entrega -->
+            <label class="date-label" for="dia-entrega">Fecha de Entrega</label>
+            <div class="form-input-wrapper">
+                <input type="date" id="dia-entrega" required>
+            </div>
+
+            <div class="form-input-small-wrapper">
+                <span class="dollar-sign">$</span>
+                <input type="number" id="valor" class="form-input-small" placeholder="0.00" min="0" step="0.01" max="999.99" required>
+            </div>
+
+            <button class="submit-button" type="submit">Ingresar Datos</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('package-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Obtener los datos del formulario
+            const nombreCliente = document.getElementById('nombreCliente').value;
+            const nombrePaquete = document.getElementById('nombrePaquete').value;
+            const destino = document.getElementById('destino').value;
+            const diaEntrega = document.getElementById('dia-entrega').value;
+            const valor = document.getElementById('valor').value;
+
+            // Generar la fecha de envío automáticamente
+            const fechaEnvio = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+
+            // Generar un número de seguimiento único
+            const trackingNumber = 'PKG-' + Date.now();
+
+            // Almacenar los datos del paquete en localStorage
+            const packageData = {
+                trackingNumber,
+                nombreCliente,
+                nombrePaquete,
+                destino,
+                fechaEnvio,
+                diaEntrega,
+                valor
+            };
+            
+            let packages = JSON.parse(localStorage.getItem('packages')) || [];
+            packages.push(packageData);
+            localStorage.setItem('packages', JSON.stringify(packages));
+
+            // Redirigir a la página de resultados con el número de seguimiento
+            window.location.href = `resultados.html?trackingNumber=${trackingNumber}`;
+        });
+    </script>
+</body>
+</html>

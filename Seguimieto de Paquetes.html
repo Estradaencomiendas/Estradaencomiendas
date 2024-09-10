@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de Paquetes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 60%;
+            border-radius: 8px;
+            border: 2px solid #f39204;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #f39204;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e67e00;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f39204;
+            color: white;
+        }
+
+        td {
+            background-color: #f7f7f7;
+        }
+
+        /* Botón de borrar historial */
+        .delete-history-button {
+            background-color: #dc3545;
+            color: white;
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .delete-history-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Seguimiento de Paquetes</h1>
+
+        <!-- Cuadro de búsqueda -->
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Buscar por Nombre de Página, Nombre de la Clienta o Número de Seguimiento">
+            <button id="search-button">Buscar</button>
+        </div>
+
+        <table id="shipment-table">
+            <thead>
+                <tr>
+                    <th>Número de Seguimiento</th>
+                    <th>Nombre de la Clienta</th>
+                    <th>Nombre de la Página</th>
+                    <th>Destino</th>
+                    <th>Fecha de Envío</th>
+                    <th>Fecha de Entrega</th>
+                    <th>Valor</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="shipment-table-body">
+                <!-- Los datos se llenarán dinámicamente aquí -->
+            </tbody>
+        </table>
+
+        <!-- Botón de borrar historial -->
+        <button id="delete-history" class="delete-history-button">Borrar Historial</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadShipments(); // Cargar los envíos guardados en localStorage
+        });
+
+        // Función para cargar los envíos desde localStorage
+        function loadShipments() {
+            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
+            const shipmentTableBody = document.getElementById('shipment-table-body');
+            shipmentTableBody.innerHTML = ''; // Limpiar la tabla antes de agregar los paquetes
+
+            if (myShipments.length === 0) {
+                shipmentTableBody.innerHTML = '<tr><td colspan="8">No hay paquetes almacenados.</td></tr>';
+                return;
+            }
+
+            myShipments.forEach(packageData => {
+                shipmentTableBody.innerHTML += `
+                    <tr>
+                        <td>${packageData.trackingNumber}</td>
+                        <td>${packageData.nombreCliente}</td>
+                        <td>${packageData.nombrePaquete}</td>
+                        <td>${packageData.destino}</td>
+                        <td>${packageData.fechaEnvio}</td>
+                        <td>${packageData.diaEntrega}</td>
+                        <td>$${packageData.valor}</td>
+                        <td>${packageData.status}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Función para borrar el historial
+        document.getElementById('delete-history').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas borrar todo el historial de envíos? Esta acción no se puede deshacer.')) {
+                localStorage.removeItem('myShipments');
+                loadShipments(); // Recargar la tabla después de borrar
+            }
+        });
+
+        // Función de búsqueda
+        document.getElementById('search-button').addEventListener('click', function() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
+            const filteredShipments = myShipments.filter(pkg => 
+                pkg.trackingNumber.toLowerCase().includes(searchInput) ||
+                pkg.nombrePaquete.toLowerCase().includes(searchInput) ||
+                pkg.nombreCliente.toLowerCase().includes(searchInput)
+            );
+
+            displayShipments(filteredShipments);
+        });
+
+        // Función para mostrar los resultados filtrados
+        function displayShipments(shipments) {
+            const shipmentTableBody = document.getElementById('shipment-table-body');
+            shipmentTableBody.innerHTML = ''; // Limpiar la tabla
+
+            if (shipments.length === 0) {
+                shipmentTableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes.</td></tr>';
+                return;
+            }
+
+            shipments.forEach(packageData => {
+                shipmentTableBody.innerHTML += `
+                    <tr>
+                        <td>${packageData.trackingNumber}</td>
+                        <td>${packageData.nombreCliente}</td>
+                        <td>${packageData.nombrePaquete}</td>
+                        <td>${packageData.destino}</td>
+                        <td>${packageData.fechaEnvio}</td>
+                        <td>${packageData.diaEntrega}</td>
+                        <td>$${packageData.valor}</td>
+                        <td>${packageData.status}</td>
+                    </tr>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
