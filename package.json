@@ -1,13 +1,13 @@
 {
-  "name": "mi_proyecto",
+  "name": "recepcion_de_paquetes",
   "version": "1.0.0",
   "description": "Proyecto para la recepción de paquetes y envío de SMS utilizando Twilio.",
-  "main": "index.js",  // Puedes dejar este valor, ya que no es relevante para Netlify Functions
+  "main": "index.js",
   "scripts": {
-    "start": "netlify dev"  // Este script es opcional, para usar con Netlify localmente
+    "start": "netlify dev"
   },
   "dependencies": {
-    "twilio": "^3.74.1"  // Dependencia de Twilio, se instalará en Netlify
+    "twilio": "^3.74.1"
   },
   "author": "Tu nombre",
   "license": "ISC"
