@@ -37,8 +37,8 @@ document.getElementById('package-form').addEventListener('submit', async functio
         const response = await fetch('/.netlify/functions/sendSms', {
             method: 'POST',
             body: JSON.stringify({
-                to: telefonoVendedora,  // Número del destinatario ingresado por el usuario
-                trackingNumber: trackingNumber
+                to: telefonoVendedora || '',  // Asegúrate de enviar una cadena vacía si no hay valor
+                trackingNumber: trackingNumber || ''
             }),
             headers: {
                 'Content-Type': 'application/json'
