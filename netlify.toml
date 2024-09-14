@@ -1,5 +1,5 @@
 [build]
-  functions = "functions"  # La carpeta donde están tus funciones
+  functions = "netlify/functions"
 
 [functions]
-  directory = "functions"  # Netlify buscará las funciones en esta carpeta
+  directory = "netlify/functions"
