@@ -12,7 +12,7 @@ exports.handler = async function(event, context) {
     try {
         const message = await client.messages.create({
             body: `Tu número de seguimiento es: ${trackingNumber}`,  // Mensaje personalizado
-            from: 'TU_NUMERO_TWILIO',  // Número de teléfono de Twilio
+            from: '(386) 333-6602',  // Número de teléfono de Twilio
             to: to  // Número de teléfono del destinatario
         });
 
