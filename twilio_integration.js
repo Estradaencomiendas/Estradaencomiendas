@@ -1,46 +1,61 @@
-document.getElementById('paqueteForm').addEventListener('submit', function(event) {
-    event.preventDefault();  // Evita que el formulario se envíe de forma predeterminada
+document.getElementById('package-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-    const valorEnvio = document.getElementById('valor_envio').value;
-    const whatsappVendedora = document.getElementById('whatsapp_vendedora').value;
+    // Obtener los datos del formulario
+    const nombreCliente = document.getElementById('nombreCliente').value;
+    const nombrePaquete = document.getElementById('nombrePaquete').value;
+    const destino = document.getElementById('destino').value;
+    const diaEntrega = document.getElementById('dia-entrega').value;
+    const valor = document.getElementById('valor').value;
+    const valorEnvio = document.getElementById('valorEnvio').value;
+    const telefonoVendedora = document.getElementById('telefonoVendedora').value;  // Número del destinatario
 
-    // Genera un número de seguimiento
-    const numeroSeguimiento = 'EC-' + Math.floor(Math.random() * 1000000);
+    // Generar la fecha de envío automáticamente
+    const fechaEnvio = new Date().toISOString().split('T')[0];
 
-    // Mensaje a enviar
-    const mensaje = `Tu paquete con número de seguimiento ${numeroSeguimiento} tiene un valor de $${valorEnvio}.`;
+    // Generar un número de seguimiento único
+    const trackingNumber = 'PKG-' + Date.now();
 
-    // Llamada a la función para enviar el mensaje usando Twilio
-    enviarMensajeWhatsApp(whatsappVendedora, mensaje);
+    // Almacenar los datos del paquete en localStorage
+    const packageData = {
+        trackingNumber,
+        nombreCliente,
+        nombrePaquete,
+        destino,
+        fechaEnvio,
+        diaEntrega,
+        valor,
+        valorEnvio
+    };
+
+    let packages = JSON.parse(localStorage.getItem('packages')) || [];
+    packages.push(packageData);
+    localStorage.setItem('packages', JSON.stringify(packages));
+
+    // Enviar SMS con Twilio
+    try {
+        const response = await fetch('/.netlify/functions/sendSms', {
+            method: 'POST',
+            body: JSON.stringify({
+                to: telefonoVendedora,  // Número del destinatario ingresado por el usuario
+                trackingNumber: trackingNumber
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error enviando el SMS');
+        }
+
+        const result = await response.json();
+        console.log('SMS enviado con éxito:', result);
+
+        // Redirigir a la página de resultados con el número de seguimiento
+        window.location.href = `resultados.html?trackingNumber=${trackingNumber}`;
+    } catch (error) {
+        console.error('Error al enviar el SMS:', error);
+    }
 });
 
-async function enviarMensajeWhatsApp(numeroDestino, mensaje) {
-    const accountSid = 'AC6c6fb4d7e40a2b8220bfb2349605166e';  // Reemplázalo con tu Account SID
-    const authToken = 'd9bb49a6b1081d478988940da1a5a435';  // Reemplázalo con tu Auth Token
-
-    // La API de Twilio a la que vamos a hacer la solicitud
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-
-    // Los datos que enviaremos a la API
-    const body = new URLSearchParams({
-        'To': `whatsapp:${numeroDestino}`,  // Número de destino en formato WhatsApp
-        'From': 'whatsapp:+13863336602',  // Número de Twilio de WhatsApp (reemplaza si usas SMS)
-        'Body': mensaje
-    });
-
-    // Hacemos la solicitud HTTP POST a la API de Twilio
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),  // Autenticación con Basic Auth
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: body.toString()
-    });
-
-    if (response.ok) {
-        document.getElementById('mensaje_status').textContent = 'Mensaje enviado correctamente!';
-    } else {
-        document.getElementById('mensaje_status').textContent = 'Error enviando mensaje: ' + (await response.text());
-    }
-}
