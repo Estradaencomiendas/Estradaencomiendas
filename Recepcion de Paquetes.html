@@ -93,11 +93,11 @@
         .form-input-column {
             display: flex;
             flex-direction: column;
-            width: 48%;  /* Ajuste para que estén alineados a la par */
+            width: 48%;
         }
 
         label {
-            font-size: 14px; /* Tamaño reducido de la letra */
+            font-size: 14px;
             font-weight: bold;
             color: #F39200;
             margin-bottom: 5px;
@@ -162,6 +162,32 @@
             height: 50px;
         }
 
+        .phone-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #F39200;
+            border-radius: 20px;
+            padding: 10px;
+            background-color: #F1F1F1;
+            width: 100%;
+        }
+
+        .phone-input span {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .phone-input input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 17px;
+            font-weight: bold;
+            color: #333;
+        }
+
         @media (max-width: 600px) {
             .form-input-row {
                 flex-direction: column;
@@ -196,7 +222,6 @@
                 <input type="date" id="dia-entrega" required>
             </div>
 
-            <!-- Valor del Envío y Valor del Paquete a la par -->
             <div class="form-input-row">
                 <div class="form-input-column">
                     <label for="valorEnvio">Valor del Envío</label>
@@ -208,12 +233,10 @@
                 </div>
             </div>
 
-            <!-- Campo para número de teléfono con el prefijo +503 -->
             <div class="form-input-wrapper">
-                <label for="telefonoVendedora">Número de Teléfono Vendedor</label>
-                <div style="display: flex; align-items: center;">
-                    <span style="padding-right: 5px;">+503</span>
-                    <input type="tel" id="telefonoVendedora" placeholder="8 dígitos" pattern="\d{8}" required>
+                <div class="phone-input">
+                    <span>+503</span>
+                    <input type="tel" id="telefonoVendedora" placeholder="Número de Vendedora" pattern="\d{8}" required>
                 </div>
             </div>
 
@@ -245,22 +268,17 @@
         document.getElementById('package-form').addEventListener('submit', async function(event) {
             event.preventDefault();
 
-            // Obtener los datos del formulario
             const nombreCliente = document.getElementById('nombreCliente').value;
             const nombrePaquete = document.getElementById('nombrePaquete').value;
             const destino = document.getElementById('destino').value;
             const diaEntrega = document.getElementById('dia-entrega').value;
             const valor = document.getElementById('valor').value;
             const valorEnvio = document.getElementById('valorEnvio').value;
-            const telefonoVendedora = '+503' + document.getElementById('telefonoVendedora').value; // Añadir el prefijo +503
+            const telefonoVendedora = '+503' + document.getElementById('telefonoVendedora').value;
 
-            // Generar la fecha de envío automáticamente
             const fechaEnvio = new Date().toISOString().split('T')[0];
-
-            // Generar un número de seguimiento único
             const trackingNumber = 'PKG-' + Date.now();
 
-            // Almacenar los datos del paquete en localStorage
             const packageData = {
                 trackingNumber,
                 nombreCliente,
@@ -276,7 +294,6 @@
             packages.push(packageData);
             localStorage.setItem('packages', JSON.stringify(packages));
 
-            // Enviar SMS con Twilio
             try {
                 const response = await fetch('/.netlify/functions/sendSms', {
                     method: 'POST',
@@ -299,7 +316,6 @@
                 const result = await response.json();
                 console.log('SMS enviado con éxito:', result);
 
-                // Redirigir a la página de resultados con el número de seguimiento
                 window.location.href = `resultados.html?trackingNumber=${trackingNumber}&fechaEnvio=${fechaEnvio}`;
             } catch (error) {
                 console.error('Error al enviar el SMS:', error);
