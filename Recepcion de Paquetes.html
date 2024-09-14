@@ -86,18 +86,18 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            margin-bottom: 10px; /* Espacio más corto entre los campos */
-            gap: 10px; /* Espacio reducido entre las columnas */
+            margin-bottom: 10px; 
+            gap: 10px; 
         }
 
         .form-input-column {
             display: flex;
             flex-direction: column;
-            width: auto;
+            width: 48%;  /* Ajuste para que estén alineados a la par */
         }
 
         label {
-            font-size: 16px;
+            font-size: 14px; /* Tamaño reducido de la letra */
             font-weight: bold;
             color: #F39200;
             margin-bottom: 5px;
@@ -105,7 +105,7 @@
         }
 
         .form-input-small {
-            width: 100px;
+            width: 100%;
             padding: 8px;
             border: 2px solid #F39200;
             border-radius: 20px;
@@ -115,7 +115,6 @@
             font-weight: bold;
             text-align: right;
             outline: none;
-            /* Quitar las flechitas de los campos numéricos */
             -moz-appearance: textfield;
         }
 
@@ -197,6 +196,7 @@
                 <input type="date" id="dia-entrega" required>
             </div>
 
+            <!-- Valor del Envío y Valor del Paquete a la par -->
             <div class="form-input-row">
                 <div class="form-input-column">
                     <label for="valorEnvio">Valor del Envío</label>
@@ -307,6 +307,8 @@
         });
     </script>
 </body>
+</html>
+
 </html>
 
 
