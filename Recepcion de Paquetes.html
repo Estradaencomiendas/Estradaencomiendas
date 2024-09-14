@@ -86,8 +86,8 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            margin-bottom: 15px;
-            gap: 20px;
+            margin-bottom: 10px; /* Espacio más corto entre los campos */
+            gap: 10px; /* Espacio reducido entre las columnas */
         }
 
         .form-input-column {
@@ -115,10 +115,14 @@
             font-weight: bold;
             text-align: right;
             outline: none;
+            /* Quitar las flechitas de los campos numéricos */
+            -moz-appearance: textfield;
         }
 
-        .form-input-small:focus {
-            border-color: #B25C00;
+        .form-input-small::-webkit-outer-spin-button,
+        .form-input-small::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         .submit-button {
@@ -196,16 +200,21 @@
             <div class="form-input-row">
                 <div class="form-input-column">
                     <label for="valorEnvio">Valor del Envío</label>
-                    <input type="number" id="valorEnvio" class="form-input-small" placeholder="0.00" min="0" step="0.01" max="999.99" required>
+                    <input type="number" id="valorEnvio" class="form-input-small" required>
                 </div>
                 <div class="form-input-column">
                     <label for="valor">Valor del Paquete</label>
-                    <input type="number" id="valor" class="form-input-small" placeholder="0.00" min="0" step="0.01" max="999.99" required>
+                    <input type="number" id="valor" class="form-input-small" required>
                 </div>
             </div>
 
+            <!-- Campo para número de teléfono con el prefijo +503 -->
             <div class="form-input-wrapper">
-                <input type="tel" id="telefonoVendedora" placeholder="Número de WhatsApp o teléfono" pattern="\+503\d{8}" required>
+                <label for="telefonoVendedora">Número de Teléfono Vendedor</label>
+                <div style="display: flex; align-items: center;">
+                    <span style="padding-right: 5px;">+503</span>
+                    <input type="tel" id="telefonoVendedora" placeholder="8 dígitos" pattern="\d{8}" required>
+                </div>
             </div>
 
             <button class="submit-button" type="submit">Ingresar Datos</button>
@@ -243,7 +252,7 @@
             const diaEntrega = document.getElementById('dia-entrega').value;
             const valor = document.getElementById('valor').value;
             const valorEnvio = document.getElementById('valorEnvio').value;
-            const telefonoVendedora = document.getElementById('telefonoVendedora').value;
+            const telefonoVendedora = '+503' + document.getElementById('telefonoVendedora').value; // Añadir el prefijo +503
 
             // Generar la fecha de envío automáticamente
             const fechaEnvio = new Date().toISOString().split('T')[0];
@@ -260,7 +269,7 @@
                 diaEntrega,
                 valor,
                 valorEnvio,
-                fechaEnvio  // Asegurarse de almacenar la fecha de envío
+                fechaEnvio
             };
 
             let packages = JSON.parse(localStorage.getItem('packages')) || [];
@@ -299,4 +308,5 @@
     </script>
 </body>
 </html>
+
 
