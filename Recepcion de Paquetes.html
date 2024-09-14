@@ -15,48 +15,46 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #f0f0f0;
+            background-color: #F1F1F1; /* Fondo gris claro */
         }
 
         .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            background-color: white; /* Fondo blanco del contenedor */
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 500px;
+            max-width: 400px;
             text-align: center;
-            background-image: url('4843463.jpg'); /* Imagen de fondo */
-            background-size: cover;
-            background-position: center;
         }
 
         .logo {
-            width: 200px; /* Tamaño del logo */
+            width: 250px; /* Tamaño ajustado para el logo */
             margin-bottom: 20px;
         }
 
         .title-wrapper {
-            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco detrás del texto */
-            display: inline-block;
-            padding: 10px 20px;
-            border-radius: 10px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 25px;
             margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            font-size: 28px;
-            color: #333;
+            font-size: 24px;
+            color: #F39200; /* Naranja vibrante */
             font-weight: bold;
         }
 
         form {
-            background-color: rgba(255, 255, 255, 0.7); /* Más transparencia para los campos */
+            background-color: white; /* Fondo blanco */
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .form-input-wrapper {
@@ -70,10 +68,10 @@
         .form-input-wrapper input {
             width: calc(100% - 20px);
             padding: 12px;
-            border: 2px solid #EDE309;
-            border-radius: 10px;
-            background-color: #f7f7f7;
-            color: #333;
+            border: 2px solid #F39200; /* Borde naranja */
+            border-radius: 20px;
+            background-color: #F1F1F1; /* Fondo gris claro */
+            color: #333; /* Texto oscuro */
             font-size: 17px;
             font-weight: bold;
             box-sizing: border-box;
@@ -81,44 +79,52 @@
         }
 
         .form-input-wrapper input:focus {
-            border-color: #F39204;
+            border-color: #B25C00; /* Un tono más fuerte de naranja en focus */
         }
 
-        .form-input-small-wrapper {
+        .form-input-row {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
             width: 100%;
             margin-bottom: 15px;
+            gap: 20px;
         }
 
-        .dollar-sign {
-            font-size: 18px;
-            margin-right: 5px;
-            color: black;
+        .form-input-column {
+            display: flex;
+            flex-direction: column;
+            width: auto;
+        }
+
+        label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #F39200; /* Naranja */
+            margin-bottom: 5px;
+            text-align: left;
         }
 
         .form-input-small {
             width: 100px;
-            padding: 12px;
-            border: 2px solid #EDE309;
-            border-radius: 10px;
-            background-color: #f7f7f7;
-            color: black;
-            font-size: 17px;
+            padding: 8px;
+            border: 2px solid #F39200;
+            border-radius: 20px;
+            background-color: #F1F1F1;
+            color: #333;
+            font-size: 15px;
             font-weight: bold;
             text-align: right;
             outline: none;
         }
 
         .form-input-small:focus {
-            border-color: #F39204;
+            border-color: #B25C00;
         }
 
         .submit-button {
-            background: linear-gradient(135deg, #F39204, #EDE309);
+            background: #F39200; /* Botón naranja */
             border: none;
-            border-radius: 10px;
+            border-radius: 20px;
             padding: 12px 20px;
             color: white;
             font-size: 17px;
@@ -130,17 +136,36 @@
         }
 
         .submit-button:hover {
-            background: linear-gradient(135deg, #EDE309, #F39204);
+            background: #B25C00; /* Un poco más oscuro en hover */
         }
 
-        /* Estilo para la etiqueta de la fecha */
-        .date-label {
-            text-align: left;
-            width: 100%;
-            color: #333;
-            font-size: 17px;
-            font-weight: bold;
-            margin-bottom: 5px;
+        /* Pie de página con íconos (barra de navegación inferior) */
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            background-color: #F39200;
+            border-radius: 20px;
+            padding: 15px 0;
+            margin-top: 20px;
+        }
+
+        .footer-link {
+            text-align: center;
+            text-decoration: none;
+            color: white;
+        }
+
+        .footer-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        /* Responsividad */
+        @media (max-width: 600px) {
+            .form-input-row {
+                flex-direction: column;
+                gap: 0;
+            }
         }
     </style>
 </head>
@@ -148,7 +173,7 @@
     <div class="container">
         <!-- Logo de Estrada Encomiendas -->
         <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
-        
+
         <div class="title-wrapper">
             <h1>Recepción de Paquetes</h1>
         </div>
@@ -172,16 +197,44 @@
                 <input type="date" id="dia-entrega" required>
             </div>
 
-            <div class="form-input-small-wrapper">
-                <span class="dollar-sign">$</span>
-                <input type="number" id="valor" class="form-input-small" placeholder="0.00" min="0" step="0.01" max="999.99" required>
+            <!-- Campos Valor del Envío y Valor del Paquete -->
+            <div class="form-input-row">
+                <div class="form-input-column">
+                    <label for="valorEnvio">Valor del Envío</label>
+                    <input type="number" id="valorEnvio" class="form-input-small" placeholder="0.00" min="0" step="0.01" max="999.99" required>
+                </div>
+                <div class="form-input-column">
+                    <label for="valor">Valor del Paquete</label>
+                    <input type="number" id="valor" class="form-input-small" placeholder="0.00" min="0" step="0.01" max="999.99" required>
+                </div>
             </div>
 
             <button class="submit-button" type="submit">Ingresar Datos</button>
         </form>
+
+        <!-- Barra de navegación inferior (con links en los iconos) -->
+        <div class="footer">
+            <a href="index.html" class="footer-link">
+                <img src="Inicio.png" alt="Inicio" class="footer-icon">
+                <div>Inicio</div>
+            </a>
+            <a href="Recepcion de Paquetes.html" class="footer-link">
+                <img src="icon1.png" alt="Recepción" class="footer-icon">
+                <div>Recepción</div>
+            </a>
+            <a href="Encargado de ruta.html" class="footer-link">
+                <img src="icon2.png" alt="Entrega" class="footer-icon">
+                <div>Entrega</div>
+            </a>
+            <a href="Seguimieto de Paquetes.html" class="footer-link">
+                <img src="icon3.png" alt="Registro" class="footer-icon">
+                <div>Registro</div>
+            </a>
+        </div>
     </div>
 
     <script>
+        // Lógica para el formulario y redirección
         document.getElementById('package-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -191,9 +244,10 @@
             const destino = document.getElementById('destino').value;
             const diaEntrega = document.getElementById('dia-entrega').value;
             const valor = document.getElementById('valor').value;
+            const valorEnvio = document.getElementById('valorEnvio').value;
 
             // Generar la fecha de envío automáticamente
-            const fechaEnvio = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+            const fechaEnvio = new Date().toISOString().split('T')[0];
 
             // Generar un número de seguimiento único
             const trackingNumber = 'PKG-' + Date.now();
@@ -206,9 +260,10 @@
                 destino,
                 fechaEnvio,
                 diaEntrega,
-                valor
+                valor,
+                valorEnvio
             };
-            
+
             let packages = JSON.parse(localStorage.getItem('packages')) || [];
             packages.push(packageData);
             localStorage.setItem('packages', JSON.stringify(packages));
