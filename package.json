@@ -9,6 +9,10 @@
   "dependencies": {
     "twilio": "^3.74.1"
   },
+  "engines": {
+    "node": "16.x",
+    "npm": "7.x"
+  },
   "author": "Tu nombre",
   "license": "ISC"
 }
