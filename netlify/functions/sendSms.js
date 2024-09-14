@@ -12,15 +12,18 @@ exports.handler = async function(event, context) {
         }
 
         // Parsear el cuerpo de la solicitud
-        const { to, trackingNumber } = JSON.parse(event.body);
+        const { to, trackingNumber, nombreCliente, destino, valor } = JSON.parse(event.body);
 
-        if (!to || !trackingNumber) {
-            throw new Error("Faltan campos 'to' o 'trackingNumber'");
+        if (!to || !trackingNumber || !nombreCliente || !destino || !valor) {
+            throw new Error("Faltan campos obligatorios");
         }
+
+        // Construir el mensaje con todos los datos requeridos
+        const messageBody = `Gracias por enviar con Estrada Encomiendas.\nTu número de seguimiento es: ${trackingNumber}\nNombre de la cliente: ${nombreCliente}\nDestino: ${destino}\nValor: $${valor}`;
 
         // Enviar el SMS usando Twilio
         const message = await client.messages.create({
-            body: `Tu número de seguimiento es: ${trackingNumber}`,
+            body: messageBody,  // Mensaje construido con todos los datos
             from: '+13863336602',  // Número de Twilio proporcionado
             to: to
         });
@@ -37,5 +40,3 @@ exports.handler = async function(event, context) {
         };
     }
 };
-
-
