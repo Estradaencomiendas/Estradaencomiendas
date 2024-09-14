@@ -20,4 +20,10 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({ message: 'Mensaje enviado con éxito', sid: message.sid }),
         };
     } catch (error) {
-        console.error('
+        console.error('Error al enviar el mensaje:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: 'Error al enviar el mensaje', error: error.message }),
+        };
+    }
+};
