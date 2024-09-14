@@ -15,11 +15,11 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #F1F1F1; /* Fondo gris claro */
+            background-color: #F1F1F1;
         }
 
         .container {
-            background-color: white; /* Fondo blanco del contenedor */
+            background-color: white;
             padding: 20px;
             border-radius: 25px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -29,7 +29,7 @@
         }
 
         .logo {
-            width: 250px; /* Tamaño ajustado para el logo */
+            width: 250px;
             margin-bottom: 20px;
         }
 
@@ -43,12 +43,12 @@
 
         h1 {
             font-size: 24px;
-            color: #F39200; /* Naranja vibrante */
+            color: #F39200;
             font-weight: bold;
         }
 
         form {
-            background-color: white; /* Fondo blanco */
+            background-color: white;
             padding: 20px;
             border-radius: 25px;
             display: flex;
@@ -68,10 +68,10 @@
         .form-input-wrapper input {
             width: calc(100% - 20px);
             padding: 12px;
-            border: 2px solid #F39200; /* Borde naranja */
+            border: 2px solid #F39200;
             border-radius: 20px;
-            background-color: #F1F1F1; /* Fondo gris claro */
-            color: #333; /* Texto oscuro */
+            background-color: #F1F1F1;
+            color: #333;
             font-size: 17px;
             font-weight: bold;
             box-sizing: border-box;
@@ -79,7 +79,7 @@
         }
 
         .form-input-wrapper input:focus {
-            border-color: #B25C00; /* Un tono más fuerte de naranja en focus */
+            border-color: #B25C00;
         }
 
         .form-input-row {
@@ -99,7 +99,7 @@
         label {
             font-size: 16px;
             font-weight: bold;
-            color: #F39200; /* Naranja */
+            color: #F39200;
             margin-bottom: 5px;
             text-align: left;
         }
@@ -122,7 +122,7 @@
         }
 
         .submit-button {
-            background: #F39200; /* Botón naranja */
+            background: #F39200;
             border: none;
             border-radius: 20px;
             padding: 12px 20px;
@@ -136,10 +136,9 @@
         }
 
         .submit-button:hover {
-            background: #B25C00; /* Un poco más oscuro en hover */
+            background: #B25C00;
         }
 
-        /* Pie de página con íconos (barra de navegación inferior) */
         .footer {
             display: flex;
             justify-content: space-around;
@@ -160,7 +159,6 @@
             height: 50px;
         }
 
-        /* Responsividad */
         @media (max-width: 600px) {
             .form-input-row {
                 flex-direction: column;
@@ -171,7 +169,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Logo de Estrada Encomiendas -->
         <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
 
         <div class="title-wrapper">
@@ -191,13 +188,11 @@
                 <input type="text" id="destino" placeholder="Destino" required>
             </div>
 
-            <!-- Fecha de Entrega -->
             <label class="date-label" for="dia-entrega">Fecha de Entrega</label>
             <div class="form-input-wrapper">
                 <input type="date" id="dia-entrega" required>
             </div>
 
-            <!-- Campos Valor del Envío y Valor del Paquete -->
             <div class="form-input-row">
                 <div class="form-input-column">
                     <label for="valorEnvio">Valor del Envío</label>
@@ -209,7 +204,6 @@
                 </div>
             </div>
 
-            <!-- Nuevo campo para el número de teléfono -->
             <div class="form-input-wrapper">
                 <input type="tel" id="telefonoVendedora" placeholder="Número de WhatsApp o teléfono" pattern="\+503\d{8}" required>
             </div>
@@ -217,7 +211,6 @@
             <button class="submit-button" type="submit">Ingresar Datos</button>
         </form>
 
-        <!-- Barra de navegación inferior (con links en los iconos) -->
         <div class="footer">
             <a href="index.html" class="footer-link">
                 <img src="Inicio.png" alt="Inicio" class="footer-icon">
@@ -250,12 +243,15 @@
             const diaEntrega = document.getElementById('dia-entrega').value;
             const valor = document.getElementById('valor').value;
             const valorEnvio = document.getElementById('valorEnvio').value;
-            const telefonoVendedora = document.getElementById('telefonoVendedora').value;  // Número del destinatario
+            const telefonoVendedora = document.getElementById('telefonoVendedora').value;
+
+            // Generar la fecha de envío automáticamente
+            const fechaEnvio = new Date().toISOString().split('T')[0];
 
             // Generar un número de seguimiento único
             const trackingNumber = 'PKG-' + Date.now();
 
-            // Almacenar los datos del paquete en localStorage (opcional)
+            // Almacenar los datos del paquete en localStorage
             const packageData = {
                 trackingNumber,
                 nombreCliente,
@@ -263,7 +259,8 @@
                 destino,
                 diaEntrega,
                 valor,
-                valorEnvio
+                valorEnvio,
+                fechaEnvio  // Asegurarse de almacenar la fecha de envío
             };
 
             let packages = JSON.parse(localStorage.getItem('packages')) || [];
@@ -278,8 +275,11 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        to: telefonoVendedora,  // Número del destinatario ingresado por el usuario
-                        trackingNumber: trackingNumber
+                        to: telefonoVendedora,
+                        trackingNumber: trackingNumber,
+                        nombreCliente: nombreCliente,
+                        destino: destino,
+                        valor: valor
                     })
                 });
 
@@ -291,7 +291,7 @@
                 console.log('SMS enviado con éxito:', result);
 
                 // Redirigir a la página de resultados con el número de seguimiento
-                window.location.href = `resultados.html?trackingNumber=${trackingNumber}`;
+                window.location.href = `resultados.html?trackingNumber=${trackingNumber}&fechaEnvio=${fechaEnvio}`;
             } catch (error) {
                 console.error('Error al enviar el SMS:', error);
             }
@@ -299,5 +299,4 @@
     </script>
 </body>
 </html>
-
 
