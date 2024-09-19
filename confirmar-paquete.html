@@ -58,16 +58,6 @@
             }
         }
 
-        // Al cargar la página, obtener los datos del paquete desde Firestore
-        document.addEventListener('DOMContentLoaded', function() {
-            const trackingNumber = sessionStorage.getItem('trackingNumber');
-            if (trackingNumber) {
-                loadPackageDetails(trackingNumber);
-            } else {
-                document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
-            }
-        });
-
         // Función para actualizar el estado del paquete
         async function updatePackageStatus(status) {
             const trackingNumber = sessionStorage.getItem('trackingNumber');
@@ -94,21 +84,32 @@
             }
         }
 
-        document.getElementById('package-delivered').addEventListener('click', function() {
-            confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como retirado?', 'Paquete Retirado');
-        });
-
-        document.getElementById('package-not-collected').addEventListener('click', function() {
-            confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como NO retirado?', 'Paquete No Retirado');
-        });
-
-        document.getElementById('report-problem').addEventListener('click', function() {
+        // Agregar los event listeners solo después de que el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', function() {
             const trackingNumber = sessionStorage.getItem('trackingNumber');
             if (trackingNumber) {
-                window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
+                loadPackageDetails(trackingNumber);
             } else {
-                alert('No se encontró información del paquete.');
+                document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
             }
+
+            // Agregar event listeners a los botones
+            document.getElementById('package-delivered').addEventListener('click', function() {
+                confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como retirado?', 'Paquete Retirado');
+            });
+
+            document.getElementById('package-not-collected').addEventListener('click', function() {
+                confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como NO retirado?', 'Paquete No Retirado');
+            });
+
+            document.getElementById('report-problem').addEventListener('click', function() {
+                const trackingNumber = sessionStorage.getItem('trackingNumber');
+                if (trackingNumber) {
+                    window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
+                } else {
+                    alert('No se encontró información del paquete.');
+                }
+            });
         });
     </script>
     <style>
@@ -240,3 +241,4 @@
     </div>
 </body>
 </html>
+
