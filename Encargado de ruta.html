@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <!-- Cargar correctamente la biblioteca para escanear QR -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> <!-- Biblioteca de escaneo QR -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> <!-- Biblioteca para QR Code -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <style>
-        /* Estilos del formulario */
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,7 +24,8 @@
         }
 
         .container {
-            background-color: rgba(255, 255, 255, 0.6);
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -29,15 +34,47 @@
             text-align: center;
         }
 
+        /* Imagen de fondo con 50% de transparencia */
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5; /* 50% de transparencia */
+            background-image: url('19199540.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* Asegura que esté detrás del contenido */
+            border-radius: 20px;
+        }
+
         .logo {
-            width: 150px;
-            margin: 0 auto 20px;
+            width: 150px; /* Tamaño del logo ajustado */
+            margin: 0 auto 20px; /* Centrado del logo */
+            display: block;
+        }
+
+        .title-wrapper {
+            background-color: rgba(255, 255, 255, 0.9);
+            display: inline-block;
+            padding: 5px 10px; /* Reducido el tamaño del marco */
+            border-radius: 5px; /* Ajuste del radio del borde */
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 22px; /* Tamaño del título reducido */
+            color: #333;
+            font-weight: bold;
+            margin: 0; /* Eliminación del margen extra */
         }
 
         .input-wrapper {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            position: relative;
         }
 
         .input-wrapper input {
@@ -51,15 +88,24 @@
             font-weight: bold;
         }
 
+        .input-wrapper input:focus {
+            border-color: #F39204;
+        }
+
         .status-buttons img {
-            width: 130px;
+            width: 130px; /* Tamaño de los botones reducido */
             cursor: pointer;
             margin: 10px;
-            opacity: 0.8;
+            opacity: 0.8; /* Transparencia del 80% */
+            transition: opacity 0.3s ease; /* Transición para el efecto hover */
+        }
+
+        .status-buttons img:hover {
+            opacity: 1; /* Restablece la opacidad al pasar el cursor */
         }
 
         #qr-reader {
-            width: 250px;
+            width: 250px; /* Reducción del ancho del lector QR */
             margin: 20px auto;
             display: none;
         }
@@ -67,14 +113,23 @@
 </head>
 <body>
     <div class="container">
+        <!-- Imagen de fondo con 50% de transparencia -->
+        <div class="background-image"></div>
+
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
         
+        <div class="title-wrapper">
+            <h1>Encargado de Ruta</h1>
+        </div>
+
         <div class="input-wrapper">
             <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
         </div>
 
         <div class="status-buttons">
             <img src="boton-de-buscar.png" alt="Buscar Paquete" id="scan-button">
+        </div>
+        <div class="status-buttons">
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
