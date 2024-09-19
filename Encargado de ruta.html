@@ -41,7 +41,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.5; /* 50% de transparencia */
+            opacity: 0.5;
             background-image: url('19199540.jpg');
             background-size: cover;
             background-position: center;
@@ -50,24 +50,24 @@
         }
 
         .logo {
-            width: 150px; /* Tamaño del logo ajustado */
-            margin: 0 auto 20px; /* Centrado del logo */
+            width: 150px;
+            margin: 0 auto 20px;
             display: block;
         }
 
         .title-wrapper {
             background-color: rgba(255, 255, 255, 0.9);
             display: inline-block;
-            padding: 5px 10px; /* Reducido el tamaño del marco */
-            border-radius: 5px; /* Ajuste del radio del borde */
+            padding: 5px 10px;
+            border-radius: 5px;
             margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 22px; /* Tamaño del título reducido */
+            font-size: 22px;
             color: #333;
             font-weight: bold;
-            margin: 0; /* Eliminación del margen extra */
+            margin: 0;
         }
 
         .input-wrapper {
@@ -93,19 +93,19 @@
         }
 
         .status-buttons img {
-            width: 130px; /* Tamaño de los botones reducido */
+            width: 130px;
             cursor: pointer;
             margin: 10px;
-            opacity: 0.8; /* Transparencia del 80% */
-            transition: opacity 0.3s ease; /* Transición para el efecto hover */
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
         }
 
         .status-buttons img:hover {
-            opacity: 1; /* Restablece la opacidad al pasar el cursor */
+            opacity: 1;
         }
 
         #qr-reader {
-            width: 250px; /* Reducción del ancho del lector QR */
+            width: 250px;
             margin: 20px auto;
             display: none;
         }
@@ -154,8 +154,8 @@
         // Función para buscar el paquete por número de seguimiento en Firestore
         async function fetchPackageDetails(trackingNumber) {
             try {
-                const doc = await db.collection('paquetes').doc(trackingNumber).get();
-                if (doc.exists) {
+                const doc = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                if (!doc.empty) {
                     sessionStorage.setItem('trackingNumber', trackingNumber);
                     window.location.href = 'confirmar-paquete.html';
                 } else {
@@ -181,6 +181,7 @@
             const qrReader = document.getElementById('qr-reader');
             qrReader.style.display = 'block'; // Mostrar el lector QR
 
+            // Instanciar Html5Qrcode
             const html5QrCode = new Html5Qrcode("qr-reader");
 
             html5QrCode.start(
@@ -190,11 +191,13 @@
                     qrbox: 250  // Tamaño de la caja de escaneo
                 },
                 qrCodeMessage => {
+                    // Usar el valor del QR como el número de seguimiento
                     document.getElementById('tracking-number').value = qrCodeMessage;
+                    fetchPackageDetails(qrCodeMessage);
 
+                    // Detener el escaneo después de leer el código
                     html5QrCode.stop().then(() => {
-                        qrReader.style.display = 'none';
-                        fetchPackageDetails(qrCodeMessage); // Buscar los datos en Firestore usando el código QR
+                        qrReader.style.display = 'none'; // Ocultar el lector QR
                     }).catch(err => {
                         console.error("No se pudo detener el escaneo.", err);
                     });
@@ -209,5 +212,3 @@
     </script>
 </body>
 </html>
-
-
