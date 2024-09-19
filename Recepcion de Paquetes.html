@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recepción de Paquetes</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
-        // Configuración de Firebase
+        // Configuración de Firebase para versión 8.10.0
         const firebaseConfig = {
             apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
             authDomain: "estradaencomiendas0.firebaseapp.com",
@@ -20,14 +20,14 @@
             measurementId: "G-BRMC9FZBC"
         };
 
+        // Inicialización Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Verificar que el usuario esté autenticado
+        // Verificar si el usuario está autenticado
         auth.onAuthStateChanged(function(user) {
             if (!user) {
-                // Redirigir al login si no está autenticado
                 window.location.href = 'login.html';
             }
         });
@@ -307,7 +307,7 @@
             const trackingNumber = 'PKG-' + Date.now();
 
             // Verificar el usuario actual
-            const user = auth.currentUser;
+            const user = firebase.auth().currentUser;
 
             // Datos del paquete
             const packageData = {
@@ -324,7 +324,7 @@
 
             try {
                 // Guardar en Firestore
-                await db.collection('paquetes').add(packageData);
+                await firebase.firestore().collection('paquetes').add(packageData);
                 console.log('Paquete guardado en Firestore');
 
                 // Guardar en LocalStorage
@@ -364,6 +364,5 @@
     </script>
 </body>
 </html>
-
 
 
