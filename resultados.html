@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados del Paquete</title>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+    <!-- Firebase (Versión 8.x) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
@@ -174,7 +175,7 @@
             };
         }
 
-        // Función para mostrar los detalles del paquete
+        // Función para mostrar los detalles del paquete desde Firestore
         function displayPackageDetails(packageData) {
             document.getElementById('package-details').innerHTML = `
                 <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
@@ -197,6 +198,30 @@
             });
         }
 
+        // Función para obtener los datos del paquete desde Firestore
+        async function fetchPackageDetails(trackingNumber) {
+            try {
+                const doc = await db.collection('paquetes').doc(trackingNumber).get();
+                if (doc.exists) {
+                    displayPackageDetails(doc.data());
+                } else {
+                    document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
+                }
+            } catch (error) {
+                console.error('Error obteniendo los datos del paquete:', error);
+            }
+        }
+
+        // Al cargar la página, obtener los datos del paquete desde Firestore
+        document.addEventListener('DOMContentLoaded', function() {
+            const { trackingNumber } = getQueryParams();
+            if (trackingNumber) {
+                fetchPackageDetails(trackingNumber);
+            } else {
+                document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
+            }
+        });
+
         // Función para imprimir el ticket
         function printTicket() {
             window.print();
@@ -206,28 +231,8 @@
         function goBack() {
             window.location.href = 'Recepcion de Paquetes.html';
         }
-
-        // Al cargar la página, obtener los datos del paquete desde Firestore
-        document.addEventListener('DOMContentLoaded', async function() {
-            const { trackingNumber } = getQueryParams();
-            if (trackingNumber) {
-                try {
-                    const paqueteSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-                    if (!paqueteSnapshot.empty) {
-                        const packageData = paqueteSnapshot.docs[0].data();
-                        displayPackageDetails(packageData);
-                    } else {
-                        document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
-                    }
-                } catch (error) {
-                    console.error('Error obteniendo los datos del paquete:', error);
-                    document.getElementById('package-details').innerHTML = '<p>Error al obtener los datos del paquete.</p>';
-                }
-            } else {
-                document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
-            }
-        });
     </script>
 </body>
 </html>
+
 
