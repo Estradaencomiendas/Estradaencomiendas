@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <!-- Cargar la biblioteca de escaneo QR -->
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script> <!-- Biblioteca Instascan -->
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -25,7 +23,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
+            background-color: rgba(255, 255, 255, 0.6);
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -34,7 +32,6 @@
             text-align: center;
         }
 
-        /* Imagen de fondo con 50% de transparencia */
         .background-image {
             position: absolute;
             top: 0;
@@ -105,17 +102,21 @@
         }
 
         #qr-reader {
-            width: 250px;
+            width: 100%;
             margin: 20px auto;
             display: none;
+        }
+
+        #preview {
+            width: 100%;
+            max-width: 300px;
+            margin: 20px auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Imagen de fondo con 50% de transparencia -->
         <div class="background-image"></div>
-
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
         
         <div class="title-wrapper">
@@ -133,7 +134,7 @@
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
-        <div id="qr-reader"></div>
+        <video id="preview" class="hidden"></video>
     </div>
 
     <script>
@@ -178,37 +179,27 @@
 
         // Acción del botón de escaneo QR
         document.getElementById('qr-scan-button').addEventListener('click', function() {
-            const qrReader = document.getElementById('qr-reader');
-            qrReader.style.display = 'block'; // Mostrar el lector QR
+            const videoElement = document.getElementById('preview');
+            videoElement.classList.remove('hidden'); // Mostrar la vista previa del escaneo
+            const scanner = new Instascan.Scanner({ video: videoElement });
 
-            // Instanciar Html5Qrcode
-            const html5QrCode = new Html5Qrcode("qr-reader");
+            scanner.addListener('scan', function(content) {
+                document.getElementById('tracking-number').value = content;
+                fetchPackageDetails(content);
+                scanner.stop();
+            });
 
-            html5QrCode.start(
-                { facingMode: "environment" }, // Usar la cámara trasera
-                {
-                    fps: 10,    // Cuadros por segundo
-                    qrbox: 250  // Tamaño de la caja de escaneo
-                },
-                qrCodeMessage => {
-                    // Usar el valor del QR como el número de seguimiento
-                    document.getElementById('tracking-number').value = qrCodeMessage;
-                    fetchPackageDetails(qrCodeMessage);
-
-                    // Detener el escaneo después de leer el código
-                    html5QrCode.stop().then(() => {
-                        qrReader.style.display = 'none'; // Ocultar el lector QR
-                    }).catch(err => {
-                        console.error("No se pudo detener el escaneo.", err);
-                    });
-                },
-                errorMessage => {
-                    console.log(`Error en el escaneo: ${errorMessage}`);
+            Instascan.Camera.getCameras().then(function (cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]); // Usar la primera cámara disponible
+                } else {
+                    console.error('No se encontraron cámaras.');
                 }
-            ).catch(err => {
-                console.error("Error al iniciar el lector QR.", err);
+            }).catch(function (e) {
+                console.error(e);
             });
         });
     </script>
 </body>
 </html>
+
