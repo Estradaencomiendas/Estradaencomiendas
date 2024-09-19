@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <!-- Cargar correctamente la biblioteca para escanear QR -->
+    <!-- Cargar la biblioteca de escaneo QR correctamente -->
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> <!-- Biblioteca de escaneo QR -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> <!-- Biblioteca para QR Code -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -184,8 +184,11 @@
             const html5QrCode = new Html5Qrcode("qr-reader");
 
             html5QrCode.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
+                { facingMode: "environment" }, // Usar la cámara trasera
+                {
+                    fps: 10,    // Cuadros por segundo
+                    qrbox: 250  // Tamaño de la caja de escaneo
+                },
                 qrCodeMessage => {
                     document.getElementById('tracking-number').value = qrCodeMessage;
 
@@ -206,5 +209,6 @@
     </script>
 </body>
 </html>
+
 
 
