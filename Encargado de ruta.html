@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script> <!-- Biblioteca Instascan -->
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -23,7 +24,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -32,6 +33,7 @@
             text-align: center;
         }
 
+        /* Imagen de fondo con 50% de transparencia */
         .background-image {
             position: absolute;
             top: 0;
@@ -103,20 +105,21 @@
 
         #qr-reader {
             width: 100%;
+            max-width: 300px;
             margin: 20px auto;
             display: none;
         }
 
-        #preview {
+        video {
             width: 100%;
-            max-width: 300px;
-            margin: 20px auto;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="background-image"></div>
+
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
         
         <div class="title-wrapper">
@@ -134,7 +137,7 @@
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
-        <video id="preview" class="hidden"></video>
+        <div id="qr-reader"></div>
     </div>
 
     <script>
@@ -153,17 +156,18 @@
         const db = firebase.firestore();
 
         // Función para buscar el paquete por número de seguimiento en Firestore
-        async function fetchPackageDetails(trackingNumber) {
+        async function searchPackage(trackingNumber) {
             try {
-                const doc = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-                if (!doc.empty) {
+                const querySnapshot = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
+                if (!querySnapshot.empty) {
                     sessionStorage.setItem('trackingNumber', trackingNumber);
                     window.location.href = 'confirmar-paquete.html';
                 } else {
-                    alert('No se encontraron datos para el número de seguimiento ingresado.');
+                    alert('No se encontró un paquete con este número de seguimiento.');
                 }
             } catch (error) {
-                console.error('Error obteniendo los datos del paquete:', error);
+                console.error("Error al buscar el paquete:", error);
+                alert("Error al buscar el paquete.");
             }
         }
 
@@ -171,31 +175,34 @@
         document.getElementById('scan-button').addEventListener('click', function() {
             const trackingNumber = document.getElementById('tracking-number').value.trim();
             if (trackingNumber) {
-                fetchPackageDetails(trackingNumber);
+                searchPackage(trackingNumber);
             } else {
                 alert('Por favor, ingrese el número de seguimiento.');
             }
         });
 
-        // Acción del botón de escaneo QR
+        // Acción del botón de escaneo QR usando Instascan
         document.getElementById('qr-scan-button').addEventListener('click', function() {
-            const videoElement = document.getElementById('preview');
-            videoElement.classList.remove('hidden'); // Mostrar la vista previa del escaneo
-            const scanner = new Instascan.Scanner({ video: videoElement });
+            const qrReader = document.getElementById('qr-reader');
+            qrReader.style.display = 'block'; // Mostrar el lector QR
+
+            let scanner = new Instascan.Scanner({ video: document.getElementById('qr-reader') });
 
             scanner.addListener('scan', function(content) {
                 document.getElementById('tracking-number').value = content;
-                fetchPackageDetails(content);
-                scanner.stop();
+                searchPackage(content);
+                scanner.stop(); // Detener el escaneo después de leer el código
+                qrReader.style.display = 'none'; // Ocultar el lector QR
             });
 
-            Instascan.Camera.getCameras().then(function (cameras) {
+            Instascan.Camera.getCameras().then(function(cameras) {
                 if (cameras.length > 0) {
-                    scanner.start(cameras[0]); // Usar la primera cámara disponible
+                    scanner.start(cameras[0]); // Usar la primera cámara disponible (trasera)
                 } else {
                     console.error('No se encontraron cámaras.');
+                    alert('No se encontraron cámaras en el dispositivo.');
                 }
-            }).catch(function (e) {
+            }).catch(function(e) {
                 console.error(e);
             });
         });
