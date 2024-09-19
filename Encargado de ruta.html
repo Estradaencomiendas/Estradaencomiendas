@@ -152,22 +152,28 @@
     </div>
 
     <script>
+        // Función para buscar en Firestore por el número de seguimiento
+        async function searchPackage(trackingNumber) {
+            try {
+                const querySnapshot = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
+                if (!querySnapshot.empty) {
+                    sessionStorage.setItem('trackingNumber', trackingNumber);
+                    window.location.href = 'confirmar-paquete.html';
+                } else {
+                    alert('No se encontró un paquete con este número de seguimiento.');
+                }
+            } catch (error) {
+                console.error("Error al buscar el paquete:", error);
+                alert("Error al buscar el paquete.");
+            }
+        }
+
         // Acción del botón de búsqueda
-        document.getElementById('scan-button').addEventListener('click', async function() {
+        document.getElementById('scan-button').addEventListener('click', function() {
             const trackingNumber = document.getElementById('tracking-number').value.trim();
 
             if (trackingNumber) {
-                try {
-                    const doc = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
-                    if (!doc.empty) {
-                        sessionStorage.setItem('trackingNumber', trackingNumber);
-                        window.location.href = 'confirmar-paquete.html';
-                    } else {
-                        alert('No se encontró un paquete con este número de seguimiento.');
-                    }
-                } catch (error) {
-                    console.error("Error al buscar el paquete:", error);
-                }
+                searchPackage(trackingNumber);
             } else {
                 alert('Por favor, ingrese el número de seguimiento.');
             }
@@ -187,11 +193,12 @@
                     qrbox: 250  // Tamaño de la caja de escaneo
                 },
                 qrCodeMessage => {
-                    document.getElementById('tracking-number').value = qrCodeMessage;
+                    // Usar el valor del QR como el número de seguimiento
+                    searchPackage(qrCodeMessage);
 
+                    // Detener el escaneo después de leer el código
                     html5QrCode.stop().then(() => {
-                        qrReader.style.display = 'none';
-                        document.getElementById('scan-button').click(); // Simular clic en el botón de búsqueda
+                        qrReader.style.display = 'none'; // Ocultar el lector QR
                     }).catch(err => {
                         console.error("No se pudo detener el escaneo.", err);
                     });
