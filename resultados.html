@@ -41,7 +41,7 @@
                 console.error('Elemento package-details no encontrado');
                 return;
             }
-    
+
             packageDetailsElement.innerHTML = `
                 <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
                 <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
@@ -85,7 +85,10 @@
                     if (trackingNumber) {
                         fetchPackageDetails(trackingNumber);
                     } else {
-                        document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
+                        const packageDetailsElement = document.getElementById('package-details');
+                        if (packageDetailsElement) {
+                            packageDetailsElement.innerHTML = '<p>No se encontró el número de seguimiento.</p>';
+                        }
                     }
                 } else {
                     console.log('Redirigiendo a login...');
@@ -109,6 +112,35 @@
     </style>
 </head>
 <body>
-    <!-- Contenido omitido -->
+    <div class="container">
+        <img src="logo-bn.png" alt="Logo Estrada Encomiendas" class="logo">
+        <h1>Detalles del Paquete</h1>
+        <div class="data">
+            <div id="package-details"></div>
+            <div id="qrcode"></div>
+        </div>
+        <button id="print-button" onclick="printTicket()">Imprimir Ticket</button>
+        <button id="back-button" onclick="goBack()">Regresar</button>
+
+        <!-- Barra de navegación inferior (con links en los iconos) -->
+        <div class="footer">
+            <a href="index.html" class="footer-link">
+                <img src="Inicio.png" alt="Inicio" class="footer-icon">
+                <div>Inicio</div>
+            </a>
+            <a href="Recepcion de Paquetes.html" class="footer-link">
+                <img src="icon1.png" alt="Recepción" class="footer-icon">
+                <div>Recepción</div>
+            </a>
+            <a href="Encargado de ruta.html" class="footer-link">
+                <img src="icon2.png" alt="Entrega" class="footer-icon">
+                <div>Entrega</div>
+            </a>
+            <a href="Seguimieto de Paquetes.html" class="footer-link">
+                <img src="icon3.png" alt="Registro" class="footer-icon">
+                <div>Registro</div>
+            </a>
+        </div>
+    </div>
 </body>
 </html>
