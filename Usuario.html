@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- Font Awesome -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script> <!-- Firestore -->
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -239,16 +241,34 @@
     </div>
 
     <script>
-        let currentPackageData = null;
+        const firebaseConfig = {
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            authDomain: "estradaencomiendas0.firebaseapp.com",
+            projectId: "estradaencomiendas0",
+            storageBucket: "estradaencomiendas0.appspot.com",
+            messagingSenderId: "247979951336",
+            appId: "1:247979951336:web:92b6b4bf615595676755d",
+            measurementId: "G-BRMC9FZBC"
+        };
 
-        // Función para cargar los paquetes desde localStorage
-        function loadPackages() {
-            return JSON.parse(localStorage.getItem('packages')) || [];
-        }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        // Guardar paquetes en localStorage
-        function savePackages(packages) {
-            localStorage.setItem('packages', JSON.stringify(packages));
+        // Función para buscar el paquete en Firestore
+        async function searchPackage(trackingNumber) {
+            try {
+                const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                if (!packageSnapshot.empty) {
+                    return packageSnapshot.docs[0].data();
+                } else {
+                    alert('No se encontraron datos para el número de seguimiento ingresado.');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error al buscar el paquete en Firestore:', error);
+                alert('Ocurrió un error al buscar el paquete.');
+                return null;
+            }
         }
 
         // Función para agregar paquetes al contenedor
@@ -267,19 +287,8 @@
                 actionButton = `<button class="action-button-small resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>`;
             }
 
-            // Mostrar imagen según el estado y configurar tamaños específicos
-            let statusImage = packageData.status === 'Pagado' ? 'Pagado.png' :
-                              packageData.status === 'En Proceso de Pago' ? 'Procesando Pago.png' :
-                              packageData.status === 'Paquete Retirado' ? 'retired.png' :
-                              packageData.status === 'En Ruta' ? 'en-route.png' :
-                              packageData.status === 'Paquete No Retirado' ? 'not-collected.png' : 'in-process.png';
-
-            const imageClass = packageData.status === 'Pagado' ? 'status-image-paid' :
-                               packageData.status === 'En Proceso de Pago' ? 'status-image-processing' : 'status-image';
-
             const packageHtml = `
                 <div class="package-container" id="package-${packageData.trackingNumber}">
-                    <img src="${statusImage}" class="${imageClass}" alt="Estado">
                     <div class="package-info">
                         <h3>${packageData.trackingNumber}</h3>
                         <p>Cliente: ${packageData.nombreCliente}</p>
@@ -297,29 +306,16 @@
         }
 
         // Evento para buscar paquete
-        document.getElementById('search-button').addEventListener('click', function() {
+        document.getElementById('search-button').addEventListener('click', async function() {
             const trackingNumber = document.getElementById('tracking-number').value.trim();
             if (trackingNumber) {
-                const packages = loadPackages();
-                const packageData = packages.find(pkg => pkg.trackingNumber === trackingNumber);
-
+                const packageData = await searchPackage(trackingNumber);
                 if (packageData) {
-                    // Recargar el estado desde myShipments en caso de que se haya actualizado
-                    const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
-                    const updatedPackage = myShipments.find(pkg => pkg.trackingNumber === trackingNumber);
-
-                    if (updatedPackage) {
-                        packageData.status = updatedPackage.status; // Actualizar el estado
-                        savePackages(packages); // Guardar los cambios
-                    }
-
-                    if (!isTrackingNumberInList(trackingNumber)) {
+                    if (!document.getElementById(`package-${packageData.trackingNumber}`)) {
                         addPackageToContainer(packageData);
                     } else {
                         alert('Este paquete ya ha sido agregado.');
                     }
-                } else {
-                    alert('No se encontraron datos para el número de seguimiento ingresado.');
                 }
             } else {
                 alert('Por favor, ingrese el número de seguimiento.');
@@ -328,23 +324,14 @@
 
         // Función para agregar paquetes a 'Mis Envíos'
         function addToMyShipments(trackingNumber) {
-            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
-            const packages = loadPackages();
-            const packageData = packages.find(pkg => pkg.trackingNumber === trackingNumber);
-
-            if (!myShipments.find(pkg => pkg.trackingNumber === trackingNumber)) {
-                myShipments.push(packageData);
-                localStorage.setItem('myShipments', JSON.stringify(myShipments));
-                alert('Paquete agregado exitosamente a Mis Envíos.');
-            } else {
-                alert('Este paquete ya ha sido agregado.');
-            }
+            alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
         }
 
-        // Verificar si el paquete ya está en el contenedor
-        function isTrackingNumberInList(trackingNumber) {
-            return document.getElementById(`package-${trackingNumber}`) !== null;
+        // Función para reenviar paquete
+        function resendPackage(trackingNumber) {
+            alert(`Paquete con número de seguimiento ${trackingNumber} reenviado.`);
         }
     </script>
 </body>
 </html>
+
