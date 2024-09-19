@@ -101,10 +101,10 @@
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
-                // Guardar usuario en Firestore
+                // Guardar usuario en Firestore con rol 'user'
                 await db.collection('users').doc(user.uid).set({
                     email: email,
-                    role: 'user'  // Por defecto asignamos 'user', puedes modificar luego
+                    role: 'user'  // Asignar por defecto el rol 'user'
                 });
 
                 alert('Usuario registrado con éxito');
@@ -117,4 +117,5 @@
     </script>
 </body>
 </html>
+
 
