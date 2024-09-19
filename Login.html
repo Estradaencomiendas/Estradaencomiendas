@@ -89,6 +89,7 @@
         const db = firebase.firestore();
     </script>
 
+    <!-- Código para redirigir según el rol del usuario -->
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -97,11 +98,23 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
+                // Iniciar sesión con Firebase Authentication
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
-                alert('Inicio de sesión exitoso');
-                window.location.href = 'Usuario0.html';  // Redirige según el rol
+                // Obtener el rol del usuario desde Firestore
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+                const userRole = userData.role;
+
+                // Redirigir según el rol del usuario
+                if (userRole === 'admin1') {
+                    window.location.href = 'Admin1.html';
+                } else if (userRole === 'admin0') {
+                    window.location.href = 'Admin0.html';
+                } else {
+                    window.location.href = 'Usuario0.html';
+                }
             } catch (error) {
                 console.error('Error al iniciar sesión:', error.message);
                 alert('Error: ' + error.message);
