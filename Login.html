@@ -67,10 +67,10 @@
         <a href="registro.html" class="link">¿No tienes una cuenta? Regístrate</a>
     </div>
 
-    <!-- Scripts de Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script>
+    <!-- Firebase Scripts (versión 8.10.0) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
         // Configuración de Firebase
@@ -80,8 +80,7 @@
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
             messagingSenderId: "247979951336",
-            appId: "1:247979951336:web:92b6b4bf615595676755d",
-            measurementId: "G-BRMC9FZBC"
+            appId: "1:247979951336:web:92b6b4bf615595676755d"
         };
 
         // Inicializar Firebase
@@ -98,7 +97,6 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                // Iniciar sesión
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
