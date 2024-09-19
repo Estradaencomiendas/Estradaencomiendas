@@ -202,9 +202,9 @@
         // Función para obtener los datos del paquete desde Firestore
         async function fetchPackageDetails(trackingNumber) {
             try {
-                const doc = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
-                if (!doc.empty) {
-                    doc.forEach(docSnap => displayPackageDetails(docSnap.data()));
+                const doc = await db.collection('paquetes').doc(trackingNumber).get();
+                if (doc.exists) {
+                    displayPackageDetails(doc.data());
                 } else {
                     document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
                 }
@@ -235,4 +235,5 @@
     </script>
 </body>
 </html>
+
 
