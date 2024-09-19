@@ -3,37 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recepción de Paquetes</title>
+    <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script>
-        // Configuración de Firebase para versión 8.10.0
-        const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
-            authDomain: "estradaencomiendas0.firebaseapp.com",
-            projectId: "estradaencomiendas0",
-            storageBucket: "estradaencomiendas0.appspot.com",
-            messagingSenderId: "247979951336",
-            appId: "1:247979951336:web:92b6b4bf615595676755d",
-            measurementId: "G-BRMC9FZBC"
-        };
-
-        // Inicialización Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // Verificar si el usuario está autenticado
-        auth.onAuthStateChanged(function(user) {
-            if (!user) {
-                window.location.href = 'login.html';
-            }
-        });
-    </script>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> <!-- Biblioteca de escaneo QR -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> <!-- Biblioteca para QR Code -->
     <style>
-        /* Estilos originales */
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
             margin: 0;
@@ -43,326 +17,165 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #F1F1F1;
+            background-color: #f0f0f0;
         }
 
         .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 25px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
             text-align: center;
         }
 
+        /* Imagen de fondo con 50% de transparencia */
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5; /* 50% de transparencia */
+            background-image: url('19199540.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* Asegura que esté detrás del contenido */
+            border-radius: 20px;
+        }
+
         .logo {
-            width: 250px;
-            margin-bottom: 20px;
+            width: 150px; /* Tamaño del logo ajustado */
+            margin: 0 auto 20px; /* Centrado del logo */
+            display: block;
         }
 
         .title-wrapper {
-            background-color: white;
-            padding: 20px;
-            border-radius: 25px;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: inline-block;
+            padding: 5px 10px; /* Reducido el tamaño del marco */
+            border-radius: 5px; /* Ajuste del radio del borde */
             margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            font-size: 24px;
-            color: #F39200;
+            font-size: 22px; /* Tamaño del título reducido */
+            color: #333;
             font-weight: bold;
+            margin: 0; /* Eliminación del margen extra */
         }
 
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-input-wrapper {
+        .input-wrapper {
             display: flex;
             align-items: center;
-            width: 100%;
             margin-bottom: 15px;
             position: relative;
         }
 
-        .form-input-wrapper input {
-            width: calc(100% - 20px);
-            padding: 12px;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            background-color: #F1F1F1;
+        .input-wrapper input {
+            width: calc(100% - 40px);
+            padding: 10px 10px 10px 40px;
+            border: 2px solid #EDE309;
+            border-radius: 10px;
+            background-color: #f7f7f7;
             color: #333;
             font-size: 17px;
             font-weight: bold;
-            box-sizing: border-box;
-            outline: none;
         }
 
-        .form-input-wrapper input:focus {
-            border-color: #B25C00;
+        .input-wrapper input:focus {
+            border-color: #F39204;
         }
 
-        .form-input-row {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 10px; 
-            gap: 10px; 
-        }
-
-        .form-input-column {
-            display: flex;
-            flex-direction: column;
-            width: 48%;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #F39200;
-            margin-bottom: 5px;
-            text-align: left;
-        }
-
-        .form-input-small {
-            width: 100%;
-            padding: 8px;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            background-color: #F1F1F1;
-            color: #333;
-            font-size: 15px;
-            font-weight: bold;
-            text-align: right;
-            outline: none;
-            -moz-appearance: textfield;
-        }
-
-        .form-input-small::-webkit-outer-spin-button,
-        .form-input-small::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .submit-button {
-            background: #F39200;
-            border: none;
-            border-radius: 20px;
-            padding: 12px 20px;
-            color: white;
-            font-size: 17px;
-            font-weight: bold;
+        .status-buttons img {
+            width: 130px; /* Tamaño de los botones reducido */
             cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s ease;
+            margin: 10px;
+            opacity: 0.8; /* Transparencia del 80% */
+            transition: opacity 0.3s ease; /* Transición para el efecto hover */
         }
 
-        .submit-button:hover {
-            background: #B25C00;
+        .status-buttons img:hover {
+            opacity: 1; /* Restablece la opacidad al pasar el cursor */
         }
 
-        .footer {
-            display: flex;
-            justify-content: space-around;
-            background-color: #F39200;
-            border-radius: 20px;
-            padding: 15px 0;
-            margin-top: 20px;
-        }
-
-        .footer-link {
-            text-align: center;
-            text-decoration: none;
-            color: white;
-        }
-
-        .footer-icon {
-            width: 50px;
-            height: 50px;
-        }
-
-        .phone-input {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            padding: 10px;
-            background-color: #F1F1F1;
-            width: 100%;
-        }
-
-        .phone-input span {
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-        .phone-input input {
-            flex: 1;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 17px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        @media (max-width: 600px) {
-            .form-input-row {
-                flex-direction: column;
-                gap: 0;
-            }
+        #qr-reader {
+            width: 250px; /* Reducción del ancho del lector QR */
+            margin: 20px auto;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
+        <!-- Imagen de fondo con 50% de transparencia -->
+        <div class="background-image"></div>
 
+        <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
+        
         <div class="title-wrapper">
-            <h1>Recepción de Paquetes</h1>
+            <h1>Encargado de Ruta</h1>
         </div>
 
-        <form id="package-form">
-            <div class="form-input-wrapper">
-                <input type="text" id="nombreCliente" placeholder="Nombre de la Clienta" required>
-            </div>
-
-            <div class="form-input-wrapper">
-                <input type="text" id="nombrePaquete" placeholder="Nombre de la Página" required>
-            </div>
-
-            <div class="form-input-wrapper">
-                <input type="text" id="destino" placeholder="Destino" required>
-            </div>
-
-            <label class="date-label" for="dia-entrega">Fecha de Entrega</label>
-            <div class="form-input-wrapper">
-                <input type="date" id="dia-entrega" required>
-            </div>
-
-            <div class="form-input-row">
-                <div class="form-input-column">
-                    <label for="valorEnvio">Valor del Envío</label>
-                    <input type="number" id="valorEnvio" class="form-input-small" required>
-                </div>
-                <div class="form-input-column">
-                    <label for="valor">Valor del Paquete</label>
-                    <input type="number" id="valor" class="form-input-small" required>
-                </div>
-            </div>
-
-            <div class="form-input-wrapper">
-                <div class="phone-input">
-                    <span>+503</span>
-                    <input type="tel" id="telefonoVendedora" placeholder="Número de Vendedora" pattern="\d{8}" required>
-                </div>
-            </div>
-
-            <button class="submit-button" type="submit">Ingresar Datos</button>
-        </form>
-
-        <div class="footer">
-            <a href="index.html" class="footer-link">
-                <img src="Inicio.png" alt="Inicio" class="footer-icon">
-                <div>Inicio</div>
-            </a>
-            <a href="Recepcion de Paquetes.html" class="footer-link">
-                <img src="icon1.png" alt="Recepción" class="footer-icon">
-                <div>Recepción</div>
-            </a>
-            <a href="Encargado de ruta.html" class="footer-link">
-                <img src="icon2.png" alt="Entrega" class="footer-icon">
-                <div>Entrega</div>
-            </a>
-            <a href="Seguimieto de Paquetes.html" class="footer-link">
-                <img src="icon3.png" alt="Registro" class="footer-icon">
-                <div>Registro</div>
-            </a>
+        <div class="input-wrapper">
+            <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
         </div>
+
+        <div class="status-buttons">
+            <img src="boton-de-buscar.png" alt="Buscar Paquete" id="scan-button">
+        </div>
+        <div class="status-buttons">
+            <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
+        </div>
+
+        <div id="qr-reader"></div>
     </div>
 
     <script>
-        document.getElementById('package-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        // Acción del botón de búsqueda
+        document.getElementById('scan-button').addEventListener('click', function() {
+            const trackingNumber = document.getElementById('tracking-number').value.trim();
 
-            const nombreCliente = document.getElementById('nombreCliente').value;
-            const nombrePaquete = document.getElementById('nombrePaquete').value;
-            const destino = document.getElementById('destino').value;
-            const diaEntrega = document.getElementById('dia-entrega').value;
-            const valor = document.getElementById('valor').value;
-            const valorEnvio = document.getElementById('valorEnvio').value;
-            const telefonoVendedora = '+503' + document.getElementById('telefonoVendedora').value;
-
-            const fechaEnvio = new Date().toISOString().split('T')[0];
-            const trackingNumber = 'PKG-' + Date.now();
-
-            // Verificar el usuario actual
-            const user = firebase.auth().currentUser;
-
-            // Datos del paquete
-            const packageData = {
-                trackingNumber,
-                nombreCliente,
-                nombrePaquete,
-                destino,
-                diaEntrega,
-                valor,
-                valorEnvio,
-                fechaEnvio,
-                recepcionadoPor: user ? user.uid : 'Desconocido' // Guardar UID del usuario
-            };
-
-            try {
-                // Guardar en Firestore
-                await firebase.firestore().collection('paquetes').add(packageData);
-                console.log('Paquete guardado en Firestore');
-
-                // Guardar en LocalStorage
-                let packages = JSON.parse(localStorage.getItem('packages')) || [];
-                packages.push(packageData);
-                localStorage.setItem('packages', JSON.stringify(packages));
-
-                alert('Datos ingresados con éxito');
-
-                // Enviar SMS con el trackingNumber
-                const response = await fetch('/.netlify/functions/sendSms', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        to: telefonoVendedora,
-                        trackingNumber: trackingNumber,
-                        nombreCliente: nombreCliente,
-                        destino: destino,
-                        valor: valor
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error enviando el SMS');
-                }
-
-                const result = await response.json();
-                console.log('SMS enviado con éxito:', result);
-
-                window.location.href = `resultados.html?trackingNumber=${trackingNumber}&fechaEnvio=${fechaEnvio}`;
-            } catch (error) {
-                console.error('Error al guardar el paquete o enviar el SMS:', error);
+            if (trackingNumber) {
+                sessionStorage.setItem('trackingNumber', trackingNumber);
+                window.location.href = 'confirmar-paquete.html';
+            } else {
+                alert('Por favor, ingrese el número de seguimiento.');
             }
+        });
+
+        // Acción del botón de escaneo QR
+        document.getElementById('qr-scan-button').addEventListener('click', function() {
+            const qrReader = document.getElementById('qr-reader');
+            qrReader.style.display = 'block'; // Mostrar el lector QR
+
+            const html5QrCode = new Html5Qrcode("qr-reader");
+
+            html5QrCode.start(
+                { facingMode: "environment" }, // Usar la cámara trasera
+                {
+                    fps: 10,    // Cuadros por segundo
+                    qrbox: 250  // Tamaño de la caja de escaneo
+                },
+                qrCodeMessage => {
+                    document.getElementById('tracking-number').value = qrCodeMessage;
+
+                    html5QrCode.stop().then(() => {
+                        qrReader.style.display = 'none';
+                        document.getElementById('scan-button').click(); // Simular clic en el botón de búsqueda
+                    }).catch(err => {
+                        console.error("No se pudo detener el escaneo.", err);
+                    });
+                },
+                errorMessage => {
+                    console.log(`Error en el escaneo: ${errorMessage}`);
+                }
+            ).catch(err => {
+                console.error("Error al iniciar el lector QR.", err);
+            });
         });
     </script>
 </body>
 </html>
-
-
