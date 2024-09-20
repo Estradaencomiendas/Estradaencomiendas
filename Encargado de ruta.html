@@ -204,18 +204,18 @@
                 Quagga.start();
             });
 
-            Quagga.onDetected(function (data) {
-                const barcode = data.codeResult.code;
-                console.log("Código detectado: ", barcode);
+           Quagga.onDetected(function (data) {
+    const barcode = data.codeResult.code;
+    console.log("Código detectado: ", barcode);  // Verificar qué se está escaneando
 
-                // Detener Quagga después de escanear
-                Quagga.stop();
-                barcodeReader.style.display = 'none';
+    // Detener Quagga después de escanear
+    Quagga.stop();
+    barcodeReader.style.display = 'none';
 
-                // Buscar el paquete usando el código escaneado
-                searchPackage(barcode);
-            });
-        }
+    // Buscar el paquete usando el código escaneado
+    searchPackage(barcode);
+});
+
 
         // Acción del botón de escaneo
         document.getElementById('barcode-scan-button').addEventListener('click', function() {
