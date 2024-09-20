@@ -32,14 +32,17 @@
         // Función para cargar detalles del paquete desde Firestore
         async function loadPackageDetails(trackingNumber) {
             try {
-                console.log("Tracking number:", trackingNumber); // Depura el número de seguimiento
+                console.log("Tracking number:", trackingNumber); // Depuración para ver el número de seguimiento
                 
-                // Aquí usamos where en lugar de doc, si el trackingNumber no es el ID del documento
+                // Buscar paquete en Firestore
                 const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                
+                console.log("Firestore response:", querySnapshot); // Depuración para ver la respuesta de Firestore
                 
                 if (!querySnapshot.empty) {
                     querySnapshot.forEach((doc) => {
                         const packageData = doc.data();
+                        console.log("Document data:", packageData); // Depuración para ver los datos del paquete
                         document.getElementById('package-details').innerHTML = `
                             <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
                             <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
