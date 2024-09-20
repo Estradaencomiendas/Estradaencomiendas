@@ -43,24 +43,6 @@
             margin: 0;
         }
 
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .input-wrapper input {
-            width: calc(100% - 40px);
-            padding: 10px 10px 10px 40px;
-            border: 2px solid #EDE309;
-            border-radius: 10px;
-            background-color: #f7f7f7;
-            color: #333;
-            font-size: 17px;
-            font-weight: bold;
-        }
-
         .status-buttons img {
             width: 130px;
             cursor: pointer;
@@ -91,13 +73,6 @@
         
         <h1>Encargado de Ruta</h1>
 
-        <div class="input-wrapper">
-            <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
-        </div>
-
-        <div class="status-buttons">
-            <img src="boton-de-buscar.png" alt="Buscar Paquete" id="scan-button">
-        </div>
         <div class="status-buttons">
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
@@ -138,9 +113,10 @@
 
                         if (qrCode) {
                             clearInterval(qrCheckInterval); // Detener el intervalo
-                            document.getElementById('tracking-number').value = qrCode.data; // Establecer el valor del número de seguimiento
-                            fetchPackageDetails(qrCode.data); // Buscar el paquete automáticamente
 
+                            // Redirigir automáticamente a la página de resultados con el número de seguimiento
+                            window.location.href = `resultados.html?trackingNumber=${qrCode.data}`;
+                            
                             stream.getTracks().forEach(track => track.stop()); // Detener la cámara
                             qrReader.style.display = 'none'; // Ocultar el lector QR
                         }
@@ -151,23 +127,8 @@
                     alert('Error al intentar acceder a la cámara.');
                 });
         });
-
-        // Función para buscar en la base de datos por el número de seguimiento
-        function fetchPackageDetails(trackingNumber) {
-            if (trackingNumber) {
-                sessionStorage.setItem('trackingNumber', trackingNumber);
-                window.location.href = 'confirmar-paquete.html';
-            } else {
-                alert('Por favor, ingrese el número de seguimiento.');
-            }
-        }
-
-        // Buscar paquete por número de seguimiento manualmente
-        document.getElementById('scan-button').addEventListener('click', function () {
-            const trackingNumber = document.getElementById('tracking-number').value.trim();
-            fetchPackageDetails(trackingNumber);
-        });
     </script>
 </body>
 </html>
+
 
