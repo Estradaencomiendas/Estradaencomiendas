@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest"></script> <!-- ZXing library -->
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest"></script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -21,7 +21,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
+            background-color: rgba(255, 255, 255, 0.6);
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -90,6 +90,11 @@
             margin: 20px auto;
             display: none;
         }
+
+        video {
+            width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -111,6 +116,7 @@
         </div>
 
         <div id="qr-reader"></div>
+        <video id="video" style="display: none;"></video> <!-- Video donde se verá la cámara -->
     </div>
 
     <script>
@@ -140,26 +146,22 @@
             }
         });
 
-        // Función para solicitar permisos de cámara y escanear el código QR
+        // Función para escanear el código QR
         document.getElementById('qr-scan-button').addEventListener('click', async function() {
-            const videoElement = document.createElement('video');
-            videoElement.setAttribute('autoplay', 'true');
-            document.body.appendChild(videoElement); // Añadir el video temporalmente para la cámara
+            const videoElement = document.getElementById('video');
+            videoElement.style.display = 'block'; // Mostrar el video
 
             const codeReader = new ZXing.BrowserQRCodeReader();
-
             try {
-                // Obtener lista de dispositivos de cámara disponibles
                 const videoInputDevices = await codeReader.listVideoInputDevices();
-                const selectedDeviceId = videoInputDevices[0].deviceId; // Usar la primera cámara disponible
+                const selectedDeviceId = videoInputDevices[0].deviceId; // Selecciona la cámara trasera
 
-                // Decodificar el código QR usando la cámara seleccionada
                 await codeReader.decodeFromVideoDevice(selectedDeviceId, videoElement, (result, error) => {
                     if (result) {
-                        document.getElementById('tracking-number').value = result.text; // Poner el valor del QR en el campo de seguimiento
+                        document.getElementById('tracking-number').value = result.text; // Coloca el valor del QR en el campo de seguimiento
                         codeReader.reset(); // Detener el lector
-                        videoElement.remove(); // Eliminar el video temporal
-                        searchPackage(result.text); // Buscar el paquete en la base de datos
+                        videoElement.style.display = 'none'; // Ocultar el video
+                        searchPackage(result.text); // Buscar el paquete
                     }
                     if (error) {
                         console.error("Error al leer el QR: ", error);
