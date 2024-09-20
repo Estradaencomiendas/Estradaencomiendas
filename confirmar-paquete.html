@@ -40,7 +40,6 @@
                             <p><span>Valor:</span> $${packageData.valor}</p>
                         `;
 
-                        // Generar el código QR
                         new QRCode(document.getElementById("qrcode"), {
                             text: packageData.trackingNumber,
                             width: 128,
