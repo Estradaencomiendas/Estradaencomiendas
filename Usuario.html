@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuario</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- Font Awesome -->
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script> <!-- Firestore -->
@@ -241,6 +240,7 @@
     </div>
 
     <script>
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
             authDomain: "estradaencomiendas0.firebaseapp.com",
@@ -331,7 +331,27 @@
         function resendPackage(trackingNumber) {
             alert(`Paquete con número de seguimiento ${trackingNumber} reenviado.`);
         }
+
+        // Función para obtener el número de seguimiento de la URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                trackingNumber: params.get('trackingNumber')
+            };
+        }
+
+        // Al cargar la página, verificar si hay un número de seguimiento en la URL y realizar la búsqueda automática
+        document.addEventListener('DOMContentLoaded', async function() {
+            const { trackingNumber } = getQueryParams();
+            if (trackingNumber) {
+                const packageData = await searchPackage(trackingNumber);
+                if (packageData && !document.getElementById(`package-${packageData.trackingNumber}`)) {
+                    addPackageToContainer(packageData);
+                }
+            }
+        });
     </script>
 </body>
 </html>
+
 
