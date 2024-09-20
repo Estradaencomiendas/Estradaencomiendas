@@ -79,7 +79,7 @@
         }
 
         .input-wrapper input {
-            width: 90%; /* Ajuste del ancho */
+            width: 90%;
             padding: 10px;
             border: 2px solid #F39200;
             border-radius: 10px;
@@ -152,23 +152,23 @@
 
     <script>
         // Función para buscar en Firestore por el número de seguimiento
-    async function searchPackage(trackingNumber) {
-    try {
-        const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-        
-        if (!querySnapshot.empty) {
-            querySnapshot.forEach((doc) => {
-                sessionStorage.setItem('trackingNumber', trackingNumber);
-                window.location.href = `confirmar-paquete.html?trackingNumber=${trackingNumber}`;  // Pasar también como parámetro en la URL
-            });
-        } else {
-            alert('No se encontró un paquete con este número de seguimiento.');
+        async function searchPackage(trackingNumber) {
+            try {
+                const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        sessionStorage.setItem('trackingNumber', trackingNumber);
+                        window.location.href = `confirmar-paquete.html?trackingNumber=${trackingNumber}`;  // Pasar también como parámetro en la URL
+                    });
+                } else {
+                    alert('No se encontró un paquete con este número de seguimiento.');
+                }
+            } catch (error) {
+                console.error("Error al buscar el paquete:", error);
+                alert("Error al buscar el paquete.");
+            }
         }
-    } catch (error) {
-        console.error("Error al buscar el paquete:", error);
-        alert("Error al buscar el paquete.");
-    }
-}
 
         // Acción del botón de búsqueda
         document.getElementById('search-button').addEventListener('click', function() {
@@ -182,50 +182,43 @@
         });
 
         // Función para inicializar el escaneo con QuaggaJS
-       function startBarcodeScanner() {
-    const barcodeReader = document.getElementById('barcode-reader');
-    barcodeReader.style.display = 'block'; // Mostrar el área de escaneo
+        function startBarcodeScanner() {
+            const barcodeReader = document.getElementById('barcode-reader');
+            barcodeReader.style.display = 'block'; // Mostrar el área de escaneo
 
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#barcode-reader')    // Pasamos el div que contendrá el video
-        },
-        decoder: {
-            readers: ["code_128_reader"] // Puedes agregar más tipos de códigos aquí si es necesario
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#barcode-reader')  // Pasamos el div que contendrá el video
+                },
+                decoder: {
+                    readers: ["code_128_reader"] // Puedes agregar más tipos de códigos aquí si es necesario
+                }
+            }, function (err) {
+                if (err) {
+                    console.error(err);
+                    alert('No se pudo inicializar el escáner.');
+                    return;
+                }
+                Quagga.start(); // Inicia el escaneo de la cámara
+            });
+
+            // Detectar el código de barras
+            Quagga.onDetected(function (data) {
+                if (data && data.codeResult && data.codeResult.code) {
+                    const barcode = data.codeResult.code;
+                    console.log("Código detectado: ", barcode);  // Depuración para verificar el código
+
+                    // Detener Quagga después de escanear
+                    Quagga.stop();
+                    barcodeReader.style.display = 'none';  // Ocultar el área de escaneo después de capturar el código
+
+                    // Buscar el paquete usando el código escaneado
+                    searchPackage(barcode);
+                }
+            });
         }
-    }, function (err) {
-        if (err) {
-            console.error(err);
-            alert('No se pudo inicializar el escáner.');
-            return;
-        }
-        Quagga.start(); // Inicia el escaneo de la cámara
-    });
-
-    // Detectar el código de barras
-    Quagga.onDetected(function (data) {
-        const barcode = data.codeResult.code;
-        console.log("Código detectado: ", barcode);  // Depuración para verificar el código
-
-        // Detener Quagga después de escanear
-        Quagga.stop();
-        barcodeReader.style.display = 'none';  // Ocultar el área de escaneo después de capturar el código
-
-        // Buscar el paquete usando el código escaneado
-        searchPackage(barcode);
-    });
-}
-
-    // Detener Quagga después de escanear
-    Quagga.stop();
-    barcodeReader.style.display = 'none';
-
-    // Buscar el paquete usando el código escaneado
-    searchPackage(barcode);
-});
-
 
         // Acción del botón de escaneo
         document.getElementById('barcode-scan-button').addEventListener('click', function() {
