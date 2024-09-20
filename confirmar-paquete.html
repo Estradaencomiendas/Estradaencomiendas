@@ -31,36 +31,38 @@
 
         // Función para cargar detalles del paquete desde Firestore usando el ID del documento
         async function loadPackageDetails(trackingNumber) {
-            try {
-                const doc = await db.collection('paquetes').doc(trackingNumber).get();
-                if (doc.exists) {
-                    const packageData = doc.data();
-                    document.getElementById('package-details').innerHTML = `
-                        <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
-                        <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
-                        <p><span>Nombre de la Página:</span> ${packageData.nombrePaquete}</p>
-                        <p><span>Destino:</span> ${packageData.destino}</p>
-                        <p><span>Fecha de Envío:</span> ${packageData.fechaEnvio}</p>
-                        <p><span>Fecha de Entrega:</span> ${packageData.diaEntrega}</p>
-                        <p><span>Valor:</span> $${packageData.valor}</p>
-                    `;
+    try {
+        // Usa .doc si el trackingNumber es el ID del documento en Firestore
+        const doc = await db.collection('paquetes').doc(trackingNumber).get();
+        if (doc.exists) {
+            const packageData = doc.data();
+            document.getElementById('package-details').innerHTML = `
+                <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
+                <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
+                <p><span>Nombre de la Página:</span> ${packageData.nombrePaquete}</p>
+                <p><span>Destino:</span> ${packageData.destino}</p>
+                <p><span>Fecha de Envío:</span> ${packageData.fechaEnvio}</p>
+                <p><span>Fecha de Entrega:</span> ${packageData.diaEntrega}</p>
+                <p><span>Valor:</span> $${packageData.valor}</p>
+            `;
 
-                    // Generar el código QR
-                    new QRCode(document.getElementById("qrcode"), {
-                        text: packageData.trackingNumber,
-                        width: 128,
-                        height: 128,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                } else {
-                    document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
-                }
-            } catch (error) {
-                console.error('Error obteniendo los datos del paquete:', error);
-            }
+            // Generar el código QR
+            new QRCode(document.getElementById("qrcode"), {
+                text: packageData.trackingNumber,
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        } else {
+            document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
         }
+    } catch (error) {
+        console.error('Error obteniendo los datos del paquete:', error);
+    }
+}
+
 
         // Función para actualizar el estado del paquete
         async function updatePackageStatus(status) {
