@@ -123,11 +123,11 @@
                     const context = canvas.getContext('2d');
 
                     const qrCheckInterval = setInterval(function () {
-                        // Ajuste de tamaño del canvas al tamaño del video
+                        // Ajustar el tamaño del canvas al tamaño del video
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
 
-                        // Dibujar imagen del video en el canvas
+                        // Dibujar la imagen del video en el canvas
                         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
                         // Obtener los datos de la imagen del canvas
@@ -156,9 +156,8 @@
 
         // Función para buscar en la base de datos por el número de seguimiento
         function fetchPackageDetails(trackingNumber) {
-            // Aquí iría la función para buscar en la base de datos
             alert('Buscando paquete con número de seguimiento: ' + trackingNumber);
-            // Realizar la búsqueda en la base de datos y procesar los datos...
+            // Aquí iría la búsqueda en la base de datos y su procesamiento...
         }
 
         // Buscar paquete por número de seguimiento manualmente
@@ -173,4 +172,3 @@
     </script>
 </body>
 </html>
-
