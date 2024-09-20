@@ -150,9 +150,14 @@
         // Función para buscar en Firestore por el número de seguimiento
         async function searchPackage(trackingNumber) {
             try {
+                if (!trackingNumber.trim()) {
+                    alert('Por favor, ingrese un número de seguimiento válido.');
+                    return;
+                }
+
                 const querySnapshot = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
                 if (!querySnapshot.empty) {
-                    // Aquí redireccionamos a la página confirmar-paquete con el número de seguimiento
+                    // Redirigir a la página de confirmación con el número de seguimiento
                     const redirectUrl = `https://estradaencomiendas.netlify.app/confirmar-paquete.html?trackingNumber=${trackingNumber}`;
                     window.location.href = redirectUrl;
                 } else {
@@ -164,7 +169,17 @@
             }
         }
 
-        // Función para iniciar la cámara y escanear el QR
+        // Acción del botón de búsqueda manual
+        document.getElementById('scan-button').addEventListener('click', function() {
+            const trackingNumber = document.getElementById('tracking-number').value.trim();
+            if (trackingNumber) {
+                searchPackage(trackingNumber);
+            } else {
+                alert('Por favor, ingrese un número de seguimiento.');
+            }
+        });
+
+        // Función para iniciar la cámara trasera y escanear el QR
         document.getElementById('qr-scan-button').addEventListener('click', function() {
             const video = document.createElement('video');
             const canvasElement = document.getElementById('qr-canvas');
