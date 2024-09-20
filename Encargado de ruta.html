@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
+    <!-- Biblioteca de escaneo QR -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
@@ -24,7 +25,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.6); 
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -108,11 +109,6 @@
             margin: 20px auto;
             display: none;
         }
-
-        video {
-            width: 100%;
-            border-radius: 10px;
-        }
     </style>
 </head>
 <body>
@@ -136,7 +132,7 @@
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
-        <video id="qr-reader" style="display:none;"></video>
+        <div id="qr-reader" style="display:none;"></div>
     </div>
 
     <script>
@@ -180,49 +176,43 @@
             }
         });
 
-        // Acción del botón de escaneo QR usando Instascan
+        // Acción del botón de escaneo QR usando html5-qrcode
         document.getElementById('qr-scan-button').addEventListener('click', function() {
             const qrReader = document.getElementById('qr-reader');
             qrReader.style.display = 'block'; // Mostrar el lector QR
 
-            let scanner = new Instascan.Scanner({ video: document.getElementById('qr-reader') });
+            const html5QrCode = new Html5Qrcode("qr-reader");
 
-            scanner.addListener('scan', function(content) {
-                document.getElementById('tracking-number').value = content;
-                searchPackage(content);
-                scanner.stop(); // Detener el escaneo después de leer el código
-                qrReader.style.display = 'none'; // Ocultar el lector QR
-            });
+            html5QrCode.start(
+                { facingMode: { exact: "environment" } }, // Usar la cámara trasera
+                {
+                    fps: 10,    // Cuadros por segundo
+                    qrbox: 250  // Tamaño de la caja de escaneo
+                },
+                qrCodeMessage => {
+                    // Usar el valor del QR como el número de seguimiento
+                    document.getElementById('tracking-number').value = qrCodeMessage;
+                    searchPackage(qrCodeMessage);
 
-            Instascan.Camera.getCameras().then(function(cameras) {
-                // Buscar la cámara trasera
-                let rearCamera = cameras.find(camera => camera.name && camera.name.toLowerCase().includes('back'));
-                if (rearCamera) {
-                    scanner.start(rearCamera).then(() => {
-                        console.log("Cámara trasera iniciada");
+                    // Detener el escaneo después de leer el código
+                    html5QrCode.stop().then(() => {
+                        qrReader.style.display = 'none'; // Ocultar el lector QR
                     }).catch(err => {
-                        console.error("Error al iniciar la cámara trasera:", err);
-                        alert('Error al iniciar la cámara trasera.');
+                        console.error("No se pudo detener el escaneo.", err);
                     });
-                } else if (cameras.length > 0) {
-                    scanner.start(cameras[0]).then(() => {
-                        console.log("Cámara frontal iniciada");
-                    }).catch(err => {
-                        console.error("Error al iniciar la cámara frontal:", err);
-                        alert('Error al iniciar la cámara frontal.');
-                    });
-                } else {
-                    console.error('No se encontraron cámaras.');
-                    alert('No se encontraron cámaras en el dispositivo.');
+                },
+                errorMessage => {
+                    console.log(`Error en el escaneo: ${errorMessage}`);
                 }
-            }).catch(function(e) {
-                console.error("Error al obtener cámaras:", e);
-                alert('Error al obtener acceso a las cámaras.');
+            ).catch(err => {
+                console.error("Error al iniciar el lector QR.", err);
+                alert("Error al iniciar la cámara para escanear.");
             });
         });
     </script>
 </body>
 </html>
+
 
 
 
