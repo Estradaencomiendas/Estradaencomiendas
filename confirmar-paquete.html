@@ -23,12 +23,16 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Función para obtener el número de seguimiento desde la URL
-        function getTrackingNumber() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('trackingNumber');
-        }
-
+       // Función para obtener el número de seguimiento desde sessionStorage o la URL
+function getTrackingNumber() {
+    const trackingNumber = sessionStorage.getItem('trackingNumber');  // Intentar obtenerlo de sessionStorage
+    if (trackingNumber) {
+        return trackingNumber;
+    } else {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('trackingNumber');  // Obtener de la URL si no está en sessionStorage
+    }
+}
         // Función para cargar detalles del paquete desde Firestore
         async function loadPackageDetails(trackingNumber) {
             try {
