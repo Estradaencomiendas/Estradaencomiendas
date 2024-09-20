@@ -210,12 +210,10 @@ Quagga.onDetected(function (data) {
         let barcode = data.codeResult.code;
         console.log("Código detectado: ", barcode);  // Depuración para ver el código escaneado
 
-        // Verificar si el código tiene el prefijo "PKG:"
-        if (!barcode.startsWith("PKG-")) {
-            barcode = "PKG-" + barcode;  // Añadir "PKG-" al código si no lo tiene
-        }
-
-        console.log("Código ajustado para búsqueda: ", barcode);  // Verificar el código ajustado
+        // Buscar el paquete usando el código escaneado tal como está
+        searchPackage(barcode);
+    }
+});
 
         // Detener Quagga después de escanear
         Quagga.stop();
