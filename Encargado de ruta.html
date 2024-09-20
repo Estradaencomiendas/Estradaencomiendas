@@ -182,31 +182,41 @@
         });
 
         // Función para inicializar el escaneo con QuaggaJS
-        function startBarcodeScanner() {
-            const barcodeReader = document.getElementById('barcode-reader');
-            barcodeReader.style.display = 'block'; // Mostrar el área de escaneo
+       function startBarcodeScanner() {
+    const barcodeReader = document.getElementById('barcode-reader');
+    barcodeReader.style.display = 'block'; // Mostrar el área de escaneo
 
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: document.querySelector('#barcode-reader')    // Pasamos el div que contendrá el video
-                },
-                decoder: {
-                    readers: ["code_128_reader"] // Puedes agregar más tipos de códigos aquí
-                }
-            }, function (err) {
-                if (err) {
-                    console.error(err);
-                    alert('No se pudo inicializar el escáner.');
-                    return;
-                }
-                Quagga.start();
-            });
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#barcode-reader')    // Pasamos el div que contendrá el video
+        },
+        decoder: {
+            readers: ["code_128_reader"] // Puedes agregar más tipos de códigos aquí si es necesario
+        }
+    }, function (err) {
+        if (err) {
+            console.error(err);
+            alert('No se pudo inicializar el escáner.');
+            return;
+        }
+        Quagga.start(); // Inicia el escaneo de la cámara
+    });
 
-           Quagga.onDetected(function (data) {
-    const barcode = data.codeResult.code;
-    console.log("Código detectado: ", barcode);  // Verificar qué se está escaneando
+    // Detectar el código de barras
+    Quagga.onDetected(function (data) {
+        const barcode = data.codeResult.code;
+        console.log("Código detectado: ", barcode);  // Depuración para verificar el código
+
+        // Detener Quagga después de escanear
+        Quagga.stop();
+        barcodeReader.style.display = 'none';  // Ocultar el área de escaneo después de capturar el código
+
+        // Buscar el paquete usando el código escaneado
+        searchPackage(barcode);
+    });
+}
 
     // Detener Quagga después de escanear
     Quagga.stop();
