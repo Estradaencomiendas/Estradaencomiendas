@@ -116,25 +116,30 @@
         
         document.getElementById('qr-scan-button').addEventListener('click', async function() {
             try {
-                // Obtener la lista de cámaras disponibles
-                const devices = await codeReader.listVideoInputDevices();
+                // Usar MediaDevices para listar cámaras y seleccionar la trasera
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
                 
-                // Elegir la cámara trasera (última de la lista)
-                const deviceId = devices[devices.length - 1].deviceId;
-                
-                // Mostrar el video y comenzar a escanear
-                video.style.display = 'block';
-                codeReader.decodeFromVideoDevice(deviceId, video, (result, err) => {
-                    if (result) {
-                        alert(`Código QR escaneado: ${result.text}`);
-                        document.getElementById('tracking-number').value = result.text;
-                        video.style.display = 'none'; // Ocultar el video después del escaneo
-                        codeReader.reset(); // Detener la cámara
-                    }
-                    if (err && !(err instanceof ZXingBrowser.NotFoundException)) {
-                        console.error(err);
-                    }
-                });
+                if (videoDevices.length > 0) {
+                    // Intentar seleccionar la cámara trasera
+                    const backCamera = videoDevices[videoDevices.length - 1].deviceId;
+
+                    video.style.display = 'block';
+                    
+                    codeReader.decodeFromVideoDevice(backCamera, video, (result, err) => {
+                        if (result) {
+                            alert(`Código QR escaneado: ${result.text}`);
+                            document.getElementById('tracking-number').value = result.text;
+                            video.style.display = 'none';
+                            codeReader.reset(); // Detener la cámara después de escanear
+                        }
+                        if (err && !(err instanceof ZXingBrowser.NotFoundException)) {
+                            console.error(err);
+                        }
+                    });
+                } else {
+                    console.error('No se encontraron cámaras disponibles.');
+                }
             } catch (error) {
                 console.error("Error al intentar acceder a la cámara: ", error);
             }
@@ -142,7 +147,5 @@
     </script>
 </body>
 </html>
-
-
 
 
