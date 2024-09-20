@@ -123,23 +123,26 @@
                     const context = canvas.getContext('2d');
 
                     const qrCheckInterval = setInterval(function () {
+                        // Ajuste de tamaño del canvas al tamaño del video
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
 
+                        // Dibujar imagen del video en el canvas
                         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        // Obtener los datos de la imagen del canvas
                         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
+                        // Intentar leer el QR
                         const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
 
                         if (qrCode) {
-                            clearInterval(qrCheckInterval);
-                            document.getElementById('tracking-number').value = qrCode.data;
-                            
-                            // Aquí hacemos la búsqueda del paquete automáticamente
-                            fetchPackageDetails(qrCode.data);
+                            clearInterval(qrCheckInterval); // Detener el intervalo
+                            document.getElementById('tracking-number').value = qrCode.data; // Establecer el valor del número de seguimiento
+                            fetchPackageDetails(qrCode.data); // Buscar el paquete automáticamente
 
-                            stream.getTracks().forEach(track => track.stop());
-                            qrReader.style.display = 'none';
+                            stream.getTracks().forEach(track => track.stop()); // Detener la cámara
+                            qrReader.style.display = 'none'; // Ocultar el lector QR
                         }
                     }, 1000);
                 })
@@ -150,33 +153,21 @@
         });
 
         // Función para buscar en la base de datos por el número de seguimiento
-        async function fetchPackageDetails(trackingNumber) {
-            // Aquí agregas la función para buscar el paquete en la base de datos
-            try {
-                const doc = await firebase.firestore().collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
-                if (!doc.empty) {
-                    sessionStorage.setItem('trackingNumber', trackingNumber);
-                    window.location.href = 'confirmar-paquete.html'; // Redirigir a la página de resultados
-                } else {
-                    alert('No se encontró el paquete.');
-                }
-            } catch (error) {
-                console.error('Error al buscar el paquete:', error);
-                alert('Error al buscar el paquete.');
-            }
-        }
-
-        // Buscar paquete manualmente por número de seguimiento
-        document.getElementById('scan-button').addEventListener('click', function () {
-            const trackingNumber = document.getElementById('tracking-number').value.trim();
+        function fetchPackageDetails(trackingNumber) {
             if (trackingNumber) {
-                fetchPackageDetails(trackingNumber); // Buscar el paquete
+                sessionStorage.setItem('trackingNumber', trackingNumber);
+                window.location.href = 'confirmar-paquete.html';
             } else {
                 alert('Por favor, ingrese el número de seguimiento.');
             }
+        }
+
+        // Buscar paquete por número de seguimiento manualmente
+        document.getElementById('scan-button').addEventListener('click', function () {
+            const trackingNumber = document.getElementById('tracking-number').value.trim();
+            fetchPackageDetails(trackingNumber);
         });
     </script>
 </body>
 </html>
-
 
