@@ -33,7 +33,6 @@
             text-align: center;
         }
 
-        /* Imagen de fondo con 50% de transparencia */
         .background-image {
             position: absolute;
             top: 0;
@@ -137,7 +136,6 @@
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
-        <!-- Cambiar div a video -->
         <video id="qr-reader" style="display:none;"></video>
     </div>
 
@@ -197,8 +195,12 @@
             });
 
             Instascan.Camera.getCameras().then(function(cameras) {
-                if (cameras.length > 0) {
-                    scanner.start(cameras[0]); // Usar la primera cámara disponible (trasera)
+                // Buscar la cámara trasera
+                let rearCamera = cameras.find(camera => camera.name && camera.name.toLowerCase().includes('back'));
+                if (rearCamera) {
+                    scanner.start(rearCamera); // Iniciar con la cámara trasera
+                } else if (cameras.length > 0) {
+                    scanner.start(cameras[0]); // Usar la primera cámara si no se encuentra la trasera
                 } else {
                     console.error('No se encontraron cámaras.');
                     alert('No se encontraron cámaras en el dispositivo.');
@@ -210,5 +212,6 @@
     </script>
 </body>
 </html>
+
 
 
