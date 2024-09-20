@@ -181,9 +181,9 @@
                 <p><span>Valor:</span> $${packageData.valor}</p>
             `;
 
-            // Generar el código QR
+            // Generar el código QR con la URL completa
             new QRCode(document.getElementById("qrcode"), {
-                text: `confirmar-paquete.html?trackingNumber=${packageData.trackingNumber}`, // Generar QR con URL
+                text: `https://estradaencomiendas.netlify.app/confirmar-paquete.html?trackingNumber=${packageData.trackingNumber}`,
                 width: 128,
                 height: 128,
                 colorDark: "#000000",
@@ -228,4 +228,5 @@
     </script>
 </body>
 </html>
+
 
