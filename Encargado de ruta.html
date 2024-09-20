@@ -24,7 +24,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
+            background-color: rgba(255, 255, 255, 0.6);
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -198,15 +198,26 @@
                 // Buscar la cámara trasera
                 let rearCamera = cameras.find(camera => camera.name && camera.name.toLowerCase().includes('back'));
                 if (rearCamera) {
-                    scanner.start(rearCamera); // Iniciar con la cámara trasera
+                    scanner.start(rearCamera).then(() => {
+                        console.log("Cámara trasera iniciada");
+                    }).catch(err => {
+                        console.error("Error al iniciar la cámara trasera:", err);
+                        alert('Error al iniciar la cámara trasera.');
+                    });
                 } else if (cameras.length > 0) {
-                    scanner.start(cameras[0]); // Usar la primera cámara si no se encuentra la trasera
+                    scanner.start(cameras[0]).then(() => {
+                        console.log("Cámara frontal iniciada");
+                    }).catch(err => {
+                        console.error("Error al iniciar la cámara frontal:", err);
+                        alert('Error al iniciar la cámara frontal.');
+                    });
                 } else {
                     console.error('No se encontraron cámaras.');
                     alert('No se encontraron cámaras en el dispositivo.');
                 }
             }).catch(function(e) {
-                console.error(e);
+                console.error("Error al obtener cámaras:", e);
+                alert('Error al obtener acceso a las cámaras.');
             });
         });
     </script>
