@@ -16,7 +16,7 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M", // Reemplaza con tu API Key de Firebase
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
             authDomain: "estradaencomiendas0.firebaseapp.com",
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
@@ -40,219 +40,167 @@
 
     <!-- Estilos CSS -->
     <style>
-        /* Estilos */
+        /* Estilos base */
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            background-color: #F1F1F1;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #F1F1F1;
         }
 
         .container {
             background-color: white;
             padding: 20px;
-            border-radius: 25px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
-            text-align: center;
+            max-width: 500px;
+            text-align: left;
         }
 
         .logo {
-            width: 250px;
-            margin-bottom: 20px;
-        }
-
-        .title-wrapper {
-            background-color: white;
-            padding: 20px;
-            border-radius: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block;
+            margin: 0 auto 20px;
+            width: 150px;
         }
 
         h1 {
-            font-size: 24px;
-            color: #F39200;
-            font-weight: bold;
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
         }
 
         form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 25px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .form-input-wrapper {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .form-input-wrapper input {
-            width: calc(100% - 20px);
-            padding: 12px;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            background-color: #F1F1F1;
+        label {
+            font-size: 14px;
             color: #333;
-            font-size: 17px;
-            font-weight: bold;
-            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        input:focus, select:focus {
+            border-color: #F39200;
             outline: none;
         }
 
-        .form-input-wrapper input:focus {
-            border-color: #B25C00;
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .submit-button {
+            width: 100%;
+            background-color: #F39200;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background-color: #B25C00;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-wrapper input {
+            margin-right: 10px;
+        }
+
+        .privacy-policy {
+            color: #F39200;
+            text-decoration: none;
+            font-size: 14px;
         }
 
         .form-input-row {
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            margin-bottom: 10px; 
-            gap: 10px; 
+            gap: 15px;
         }
 
         .form-input-column {
-            display: flex;
-            flex-direction: column;
             width: 48%;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #F39200;
-            margin-bottom: 5px;
-            text-align: left;
-        }
-
-        .form-input-small {
-            width: 100%;
-            padding: 8px;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            background-color: #F1F1F1;
-            color: #333;
-            font-size: 15px;
-            font-weight: bold;
-            text-align: right;
-            outline: none;
-            -moz-appearance: textfield;
-        }
-
-        .form-input-small::-webkit-outer-spin-button,
-        .form-input-small::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .submit-button {
-            background: #F39200;
-            border: none;
-            border-radius: 20px;
-            padding: 12px 20px;
-            color: white;
-            font-size: 17px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s ease;
-        }
-
-        .submit-button:hover {
-            background: #B25C00;
-        }
-
-        .phone-input {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            padding: 10px;
-            background-color: #F1F1F1;
-            width: 100%;
-        }
-
-        .phone-input span {
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-        .phone-input input {
-            flex: 1;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 17px;
-            font-weight: bold;
-            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
-
-        <div class="title-wrapper">
-            <h1>Recepción de Paquetes</h1>
-        </div>
+        <h1>Recepción de Paquetes</h1>
 
         <form id="package-form">
-            <div class="form-input-wrapper">
+            <div class="form-group">
+                <label for="nombreCliente">Nombre de la Clienta</label>
                 <input type="text" id="nombreCliente" placeholder="Nombre de la Clienta" required>
             </div>
 
-            <div class="form-input-wrapper">
+            <div class="form-group">
+                <label for="nombrePaquete">Nombre de la Página</label>
                 <input type="text" id="nombrePaquete" placeholder="Nombre de la Página" required>
             </div>
 
-            <div class="form-input-wrapper">
+            <div class="form-group">
+                <label for="destino">Destino</label>
                 <input type="text" id="destino" placeholder="Destino" required>
             </div>
 
-            <label class="date-label" for="dia-entrega">Fecha de Entrega</label>
-            <div class="form-input-wrapper">
+            <div class="form-group">
+                <label for="dia-entrega">Fecha de Entrega</label>
                 <input type="date" id="dia-entrega" required>
             </div>
 
             <div class="form-input-row">
                 <div class="form-input-column">
                     <label for="valorEnvio">Valor del Envío</label>
-                    <input type="number" id="valorEnvio" class="form-input-small" required>
+                    <input type="number" id="valorEnvio" placeholder="Valor del Envío" required>
                 </div>
                 <div class="form-input-column">
                     <label for="valor">Valor del Paquete</label>
-                    <input type="number" id="valor" class="form-input-small" required>
+                    <input type="number" id="valor" placeholder="Valor del Paquete" required>
                 </div>
             </div>
 
-            <div class="form-input-wrapper">
-                <div class="phone-input">
-                    <span>+503</span>
-                    <input type="tel" id="telefonoVendedora" placeholder="Número de Vendedora" pattern="\d{8}" required>
-                </div>
+            <div class="form-group">
+                <label for="telefonoVendedora">Teléfono de la Vendedora</label>
+                <input type="tel" id="telefonoVendedora" placeholder="Número de Vendedora" pattern="\d{8}" required>
+            </div>
+
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="privacyPolicy" required>
+                <label for="privacyPolicy">Acepto la <a href="#" class="privacy-policy">Política de Privacidad</a></label>
             </div>
 
             <button class="submit-button" type="submit">Ingresar Datos</button>
         </form>
     </div>
 
-    <!-- Script principal -->
     <script>
         document.getElementById('package-form').addEventListener('submit', async function(event) {
             event.preventDefault();
