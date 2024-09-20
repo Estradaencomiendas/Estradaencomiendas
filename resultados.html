@@ -183,7 +183,7 @@
 
             // Generar el código QR
             new QRCode(document.getElementById("qrcode"), {
-                text: packageData.trackingNumber, // Asegúrate de solo usar el número de seguimiento
+                text: `confirmar-paquete.html?trackingNumber=${packageData.trackingNumber}`, // Generar QR con URL
                 width: 128,
                 height: 128,
                 colorDark: "#000000",
