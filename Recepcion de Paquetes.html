@@ -106,6 +106,52 @@
             outline: none;
         }
 
+        .form-input-wrapper input:focus {
+            border-color: #B25C00;
+        }
+
+        .form-input-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px; 
+            gap: 10px; 
+        }
+
+        .form-input-column {
+            display: flex;
+            flex-direction: column;
+            width: 48%;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #F39200;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .form-input-small {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #F39200;
+            border-radius: 20px;
+            background-color: #F1F1F1;
+            color: #333;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: right;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+
+        .form-input-small::-webkit-outer-spin-button,
+        .form-input-small::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
         .submit-button {
             background: #F39200;
             border: none;
@@ -177,6 +223,17 @@
                 <input type="date" id="dia-entrega" required>
             </div>
 
+            <div class="form-input-row">
+                <div class="form-input-column">
+                    <label for="valorEnvio">Valor del Envío</label>
+                    <input type="number" id="valorEnvio" class="form-input-small" required>
+                </div>
+                <div class="form-input-column">
+                    <label for="valor">Valor del Paquete</label>
+                    <input type="number" id="valor" class="form-input-small" required>
+                </div>
+            </div>
+
             <div class="form-input-wrapper">
                 <div class="phone-input">
                     <span>+503</span>
@@ -222,17 +279,17 @@
                 await db.collection('paquetes').doc(trackingNumber).set(packageData);
                 console.log('Paquete guardado en Firestore');
 
-                // Enviar mensaje de texto
-                const smsUrl = 'https://api.twilio.com/2010-04-01/Accounts/YOUR_TWILIO_ACCOUNT_SID/Messages.json';
+                // Enviar mensaje de texto con Twilio utilizando las variables de entorno de Netlify
+                const smsUrl = 'https://api.twilio.com/2010-04-01/Accounts/' + process.env.TWILIO_ACCOUNT_SID + '/Messages.json';
                 await fetch(smsUrl, {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Basic ' + btoa('YOUR_TWILIO_ACCOUNT_SID:YOUR_TWILIO_AUTH_TOKEN'),
+                        'Authorization': 'Basic ' + btoa(process.env.TWILIO_ACCOUNT_SID + ':' + process.env.TWILIO_AUTH_TOKEN),
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
                     body: new URLSearchParams({
-                        Body: `Hola, su paquete con número de seguimiento ${trackingNumber} ha sido registrado y será entregado el ${diaEntrega}.`,
-                        From: 'YOUR_TWILIO_PHONE_NUMBER',
+                        Body: `Gracias por enviar con Estrada Encomiendas. Tu número de seguimiento es: ${trackingNumber}. Nombre de la clienta: ${nombreCliente}, Destino: ${destino}, Valor: $${valor}.`,
+                        From: '+13863336602', // Número proporcionado
                         To: telefonoVendedora
                     })
                 });
