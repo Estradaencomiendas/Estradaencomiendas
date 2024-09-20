@@ -5,9 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script> <!-- Biblioteca jsQR -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> <!-- Biblioteca de escaneo QR -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> <!-- Biblioteca para QR Code -->
+    <!-- Firebase (Versión 8.x) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            authDomain: "estradaencomiendas0.firebaseapp.com",
+            projectId: "estradaencomiendas0",
+            storageBucket: "estradaencomiendas0.appspot.com",
+            messagingSenderId: "247979951336",
+            appId: "1:247979951336:web:92b6b4bf615595676755d",
+            measurementId: "G-BRMC9FZBC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -23,7 +40,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6); 
+            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -32,14 +49,37 @@
             text-align: center;
         }
 
+        /* Imagen de fondo con 50% de transparencia */
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5; /* 50% de transparencia */
+            background-image: url('19199540.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* Asegura que esté detrás del contenido */
+            border-radius: 20px;
+        }
+
         .logo {
-            width: 150px; 
-            margin: 0 auto 20px; 
+            width: 150px;
+            margin: 0 auto 20px;
             display: block;
         }
 
+        .title-wrapper {
+            background-color: rgba(255, 255, 255, 0.9);
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
         h1 {
-            font-size: 22px; 
+            font-size: 22px;
             color: #333;
             font-weight: bold;
             margin: 0;
@@ -63,6 +103,10 @@
             font-weight: bold;
         }
 
+        .input-wrapper input:focus {
+            border-color: #F39204;
+        }
+
         .status-buttons img {
             width: 130px;
             cursor: pointer;
@@ -80,18 +124,18 @@
             margin: 20px auto;
             display: none;
         }
-
-        video {
-            width: 100%;
-            border-radius: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Imagen de fondo con 50% de transparencia -->
+        <div class="background-image"></div>
+
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
         
-        <h1>Encargado de Ruta</h1>
+        <div class="title-wrapper">
+            <h1>Encargado de Ruta</h1>
+        </div>
 
         <div class="input-wrapper">
             <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
@@ -104,47 +148,32 @@
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
-        <div id="qr-reader">
-            <video id="video" autoplay></video>
-        </div>
+        <div id="qr-reader"></div>
     </div>
 
     <script>
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
-            authDomain: "estradaencomiendas0.firebaseapp.com",
-            projectId: "estradaencomiendas0",
-            storageBucket: "estradaencomiendas0.appspot.com",
-            messagingSenderId: "247979951336",
-            appId: "1:247979951336:web:92b6b4bf615595676755d",
-            measurementId: "G-BRMC9FZBC"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // Función para buscar el paquete por número de seguimiento en Firestore
-        async function fetchPackageDetails(trackingNumber) {
+        // Función para buscar en Firestore por el número de seguimiento
+        async function searchPackage(trackingNumber) {
             try {
-                const doc = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
-                if (!doc.empty) {
-                    // Guardar el número de seguimiento en sessionStorage y redirigir a la página de resultados
+                const querySnapshot = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
+                if (!querySnapshot.empty) {
                     sessionStorage.setItem('trackingNumber', trackingNumber);
-                    window.location.href = 'resultados.html';
+                    window.location.href = 'confirmar-paquete.html';
                 } else {
-                    alert('No se encontraron datos para el número de seguimiento ingresado.');
+                    alert('No se encontró un paquete con este número de seguimiento.');
                 }
             } catch (error) {
-                console.error('Error obteniendo los datos del paquete:', error);
+                console.error("Error al buscar el paquete:", error);
+                alert("Error al buscar el paquete.");
             }
         }
 
-        // Acción del botón de búsqueda manual
+        // Acción del botón de búsqueda
         document.getElementById('scan-button').addEventListener('click', function() {
             const trackingNumber = document.getElementById('tracking-number').value.trim();
+
             if (trackingNumber) {
-                fetchPackageDetails(trackingNumber); // Buscar el paquete en la base de datos
+                searchPackage(trackingNumber);
             } else {
                 alert('Por favor, ingrese el número de seguimiento.');
             }
@@ -155,43 +184,35 @@
             const qrReader = document.getElementById('qr-reader');
             qrReader.style.display = 'block'; // Mostrar el lector QR
 
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(function (stream) {
-                    const video = document.getElementById('video');
-                    video.srcObject = stream;
+            const html5QrCode = new Html5Qrcode("qr-reader");
 
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
+            html5QrCode.start(
+                { facingMode: "environment" }, // Usar la cámara trasera
+                {
+                    fps: 10,    // Cuadros por segundo
+                    qrbox: 250  // Tamaño de la caja de escaneo
+                },
+                qrCodeMessage => {
+                    // Usar el valor del QR como el número de seguimiento
+                    searchPackage(qrCodeMessage);
 
-                    const qrCheckInterval = setInterval(function () {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
-
-                        if (qrCode) {
-                            clearInterval(qrCheckInterval); // Detener el intervalo de escaneo
-                            document.getElementById('tracking-number').value = qrCode.data; // Poner el número de seguimiento
-
-                            // Llamar la función para buscar el paquete
-                            fetchPackageDetails(qrCode.data);
-
-                            stream.getTracks().forEach(track => track.stop()); // Detener la cámara
-                            qrReader.style.display = 'none'; // Ocultar el lector
-                        }
-                    }, 1000);
-                })
-                .catch(function (error) {
-                    console.error('Error al intentar acceder a la cámara: ', error);
-                    alert('Error al intentar acceder a la cámara.');
-                });
+                    // Detener el escaneo después de leer el código
+                    html5QrCode.stop().then(() => {
+                        qrReader.style.display = 'none'; // Ocultar el lector QR
+                    }).catch(err => {
+                        console.error("No se pudo detener el escaneo.", err);
+                    });
+                },
+                errorMessage => {
+                    console.log(Error en el escaneo: ${errorMessage});
+                }
+            ).catch(err => {
+                console.error("Error al iniciar el lector QR.", err);
+            });
         });
     </script>
 </body>
 </html>
-
 
 
 
