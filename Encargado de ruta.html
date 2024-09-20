@@ -49,21 +49,6 @@
             text-align: center;
         }
 
-        /* Imagen de fondo con 50% de transparencia */
-        .background-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.5;
-            background-image: url('19199540.jpg');
-            background-size: cover;
-            background-position: center;
-            z-index: -1;
-            border-radius: 20px;
-        }
-
         .logo {
             width: 150px;
             margin: 0 auto 20px;
@@ -138,13 +123,14 @@
             margin: 20px auto;
             display: none;
         }
+
+        video {
+            max-width: 100%;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Imagen de fondo con 50% de transparencia -->
-        <div class="background-image"></div>
-
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
         
         <div class="title-wrapper">
@@ -210,5 +196,3 @@
     </script>
 </body>
 </html>
-
-
