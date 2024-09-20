@@ -181,9 +181,20 @@
                 <p><span>Valor:</span> $${packageData.valor}</p>
             `;
 
-            // Generar el código QR con la URL completa
+            // Obtener tipo de usuario desde localStorage
+            const userType = localStorage.getItem('userType'); // Admin1, Admin0 o user
+
+            // Definir la URL según el tipo de usuario
+            let redirectUrl = "";
+            if (userType === "Admin1" || userType === "Admin0") {
+                redirectUrl = `https://estradaencomiendas.netlify.app/confirmar-paquete.html?trackingNumber=${packageData.trackingNumber}`;
+            } else if (userType === "user") {
+                redirectUrl = `https://estradaencomiendas.netlify.app/Usuario.html?trackingNumber=${packageData.trackingNumber}`;
+            }
+
+            // Generar el código QR con la URL correspondiente
             new QRCode(document.getElementById("qrcode"), {
-                text: `https://estradaencomiendas.netlify.app/confirmar-paquete.html?trackingNumber=${packageData.trackingNumber}`,
+                text: redirectUrl,
                 width: 128,
                 height: 128,
                 colorDark: "#000000",
