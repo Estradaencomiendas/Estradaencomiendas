@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Configuración del encabezado -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recepción de Paquetes</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <!-- Scripts de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -32,111 +34,9 @@
             }
         });
     </script>
+    <!-- Estilos -->
     <style>
-        body {
-            font-family: 'Acumin Variable Concept', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #F1F1F1;
-        }
-
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 25px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .logo {
-            width: 250px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 24px;
-            color: #F39200;
-            font-weight: bold;
-        }
-
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-input-wrapper {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-
-        .form-input-wrapper input {
-            width: calc(100% - 20px);
-            padding: 12px;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            background-color: #F1F1F1;
-            color: #333;
-            font-size: 17px;
-            font-weight: bold;
-            outline: none;
-        }
-
-        .submit-button {
-            background: #F39200;
-            border: none;
-            border-radius: 20px;
-            padding: 12px 20px;
-            color: white;
-            font-size: 17px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s ease;
-        }
-
-        .submit-button:hover {
-            background: #B25C00;
-        }
-
-        .phone-input {
-            display: flex;
-            align-items: center;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            padding: 10px;
-            background-color: #F1F1F1;
-            width: 100%;
-        }
-
-        .phone-input span {
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-        .phone-input input {
-            flex: 1;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 17px;
-            font-weight: bold;
-            color: #333;
-        }
+        /* ... (mantén tus estilos existentes aquí) ... */
     </style>
 </head>
 <body>
@@ -144,31 +44,8 @@
         <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
         <h1>Recepción de Paquetes</h1>
         <form id="package-form">
-            <div class="form-input-wrapper">
-                <input type="text" id="nombreCliente" placeholder="Nombre de la Clienta" required>
-            </div>
-            <div class="form-input-wrapper">
-                <input type="text" id="nombrePaquete" placeholder="Nombre de la Página" required>
-            </div>
-            <div class="form-input-wrapper">
-                <input type="text" id="destino" placeholder="Destino" required>
-            </div>
-            <div class="form-input-wrapper">
-                <label for="dia-entrega">Fecha de Entrega</label>
-                <input type="date" id="dia-entrega" required>
-            </div>
-            <div class="form-input-wrapper">
-                <label for="valorEnvio">Valor del Envío</label>
-                <input type="number" id="valorEnvio" required>
-            </div>
-            <div class="form-input-wrapper">
-                <label for="valor">Valor del Paquete</label>
-                <input type="number" id="valor" required>
-            </div>
-            <div class="form-input-wrapper phone-input">
-                <span>+503</span>
-                <input type="tel" id="telefonoVendedora" placeholder="Número de Vendedora" pattern="\d{8}" required>
-            </div>
+            <!-- Campos del formulario -->
+            <!-- ... (mantén tus campos de formulario existentes aquí) ... -->
             <button class="submit-button" type="submit">Ingresar Datos</button>
         </form>
     </div>
@@ -215,10 +92,7 @@
                     },
                     body: JSON.stringify({
                         to: telefonoVendedora,
-                        trackingNumber: trackingNumber,
-                        nombreCliente: nombreCliente,
-                        destino: destino,
-                        valor: valor
+                        message: `Gracias por enviar con Estrada Encomiendas. Tu número de seguimiento es: ${trackingNumber}. Nombre de la clienta: ${nombreCliente}, Destino: ${destino}, Valor: $${valor}.`
                     })
                 });
 
