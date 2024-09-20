@@ -23,6 +23,12 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // Función para obtener el número de seguimiento desde la URL
+        function getTrackingNumber() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('trackingNumber');
+        }
+
         // Función para cargar detalles del paquete desde Firestore
         async function loadPackageDetails(trackingNumber) {
             try {
@@ -40,6 +46,7 @@
                             <p><span>Valor:</span> $${packageData.valor}</p>
                         `;
 
+                        // Generar el código QR
                         new QRCode(document.getElementById("qrcode"), {
                             text: packageData.trackingNumber,
                             width: 128,
@@ -59,14 +66,13 @@
 
         // Función para actualizar el estado del paquete
         async function updatePackageStatus(status) {
-            const trackingNumber = sessionStorage.getItem('trackingNumber');
+            const trackingNumber = getTrackingNumber();  // Obtener el número de seguimiento desde la URL
             if (trackingNumber) {
                 try {
                     const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
                     querySnapshot.forEach(async (docSnap) => {
                         await db.collection('paquetes').doc(docSnap.id).update({ status });
-                        sessionStorage.setItem('packageStatus', status);
-                        window.location.href = 'Encargado de ruta.html';
+                        window.location.href = 'Encargado de ruta.html';  // Redirigir después de la actualización
                     });
                 } catch (error) {
                     console.error('Error actualizando el estado del paquete:', error);
@@ -85,7 +91,7 @@
 
         // Agregar los event listeners solo después de que el DOM esté completamente cargado
         document.addEventListener('DOMContentLoaded', function() {
-            const trackingNumber = sessionStorage.getItem('trackingNumber');
+            const trackingNumber = getTrackingNumber();  // Obtener el número de seguimiento desde la URL
             if (trackingNumber) {
                 loadPackageDetails(trackingNumber);
             } else {
@@ -102,7 +108,7 @@
             });
 
             document.getElementById('report-problem').addEventListener('click', function() {
-                const trackingNumber = sessionStorage.getItem('trackingNumber');
+                const trackingNumber = getTrackingNumber();
                 if (trackingNumber) {
                     window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
                 } else {
@@ -240,4 +246,5 @@
     </div>
 </body>
 </html>
+
 
