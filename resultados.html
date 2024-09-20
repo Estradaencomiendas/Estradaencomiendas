@@ -63,10 +63,9 @@
             color: #333;
         }
 
-        #barcode {
+        svg {
             margin: 20px auto;
-            display: flex;
-            justify-content: center;
+            display: block;
         }
 
         #print-button, #back-button {
@@ -118,7 +117,7 @@
         <h1>Detalles del Paquete</h1>
         <div class="data">
             <div id="package-details"></div>
-            <div id="barcode"></div> <!-- Aquí se generará el código de barras -->
+            <svg id="barcode"></svg> <!-- Cambiado a <svg> para renderizar el código de barras -->
         </div>
         <button id="print-button" onclick="printTicket()">Imprimir Ticket</button>
         <button id="back-button" onclick="goBack()">Regresar</button>
