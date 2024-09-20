@@ -33,7 +33,6 @@
         });
     </script>
     <style>
-        /* Estilos */
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
             margin: 0;
@@ -61,14 +60,6 @@
             margin-bottom: 20px;
         }
 
-        .title-wrapper {
-            background-color: white;
-            padding: 20px;
-            border-radius: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
         h1 {
             font-size: 24px;
             color: #F39200;
@@ -90,7 +81,6 @@
             align-items: center;
             width: 100%;
             margin-bottom: 15px;
-            position: relative;
         }
 
         .form-input-wrapper input {
@@ -102,54 +92,7 @@
             color: #333;
             font-size: 17px;
             font-weight: bold;
-            box-sizing: border-box;
             outline: none;
-        }
-
-        .form-input-wrapper input:focus {
-            border-color: #B25C00;
-        }
-
-        .form-input-row {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 10px; 
-            gap: 10px; 
-        }
-
-        .form-input-column {
-            display: flex;
-            flex-direction: column;
-            width: 48%;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: bold;
-            color: #F39200;
-            margin-bottom: 5px;
-            text-align: left;
-        }
-
-        .form-input-small {
-            width: 100%;
-            padding: 8px;
-            border: 2px solid #F39200;
-            border-radius: 20px;
-            background-color: #F1F1F1;
-            color: #333;
-            font-size: 15px;
-            font-weight: bold;
-            text-align: right;
-            outline: none;
-            -moz-appearance: textfield;
-        }
-
-        .form-input-small::-webkit-outer-spin-button,
-        .form-input-small::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
         }
 
         .submit-button {
@@ -173,7 +116,6 @@
         .phone-input {
             display: flex;
             align-items: center;
-            justify-content: center;
             border: 2px solid #F39200;
             border-radius: 20px;
             padding: 10px;
@@ -200,47 +142,33 @@
 <body>
     <div class="container">
         <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
-
-        <div class="title-wrapper">
-            <h1>Recepción de Paquetes</h1>
-        </div>
-
+        <h1>Recepción de Paquetes</h1>
         <form id="package-form">
             <div class="form-input-wrapper">
                 <input type="text" id="nombreCliente" placeholder="Nombre de la Clienta" required>
             </div>
-
             <div class="form-input-wrapper">
                 <input type="text" id="nombrePaquete" placeholder="Nombre de la Página" required>
             </div>
-
             <div class="form-input-wrapper">
                 <input type="text" id="destino" placeholder="Destino" required>
             </div>
-
-            <label class="date-label" for="dia-entrega">Fecha de Entrega</label>
             <div class="form-input-wrapper">
+                <label for="dia-entrega">Fecha de Entrega</label>
                 <input type="date" id="dia-entrega" required>
             </div>
-
-            <div class="form-input-row">
-                <div class="form-input-column">
-                    <label for="valorEnvio">Valor del Envío</label>
-                    <input type="number" id="valorEnvio" class="form-input-small" required>
-                </div>
-                <div class="form-input-column">
-                    <label for="valor">Valor del Paquete</label>
-                    <input type="number" id="valor" class="form-input-small" required>
-                </div>
-            </div>
-
             <div class="form-input-wrapper">
-                <div class="phone-input">
-                    <span>+503</span>
-                    <input type="tel" id="telefonoVendedora" placeholder="Número de Vendedora" pattern="\d{8}" required>
-                </div>
+                <label for="valorEnvio">Valor del Envío</label>
+                <input type="number" id="valorEnvio" required>
             </div>
-
+            <div class="form-input-wrapper">
+                <label for="valor">Valor del Paquete</label>
+                <input type="number" id="valor" required>
+            </div>
+            <div class="form-input-wrapper phone-input">
+                <span>+503</span>
+                <input type="tel" id="telefonoVendedora" placeholder="Número de Vendedora" pattern="\d{8}" required>
+            </div>
             <button class="submit-button" type="submit">Ingresar Datos</button>
         </form>
     </div>
@@ -275,24 +203,31 @@
             };
 
             try {
-                // Guardar usando el número de seguimiento como ID del documento
+                // Guardar en Firestore
                 await db.collection('paquetes').doc(trackingNumber).set(packageData);
                 console.log('Paquete guardado en Firestore');
 
-                // Enviar mensaje de texto con Twilio utilizando las variables de entorno de Netlify
-                const smsUrl = 'https://api.twilio.com/2010-04-01/Accounts/' + process.env.TWILIO_ACCOUNT_SID + '/Messages.json';
-                await fetch(smsUrl, {
+                // Enviar mensaje de texto a través de Netlify Functions
+                const response = await fetch('/.netlify/functions/send-sms', {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Basic ' + btoa(process.env.TWILIO_ACCOUNT_SID + ':' + process.env.TWILIO_AUTH_TOKEN),
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                        'Content-Type': 'application/json'
                     },
-                    body: new URLSearchParams({
-                        Body: `Gracias por enviar con Estrada Encomiendas. Tu número de seguimiento es: ${trackingNumber}. Nombre de la clienta: ${nombreCliente}, Destino: ${destino}, Valor: $${valor}.`,
-                        From: '+13863336602', // Número proporcionado
-                        To: telefonoVendedora
+                    body: JSON.stringify({
+                        to: telefonoVendedora,
+                        trackingNumber: trackingNumber,
+                        nombreCliente: nombreCliente,
+                        destino: destino,
+                        valor: valor
                     })
                 });
+
+                if (!response.ok) {
+                    throw new Error('Error enviando el SMS');
+                }
+
+                const result = await response.json();
+                console.log('SMS enviado con éxito:', result);
 
                 alert('Datos ingresados con éxito y mensaje enviado');
                 window.location.href = `resultados.html?trackingNumber=${trackingNumber}&fechaEnvio=${fechaEnvio}`;
