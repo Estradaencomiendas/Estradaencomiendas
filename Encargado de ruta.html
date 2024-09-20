@@ -152,20 +152,23 @@
 
     <script>
         // Función para buscar en Firestore por el número de seguimiento
-        async function searchPackage(trackingNumber) {
-            try {
-                const querySnapshot = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
-                if (!querySnapshot.empty) {
-                    sessionStorage.setItem('trackingNumber', trackingNumber);
-                    window.location.href = 'confirmar-paquete.html';
-                } else {
-                    alert('No se encontró un paquete con este número de seguimiento.');
-                }
-            } catch (error) {
-                console.error("Error al buscar el paquete:", error);
-                alert("Error al buscar el paquete.");
-            }
+       async function searchPackage(trackingNumber) {
+    try {
+        // Usa .doc si el trackingNumber es el ID del documento en Firestore
+        const docRef = db.collection('paquetes').doc(trackingNumber);
+        const doc = await docRef.get();
+        if (doc.exists) {
+            sessionStorage.setItem('trackingNumber', trackingNumber);
+            window.location.href = 'confirmar-paquete.html';
+        } else {
+            alert('No se encontró un paquete con este número de seguimiento.');
         }
+    } catch (error) {
+        console.error("Error al buscar el paquete:", error);
+        alert("Error al buscar el paquete.");
+    }
+}
+
 
         // Acción del botón de búsqueda
         document.getElementById('search-button').addEventListener('click', function() {
