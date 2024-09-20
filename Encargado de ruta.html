@@ -152,7 +152,9 @@
             try {
                 const querySnapshot = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
                 if (!querySnapshot.empty) {
-                    window.location.href = `confirmar-paquete.html?trackingNumber=${trackingNumber}`;
+                    // Aquí redireccionamos a la página confirmar-paquete con el número de seguimiento
+                    const redirectUrl = `https://estradaencomiendas.netlify.app/confirmar-paquete.html?trackingNumber=${trackingNumber}`;
+                    window.location.href = redirectUrl;
                 } else {
                     alert('No se encontró un paquete con este número de seguimiento.');
                 }
@@ -162,18 +164,7 @@
             }
         }
 
-        // Acción del botón de búsqueda
-        document.getElementById('scan-button').addEventListener('click', function() {
-            const trackingNumber = document.getElementById('tracking-number').value.trim();
-
-            if (trackingNumber) {
-                searchPackage(trackingNumber);
-            } else {
-                alert('Por favor, ingrese el número de seguimiento.');
-            }
-        });
-
-        // Acción del botón de escaneo QR
+        // Función para iniciar la cámara y escanear el QR
         document.getElementById('qr-scan-button').addEventListener('click', function() {
             const video = document.createElement('video');
             const canvasElement = document.getElementById('qr-canvas');
@@ -196,6 +187,7 @@
                         const code = jsQR(imageData.data, imageData.width, imageData.height);
 
                         if (code) {
+                            // Una vez que el código QR es leído, buscar el paquete con el número de seguimiento
                             searchPackage(code.data);
                             video.srcObject.getTracks().forEach(track => track.stop()); // Detener la cámara
                         }
@@ -210,5 +202,6 @@
     </script>
 </body>
 </html>
+
 
 
