@@ -68,46 +68,29 @@
             display: block;
         }
 
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
         #print-button, #back-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #EDE309, #F39204);
+            background: #F39200;
             border: none;
             border-radius: 10px;
-            padding: 10px 20px;
+            padding: 12px 20px;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            color: #fff;
+            color: white;
+            font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
-            margin-top: 20px;
-            margin-right: 10px;
+            width: 48%;
         }
 
         #print-button:hover, #back-button:hover {
-            background: linear-gradient(135deg, #F39204, #EDE309);
+            background: #B25C00;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Barra de navegación inferior (con links en los iconos) */
-        .footer {
-            display: flex;
-            justify-content: space-around;
-            background-color: #F39200;
-            border-radius: 20px;
-            padding: 15px 0;
-            margin-top: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .footer-link {
-            text-align: center;
-            text-decoration: none;
-            color: white;
-        }
-
-        .footer-icon {
-            width: 50px;
-            height: 50px;
         }
     </style>
 </head>
@@ -119,27 +102,11 @@
             <div id="package-details"></div>
             <svg id="barcode"></svg> <!-- Cambiado a <svg> para renderizar el código de barras -->
         </div>
-        <button id="print-button" onclick="printTicket()">Imprimir Ticket</button>
-        <button id="back-button" onclick="goBack()">Regresar</button>
 
-        <!-- Barra de navegación inferior (con links en los iconos) -->
-        <div class="footer">
-            <a href="index.html" class="footer-link">
-                <img src="Inicio.png" alt="Inicio" class="footer-icon">
-                <div>Inicio</div>
-            </a>
-            <a href="Recepcion de Paquetes.html" class="footer-link">
-                <img src="icon1.png" alt="Recepción" class="footer-icon">
-                <div>Recepción</div>
-            </a>
-            <a href="Encargado de ruta.html" class="footer-link">
-                <img src="icon2.png" alt="Entrega" class="footer-icon">
-                <div>Entrega</div>
-            </a>
-            <a href="Seguimieto de Paquetes.html" class="footer-link">
-                <img src="icon3.png" alt="Registro" class="footer-icon">
-                <div>Registro</div>
-            </a>
+        <!-- Contenedor para los botones de "Imprimir" y "Regresar" -->
+        <div class="btn-container">
+            <button id="print-button" onclick="printTicket()">Imprimir Ticket</button>
+            <button id="back-button" onclick="goBack()">Regresar</button>
         </div>
     </div>
 
@@ -227,6 +194,5 @@
     </script>
 </body>
 </html>
-
 
 
