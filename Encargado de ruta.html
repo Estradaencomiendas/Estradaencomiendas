@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <!-- Cargar la biblioteca de escaneo de código de barras -->
-    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js"></script>
+    <!-- Cargar la biblioteca QuaggaJS -->
+    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
     <!-- Firebase (Versión 8.x) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -178,20 +178,45 @@
             }
         });
 
-        // Acción del botón de escaneo de código de barras
-        document.getElementById('barcode-scan-button').addEventListener('click', function() {
+        // Función para inicializar el escaneo con QuaggaJS
+        function startBarcodeScanner() {
             const barcodeReader = document.getElementById('barcode-reader');
-            barcodeReader.style.display = 'block'; // Mostrar el lector de código de barras
+            barcodeReader.style.display = 'block'; // Mostrar el área de escaneo
 
-            // Inicializar la cámara para el escaneo
-            const codeReader = new ZXing.BrowserBarcodeReader();
-            codeReader.decodeOnceFromVideoDevice(undefined, 'barcode-reader').then(result => {
-                searchPackage(result.text); // Usar el valor escaneado como número de seguimiento
-                barcodeReader.style.display = 'none'; // Ocultar el lector de código de barras
-            }).catch(err => {
-                console.error('Error al escanear el código de barras:', err);
-                alert('Error al escanear el código de barras.');
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#barcode-reader')    // Pasamos el div que contendrá el video
+                },
+                decoder: {
+                    readers: ["code_128_reader"] // Puedes agregar más tipos de códigos aquí
+                }
+            }, function (err) {
+                if (err) {
+                    console.error(err);
+                    alert('No se pudo inicializar el escáner.');
+                    return;
+                }
+                Quagga.start();
             });
+
+            Quagga.onDetected(function (data) {
+                const barcode = data.codeResult.code;
+                console.log("Código detectado: ", barcode);
+
+                // Detener Quagga después de escanear
+                Quagga.stop();
+                barcodeReader.style.display = 'none';
+
+                // Buscar el paquete usando el código escaneado
+                searchPackage(barcode);
+            });
+        }
+
+        // Acción del botón de escaneo
+        document.getElementById('barcode-scan-button').addEventListener('click', function() {
+            startBarcodeScanner();
         });
     </script>
 </body>
