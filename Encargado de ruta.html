@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script> <!-- Biblioteca jsQR -->
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -21,7 +21,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.6); 
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -31,21 +31,13 @@
         }
 
         .logo {
-            width: 150px;
-            margin: 0 auto 20px;
+            width: 150px; 
+            margin: 0 auto 20px; 
             display: block;
         }
 
-        .title-wrapper {
-            background-color: rgba(255, 255, 255, 0.9);
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
         h1 {
-            font-size: 22px;
+            font-size: 22px; 
             color: #333;
             font-weight: bold;
             margin: 0;
@@ -69,10 +61,6 @@
             font-weight: bold;
         }
 
-        .input-wrapper input:focus {
-            border-color: #F39204;
-        }
-
         .status-buttons img {
             width: 130px;
             cursor: pointer;
@@ -93,16 +81,15 @@
 
         video {
             width: 100%;
-            height: auto;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
-        <div class="title-wrapper">
-            <h1>Encargado de Ruta</h1>
-        </div>
+        
+        <h1>Encargado de Ruta</h1>
 
         <div class="input-wrapper">
             <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
@@ -115,64 +102,54 @@
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
-        <div id="qr-reader"></div>
-        <video id="video" style="display: none;"></video> <!-- Video donde se verá la cámara -->
+        <div id="qr-reader">
+            <video id="video" autoplay></video>
+        </div>
     </div>
 
     <script>
-        // Función para buscar en Firestore por el número de seguimiento
-        async function searchPackage(trackingNumber) {
-            try {
-                const querySnapshot = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
-                if (!querySnapshot.empty) {
-                    sessionStorage.setItem('trackingNumber', trackingNumber);
-                    window.location.href = 'confirmar-paquete.html';
-                } else {
-                    alert('No se encontró un paquete con este número de seguimiento.');
-                }
-            } catch (error) {
-                console.error("Error al buscar el paquete:", error);
-                alert("Error al buscar el paquete.");
-            }
-        }
+        const qrReaderButton = document.getElementById('qr-scan-button');
+        const video = document.getElementById('video');
+        const qrReader = document.getElementById('qr-reader');
 
-        // Acción del botón de búsqueda
-        document.getElementById('scan-button').addEventListener('click', function() {
-            const trackingNumber = document.getElementById('tracking-number').value.trim();
-            if (trackingNumber) {
-                searchPackage(trackingNumber);
-            } else {
-                alert('Por favor, ingrese el número de seguimiento.');
-            }
+        // Iniciar la cámara y escanear
+        qrReaderButton.addEventListener('click', function () {
+            qrReader.style.display = 'block';
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    const context = document.createElement('canvas').getContext('2d');
+                    const qrCheckInterval = setInterval(function () {
+                        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                        const imageData = context.getImageData(0, 0, video.videoWidth, video.videoHeight);
+                        const qrCode = jsQR(imageData.data, video.videoWidth, video.videoHeight);
+                        if (qrCode) {
+                            clearInterval(qrCheckInterval);
+                            document.getElementById('tracking-number').value = qrCode.data;
+                            alert('Código QR escaneado: ' + qrCode.data);
+                            stream.getTracks().forEach(track => track.stop()); // Detener la cámara
+                            qrReader.style.display = 'none'; // Ocultar el lector
+                        }
+                    }, 1000);
+                })
+                .catch(function (error) {
+                    console.error('Error al intentar acceder a la cámara: ', error);
+                });
         });
 
-        // Función para escanear el código QR
-        document.getElementById('qr-scan-button').addEventListener('click', async function() {
-            const videoElement = document.getElementById('video');
-            videoElement.style.display = 'block'; // Mostrar el video
-
-            const codeReader = new ZXing.BrowserQRCodeReader();
-            try {
-                const videoInputDevices = await codeReader.listVideoInputDevices();
-                const selectedDeviceId = videoInputDevices[0].deviceId; // Selecciona la cámara trasera
-
-                await codeReader.decodeFromVideoDevice(selectedDeviceId, videoElement, (result, error) => {
-                    if (result) {
-                        document.getElementById('tracking-number').value = result.text; // Coloca el valor del QR en el campo de seguimiento
-                        codeReader.reset(); // Detener el lector
-                        videoElement.style.display = 'none'; // Ocultar el video
-                        searchPackage(result.text); // Buscar el paquete
-                    }
-                    if (error) {
-                        console.error("Error al leer el QR: ", error);
-                    }
-                });
-            } catch (err) {
-                console.error("Error al intentar acceder a la cámara: ", err);
-                alert("Error al intentar acceder a la cámara: " + err.message);
+        // Buscar paquete por número de seguimiento
+        document.getElementById('scan-button').addEventListener('click', function () {
+            const trackingNumber = document.getElementById('tracking-number').value.trim();
+            if (trackingNumber) {
+                // Aquí iría la función para buscar el paquete en la base de datos
+                alert('Número de seguimiento: ' + trackingNumber);
+            } else {
+                alert('Por favor, ingrese el número de seguimiento.');
             }
         });
     </script>
 </body>
 </html>
+
+
 
