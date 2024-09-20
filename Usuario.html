@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuario</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- Font Awesome -->
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script> <!-- Firestore -->
@@ -240,7 +241,6 @@
     </div>
 
     <script>
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
             authDomain: "estradaencomiendas0.firebaseapp.com",
@@ -282,12 +282,12 @@
 
             let actionButton = '';
             if (packageData.status === 'Paquete Retirado') {
-                actionButton = `<button class="action-button-small add-button" onclick="addToMyShipments('${packageData.trackingNumber}')">Agregar</button>`;
+                actionButton = <button class="action-button-small add-button" onclick="addToMyShipments('${packageData.trackingNumber}')">Agregar</button>;
             } else if (packageData.status === 'Paquete No Retirado') {
-                actionButton = `<button class="action-button-small resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>`;
+                actionButton = <button class="action-button-small resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>;
             }
 
-            const packageHtml = `
+            const packageHtml = 
                 <div class="package-container" id="package-${packageData.trackingNumber}">
                     <div class="package-info">
                         <h3>${packageData.trackingNumber}</h3>
@@ -300,7 +300,7 @@
                     <span class="status ${statusClass}">${packageData.status || 'En Ruta'}</span>
                     <div class="package-actions">${actionButton}</div>
                 </div>
-            `;
+            ;
 
             packageList.innerHTML += packageHtml;
         }
@@ -311,7 +311,7 @@
             if (trackingNumber) {
                 const packageData = await searchPackage(trackingNumber);
                 if (packageData) {
-                    if (!document.getElementById(`package-${packageData.trackingNumber}`)) {
+                    if (!document.getElementById(package-${packageData.trackingNumber})) {
                         addPackageToContainer(packageData);
                     } else {
                         alert('Este paquete ya ha sido agregado.');
@@ -324,34 +324,14 @@
 
         // Función para agregar paquetes a 'Mis Envíos'
         function addToMyShipments(trackingNumber) {
-            alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
+            alert(Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.);
         }
 
         // Función para reenviar paquete
         function resendPackage(trackingNumber) {
-            alert(`Paquete con número de seguimiento ${trackingNumber} reenviado.`);
+            alert(Paquete con número de seguimiento ${trackingNumber} reenviado.);
         }
-
-        // Función para obtener el número de seguimiento de la URL
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                trackingNumber: params.get('trackingNumber')
-            };
-        }
-
-        // Al cargar la página, verificar si hay un número de seguimiento en la URL y realizar la búsqueda automática
-        document.addEventListener('DOMContentLoaded', async function() {
-            const { trackingNumber } = getQueryParams();
-            if (trackingNumber) {
-                const packageData = await searchPackage(trackingNumber);
-                if (packageData && !document.getElementById(`package-${packageData.trackingNumber}`)) {
-                    addPackageToContainer(packageData);
-                }
-            }
-        });
     </script>
 </body>
 </html>
-
 
