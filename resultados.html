@@ -190,7 +190,7 @@
 
             // Generar el código QR
             new QRCode(document.getElementById("qrcode"), {
-                text: packageData.trackingNumber,
+                text: packageData.trackingNumber, // Asegúrate de solo usar el número de seguimiento
                 width: 128,
                 height: 128,
                 colorDark: "#000000",
@@ -202,9 +202,9 @@
         // Función para obtener los datos del paquete desde Firestore
         async function fetchPackageDetails(trackingNumber) {
             try {
-                const doc = await db.collection('paquetes').doc(trackingNumber).get();
-                if (doc.exists) {
-                    displayPackageDetails(doc.data());
+                const doc = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
+                if (!doc.empty) {
+                    doc.forEach(docSnap => displayPackageDetails(docSnap.data()));
                 } else {
                     document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
                 }
@@ -235,5 +235,6 @@
     </script>
 </body>
 </html>
+
 
 
