@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <!-- ZXing JavaScript library para el escaneo de QR -->
-    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest"></script> <!-- ZXing library -->
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -22,27 +21,13 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
             text-align: center;
-        }
-
-        .background-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.5;
-            background-image: url('19199540.jpg');
-            background-size: cover;
-            background-position: center;
-            z-index: -1;
-            border-radius: 20px;
         }
 
         .logo {
@@ -100,20 +85,16 @@
             opacity: 1;
         }
 
-        #video {
-            width: 100%;
-            height: auto;
-            margin-top: 20px;
+        #qr-reader {
+            width: 250px;
+            margin: 20px auto;
             display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Imagen de fondo -->
-        <div class="background-image"></div>
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
-
         <div class="title-wrapper">
             <h1>Encargado de Ruta</h1>
         </div>
@@ -125,50 +106,71 @@
         <div class="status-buttons">
             <img src="boton-de-buscar.png" alt="Buscar Paquete" id="scan-button">
         </div>
-
         <div class="status-buttons">
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
-        <video id="video"></video>
+        <div id="qr-reader"></div>
     </div>
 
     <script>
-        // Acción del botón para escanear el código QR
-        document.getElementById('qr-scan-button').addEventListener('click', function() {
-            const video = document.getElementById('video');
-            
-            // Solicitar permisos para la cámara
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then((stream) => {
-                video.srcObject = stream;
-                video.setAttribute('playsinline', true); // para iOS
-                video.play();
-                video.style.display = 'block'; // Mostrar el video
+        // Función para buscar en Firestore por el número de seguimiento
+        async function searchPackage(trackingNumber) {
+            try {
+                const querySnapshot = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
+                if (!querySnapshot.empty) {
+                    sessionStorage.setItem('trackingNumber', trackingNumber);
+                    window.location.href = 'confirmar-paquete.html';
+                } else {
+                    alert('No se encontró un paquete con este número de seguimiento.');
+                }
+            } catch (error) {
+                console.error("Error al buscar el paquete:", error);
+                alert("Error al buscar el paquete.");
+            }
+        }
 
-                // Iniciar el escaneo utilizando ZXing
-                const codeReader = new ZXing.BrowserQRCodeReader();
-                codeReader.decodeOnceFromVideoElement(video)
-                .then(result => {
-                    document.getElementById('tracking-number').value = result.text; // Colocar el resultado en el campo
-                    stream.getTracks().forEach(track => track.stop()); // Detener el stream de video
-                    video.style.display = 'none'; // Ocultar el video
-                    alert(`Código escaneado: ${result.text}`);
-                })
-                .catch(err => {
-                    console.error("Error escaneando el QR", err);
-                    alert('No se pudo leer el código QR. Inténtalo nuevamente.');
-                    stream.getTracks().forEach(track => track.stop());
-                    video.style.display = 'none';
+        // Acción del botón de búsqueda
+        document.getElementById('scan-button').addEventListener('click', function() {
+            const trackingNumber = document.getElementById('tracking-number').value.trim();
+            if (trackingNumber) {
+                searchPackage(trackingNumber);
+            } else {
+                alert('Por favor, ingrese el número de seguimiento.');
+            }
+        });
+
+        // Función para solicitar permisos de cámara y escanear el código QR
+        document.getElementById('qr-scan-button').addEventListener('click', async function() {
+            const videoElement = document.createElement('video');
+            videoElement.setAttribute('autoplay', 'true');
+            document.body.appendChild(videoElement); // Añadir el video temporalmente para la cámara
+
+            const codeReader = new ZXing.BrowserQRCodeReader();
+
+            try {
+                // Obtener lista de dispositivos de cámara disponibles
+                const videoInputDevices = await codeReader.listVideoInputDevices();
+                const selectedDeviceId = videoInputDevices[0].deviceId; // Usar la primera cámara disponible
+
+                // Decodificar el código QR usando la cámara seleccionada
+                await codeReader.decodeFromVideoDevice(selectedDeviceId, videoElement, (result, error) => {
+                    if (result) {
+                        document.getElementById('tracking-number').value = result.text; // Poner el valor del QR en el campo de seguimiento
+                        codeReader.reset(); // Detener el lector
+                        videoElement.remove(); // Eliminar el video temporal
+                        searchPackage(result.text); // Buscar el paquete en la base de datos
+                    }
+                    if (error) {
+                        console.error("Error al leer el QR: ", error);
+                    }
                 });
-            })
-            .catch(err => {
-                console.error('Error al intentar acceder a la cámara: ', err);
-                alert('Error al intentar acceder a la cámara: ' + err.message);
-            });
+            } catch (err) {
+                console.error("Error al intentar acceder a la cámara: ", err);
+                alert("Error al intentar acceder a la cámara: " + err.message);
+            }
         });
     </script>
 </body>
 </html>
-
 
