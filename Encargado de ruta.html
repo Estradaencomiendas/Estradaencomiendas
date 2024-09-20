@@ -204,20 +204,28 @@
                 Quagga.start(); // Inicia el escaneo de la cámara
             });
 
-            // Detectar el código de barras
-            Quagga.onDetected(function (data) {
-                if (data && data.codeResult && data.codeResult.code) {
-                    const barcode = data.codeResult.code;
-                    console.log("Código detectado: ", barcode);  // Depuración para verificar el código
+          // Detectar el código de barras
+Quagga.onDetected(function (data) {
+    if (data && data.codeResult && data.codeResult.code) {
+        let barcode = data.codeResult.code;
+        console.log("Código detectado: ", barcode);  // Depuración para ver el código escaneado
 
-                    // Detener Quagga después de escanear
-                    Quagga.stop();
-                    barcodeReader.style.display = 'none';  // Ocultar el área de escaneo después de capturar el código
+        // Verificar si el código tiene el prefijo "PKG:"
+        if (!barcode.startsWith("PKG-")) {
+            barcode = "PKG-" + barcode;  // Añadir "PKG-" al código si no lo tiene
+        }
 
-                    // Buscar el paquete usando el código escaneado
-                    searchPackage(barcode);
-                }
-            });
+        console.log("Código ajustado para búsqueda: ", barcode);  // Verificar el código ajustado
+
+        // Detener Quagga después de escanear
+        Quagga.stop();
+        barcodeReader.style.display = 'none';  // Ocultar el área de escaneo después de capturar el código
+
+        // Buscar el paquete usando el código escaneado
+        searchPackage(barcode);
+    }
+});
+
         }
 
         // Acción del botón de escaneo
