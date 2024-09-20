@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmar Paquete</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script> <!-- Biblioteca para QR Code -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
@@ -29,32 +29,30 @@
             return params.get('trackingNumber');
         }
 
-        // Función para cargar detalles del paquete desde Firestore
+        // Función para cargar detalles del paquete desde Firestore usando el ID del documento
         async function loadPackageDetails(trackingNumber) {
             try {
-                const doc = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-                if (!doc.empty) {
-                    doc.forEach((docSnap) => {
-                        const packageData = docSnap.data();
-                        document.getElementById('package-details').innerHTML = `
-                            <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
-                            <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
-                            <p><span>Nombre de la Página:</span> ${packageData.nombrePaquete}</p>
-                            <p><span>Destino:</span> ${packageData.destino}</p>
-                            <p><span>Fecha de Envío:</span> ${packageData.fechaEnvio}</p>
-                            <p><span>Fecha de Entrega:</span> ${packageData.diaEntrega}</p>
-                            <p><span>Valor:</span> $${packageData.valor}</p>
-                        `;
+                const doc = await db.collection('paquetes').doc(trackingNumber).get();
+                if (doc.exists) {
+                    const packageData = doc.data();
+                    document.getElementById('package-details').innerHTML = `
+                        <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
+                        <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
+                        <p><span>Nombre de la Página:</span> ${packageData.nombrePaquete}</p>
+                        <p><span>Destino:</span> ${packageData.destino}</p>
+                        <p><span>Fecha de Envío:</span> ${packageData.fechaEnvio}</p>
+                        <p><span>Fecha de Entrega:</span> ${packageData.diaEntrega}</p>
+                        <p><span>Valor:</span> $${packageData.valor}</p>
+                    `;
 
-                        // Generar el código QR
-                        new QRCode(document.getElementById("qrcode"), {
-                            text: packageData.trackingNumber,
-                            width: 128,
-                            height: 128,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
+                    // Generar el código QR
+                    new QRCode(document.getElementById("qrcode"), {
+                        text: packageData.trackingNumber,
+                        width: 128,
+                        height: 128,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
                     });
                 } else {
                     document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
@@ -69,11 +67,9 @@
             const trackingNumber = getTrackingNumber();  // Obtener el número de seguimiento desde la URL
             if (trackingNumber) {
                 try {
-                    const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-                    querySnapshot.forEach(async (docSnap) => {
-                        await db.collection('paquetes').doc(docSnap.id).update({ status });
-                        window.location.href = 'Encargado de ruta.html';  // Redirigir después de la actualización
-                    });
+                    const docRef = db.collection('paquetes').doc(trackingNumber);
+                    await docRef.update({ status });
+                    window.location.href = 'Encargado de ruta.html';  // Redirigir después de la actualización
                 } catch (error) {
                     console.error('Error actualizando el estado del paquete:', error);
                 }
@@ -118,7 +114,6 @@
         });
     </script>
     <style>
-        /* Estilos anteriores */
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
             margin: 0;
@@ -226,7 +221,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Imagen de fondo con 50% de transparencia -->
         <div class="background-image"></div>
 
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
