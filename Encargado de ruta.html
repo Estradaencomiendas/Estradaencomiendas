@@ -56,11 +56,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.5; /* 50% de transparencia */
+            opacity: 0.5;
             background-image: url('19199540.jpg');
             background-size: cover;
             background-position: center;
-            z-index: -1; /* Asegura que esté detrás del contenido */
+            z-index: -1;
             border-radius: 20px;
         }
 
@@ -204,7 +204,7 @@
                     });
                 },
                 errorMessage => {
-                    console.log(Error en el escaneo: ${errorMessage});
+                    console.log(`Error en el escaneo: ${errorMessage}`);
                 }
             ).catch(err => {
                 console.error("Error al iniciar el lector QR.", err);
