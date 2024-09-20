@@ -1,244 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Meta y título -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encargado de Ruta</title>
+    <title>Recepción de Paquetes</title>
+
+    <!-- Fuente -->
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- Font Awesome -->
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js"></script> <!-- Firestore -->
-    <style>
-        body {
-            font-family: 'Acumin Variable Concept', sans-serif;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: #f7f7f7;
-        }
 
-        .container {
-            text-align: center;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 1200px;
-            margin: 20px auto;
-        }
-
-        h1 {
-            font-size: 22px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .input-wrapper input {
-            width: calc(100% - 40px);
-            padding: 8px 10px 8px 40px;
-            border: 2px solid #EDE309;
-            border-radius: 10px;
-            background-color: #E8E8E8;
-            color: #333;
-            font-size: 14px;
-            font-weight: bold;
-            box-sizing: border-box;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        .action-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .action-button:hover {
-            background-color: #0056b3;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .package-container {
-            background-color: #f9f9f9;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .package-info {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .package-info h3 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .package-info p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #555;
-        }
-
-        .status {
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            margin-top: 15px;
-            font-size: 18px;
-        }
-
-        .status-retired {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-not-collected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-in-route {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-
-        .status-in-process {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-paid {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-
-        /* Tamaño específico para imágenes */
-        .status-image {
-            width: 360px;
-            height: auto;
-        }
-
-        .status-image-paid {
-            width: 125px;
-            height: auto;
-        }
-
-        .status-image-processing {
-            width: 125px;
-            height: auto;
-        }
-
-        .package-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .action-button-small {
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .add-button {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .resend-button {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .resend-button:hover {
-            background-color: #c82333;
-        }
-
-        @media screen and (max-width: 768px) {
-            .status-image {
-                width: 220px;
-                height: auto;
-            }
-
-            .status-image-paid {
-                width: 100px;
-                height: auto;
-            }
-
-            .status-image-processing {
-                width: 225px;
-                height: auto;
-            }
-
-            .package-info h3 {
-                font-size: 18px;
-            }
-
-            .package-info p {
-                font-size: 14px;
-            }
-
-            .action-button-small {
-                font-size: 14px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Escanear Paquete - Encargado de Ruta</h1>
-        <div class="input-wrapper">
-            <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
-        </div>
-
-        <div class="button-group">
-            <button class="action-button" id="search-button">
-                <i class="fas fa-search"></i>
-                Buscar Paquete
-            </button>
-            <button class="action-button" id="qr-scan-button">
-                <i class="fas fa-qrcode"></i>
-                Escanear Paquete
-            </button>
-        </div>
-
-        <!-- Contenedores para mostrar paquetes -->
-        <div id="package-list">
-            <!-- Aquí se insertarán dinámicamente los paquetes -->
-        </div>
-    </div>
-
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
@@ -251,108 +25,253 @@
             measurementId: "G-BRMC9FZBC"
         };
 
+        // Inicialización de Firebase
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Función para buscar el paquete en Firestore
-        async function searchPackage(trackingNumber) {
-            try {
-                const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-                if (!packageSnapshot.empty) {
-                    return packageSnapshot.docs[0].data();
-                } else {
-                    alert('No se encontraron datos para el número de seguimiento ingresado.');
-                    return null;
-                }
-            } catch (error) {
-                console.error('Error al buscar el paquete en Firestore:', error);
-                alert('Ocurrió un error al buscar el paquete.');
-                return null;
-            }
-        }
-
-        // Función para agregar paquetes al contenedor
-        function addPackageToContainer(packageData) {
-            const packageList = document.getElementById('package-list');
-            const statusClass = packageData.status === 'Pagado' ? 'status-paid' :
-                                packageData.status === 'Paquete Retirado' ? 'status-retired' :
-                                packageData.status === 'En Proceso de Pago' ? 'status-in-process' :
-                                packageData.status === 'Paquete No Retirado' ? 'status-not-collected' :
-                                packageData.status === 'En Ruta' ? 'status-in-route' : 'status-in-route';
-
-            let actionButton = '';
-            if (packageData.status === 'Paquete Retirado') {
-                actionButton = `<button class="action-button-small add-button" onclick="addToMyShipments('${packageData.trackingNumber}')">Agregar</button>`;
-            } else if (packageData.status === 'Paquete No Retirado') {
-                actionButton = `<button class="action-button-small resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>`;
-            }
-
-            const packageHtml = `
-                <div class="package-container" id="package-${packageData.trackingNumber}">
-                    <div class="package-info">
-                        <h3>${packageData.trackingNumber}</h3>
-                        <p>Cliente: ${packageData.nombreCliente}</p>
-                        <p>Destino: ${packageData.destino}</p>
-                        <p>Fecha de Envío: ${packageData.fechaEnvio}</p>
-                        <p>Fecha de Entrega: ${packageData.diaEntrega}</p>
-                        <p>Valor: $${packageData.valor}</p>
-                    </div>
-                    <span class="status ${statusClass}">${packageData.status || 'En Ruta'}</span>
-                    <div class="package-actions">${actionButton}</div>
-                </div>
-            `;
-
-            packageList.innerHTML += packageHtml;
-        }
-
-        // Evento para buscar paquete
-        document.getElementById('search-button').addEventListener('click', async function() {
-            const trackingNumber = document.getElementById('tracking-number').value.trim();
-            if (trackingNumber) {
-                const packageData = await searchPackage(trackingNumber);
-                if (packageData) {
-                    if (!document.getElementById(`package-${packageData.trackingNumber}`)) {
-                        addPackageToContainer(packageData);
-                    } else {
-                        alert('Este paquete ya ha sido agregado.');
-                    }
-                }
-            } else {
-                alert('Por favor, ingrese el número de seguimiento.');
+        // Verificar si el usuario está autenticado
+        auth.onAuthStateChanged(function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
             }
         });
+    </script>
 
-        // Función para agregar paquetes a 'Mis Envíos'
-        function addToMyShipments(trackingNumber) {
-            alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
+    <!-- Estilos CSS -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        // Función para reenviar paquete
-        function resendPackage(trackingNumber) {
-            alert(`Paquete con número de seguimiento ${trackingNumber} reenviado.`);
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            background-color: #F1F1F1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        // Función para obtener el número de seguimiento de la URL
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                trackingNumber: params.get('trackingNumber')
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #F39200;
+            font-weight: bold;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #F39200;
+            font-weight: bold;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #F39200;
+            border-radius: 20px;
+            background-color: #F1F1F1;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #B25C00;
+        }
+
+        .form-input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-input-small {
+            padding: 10px;
+            text-align: right;
+        }
+
+        .phone-input {
+            display: flex;
+            align-items: center;
+            border: 2px solid #F39200;
+            border-radius: 20px;
+            padding: 10px;
+            background-color: #F1F1F1;
+        }
+
+        .phone-input span {
+            margin-right: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .submit-button {
+            background-color: #F39200;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 12px;
+            font-size: 17px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .submit-button:hover {
+            background-color: #B25C00;
+        }
+
+        @media (min-width: 768px) {
+            .form-input-row {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .form-input-column {
+                width: 48%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
+        <h1>Recepción de Paquetes</h1>
+
+        <form id="package-form">
+            <label for="nombreCliente">Nombre de la Clienta</label>
+            <input type="text" id="nombreCliente" placeholder="Nombre de la Clienta" required>
+
+            <label for="nombrePaquete">Nombre de la Página</label>
+            <input type="text" id="nombrePaquete" placeholder="Nombre de la Página" required>
+
+            <label for="destino">Destino</label>
+            <input type="text" id="destino" placeholder="Destino" required>
+
+            <label for="dia-entrega">Fecha de Entrega</label>
+            <input type="date" id="dia-entrega" required>
+
+            <div class="form-input-row">
+                <div class="form-input-column">
+                    <label for="valorEnvio">Valor del Envío</label>
+                    <input type="number" id="valorEnvio" class="form-input-small" required>
+                </div>
+                <div class="form-input-column">
+                    <label for="valor">Valor del Paquete</label>
+                    <input type="number" id="valor" class="form-input-small" required>
+                </div>
+            </div>
+
+            <label for="telefonoVendedora">Teléfono de la Vendedora</label>
+            <div class="phone-input">
+                <span>+503</span>
+                <input type="tel" id="telefonoVendedora" placeholder="Número de Vendedora" pattern="\d{8}" required>
+            </div>
+
+            <button class="submit-button" type="submit">Ingresar Datos</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('package-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const nombreCliente = document.getElementById('nombreCliente').value;
+            const nombrePaquete = document.getElementById('nombrePaquete').value;
+            const destino = document.getElementById('destino').value;
+            const diaEntrega = document.getElementById('dia-entrega').value;
+            const valor = document.getElementById('valor').value;
+            const valorEnvio = document.getElementById('valorEnvio').value;
+            const telefonoVendedora = '+503' + document.getElementById('telefonoVendedora').value;
+
+            const fechaEnvio = new Date().toISOString().split('T')[0];
+            const trackingNumber = 'PKG-' + Date.now();
+
+            const user = firebase.auth().currentUser;
+
+            const packageData = {
+                trackingNumber,
+                nombreCliente,
+                nombrePaquete,
+                destino,
+                diaEntrega,
+                valor,
+                valorEnvio,
+                fechaEnvio,
+                recepcionadoPor: user ? user.uid : 'Desconocido'
             };
-        }
 
-        // Al cargar la página, verificar si hay un número de seguimiento en la URL y realizar la búsqueda automática
-        document.addEventListener('DOMContentLoaded', async function() {
-            const { trackingNumber } = getQueryParams();
-            if (trackingNumber) {
-                const packageData = await searchPackage(trackingNumber);
-                if (packageData && !document.getElementById(`package-${packageData.trackingNumber}`)) {
-                    addPackageToContainer(packageData);
+            try {
+                // Guardar en Firestore
+                await db.collection('paquetes').doc(trackingNumber).set(packageData);
+                console.log('Paquete guardado en Firestore');
+
+                // Enviar SMS a través de Netlify Functions
+                const response = await fetch('/.netlify/functions/sendSms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        to: telefonoVendedora,
+                        trackingNumber: trackingNumber,
+                        nombreCliente: nombreCliente,
+                        destino: destino,
+                        valor: valor
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error enviando el SMS');
                 }
+
+                const result = await response.json();
+                console.log('SMS enviado con éxito:', result);
+
+                alert('Datos ingresados con éxito y mensaje enviado');
+                window.location.href = `resultados.html?trackingNumber=${trackingNumber}&fechaEnvio=${fechaEnvio}`;
+            } catch (error) {
+                console.error('Error al guardar el paquete o enviar el mensaje:', error);
+                alert('Hubo un error al procesar la solicitud. Por favor, intenta de nuevo.');
             }
         });
     </script>
 </body>
 </html>
+
 
 
 
