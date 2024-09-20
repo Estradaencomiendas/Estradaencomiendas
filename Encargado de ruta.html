@@ -154,10 +154,7 @@
 
                         if (qrCode) {
                             clearInterval(qrCheckInterval); // Detener el intervalo
-                            document.getElementById('tracking-number').value = qrCode.data; // Establecer el valor del número de seguimiento
-
-                            // Buscar en la base de datos
-                            fetchPackageDetails(qrCode.data);
+                            document.getElementById('tracking-number').value = qrCode.data; // Colocar el número de seguimiento en el cuadro de texto
 
                             stream.getTracks().forEach(track => track.stop()); // Detener la cámara
                             qrReader.style.display = 'none'; // Ocultar el lector QR
@@ -191,7 +188,7 @@
             const trackingNumber = document.getElementById('tracking-number').value.trim();
 
             if (trackingNumber) {
-                fetchPackageDetails(trackingNumber);
+                fetchPackageDetails(trackingNumber); // Realiza la búsqueda manual tras presionar el botón
             } else {
                 alert('Por favor, ingrese el número de seguimiento.');
             }
