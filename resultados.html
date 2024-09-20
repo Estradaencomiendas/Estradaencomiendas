@@ -25,7 +25,114 @@
         const db = firebase.firestore();
     </script>
     <style>
-        /* Estilos... */
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 20px;
+            text-align: center;
+            background-color: white;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .data {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .data p {
+            font-size: 16px;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .data span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        #qrcode {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        #print-button, #back-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #EDE309, #F39204);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+
+        #print-button:hover, #back-button:hover {
+            background: linear-gradient(135deg, #F39204, #EDE309);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Ocultar los botones y el menú al imprimir */
+        @media print {
+            #print-button, #back-button, .footer {
+                display: none !important;
+            }
+        }
+
+        /* Pie de página con íconos (barra de navegación inferior) */
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            background-color: #F39200;
+            border-radius: 20px;
+            padding: 15px 0;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-link {
+            text-align: center;
+            text-decoration: none;
+            color: white;
+        }
+
+        .footer-icon {
+            width: 50px;
+            height: 50px;
+        }
     </style>
 </head>
 <body>
@@ -39,64 +146,93 @@
         <button id="print-button" onclick="printTicket()">Imprimir Ticket</button>
         <button id="back-button" onclick="goBack()">Regresar</button>
 
-        <script>
-            function getQueryParams() {
-                const params = new URLSearchParams(window.location.search);
-                return {
-                    trackingNumber: params.get('trackingNumber')
-                };
-            }
-
-            function displayPackageDetails(packageData) {
-                document.getElementById('package-details').innerHTML = `
-                    <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
-                    <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
-                    <p><span>Destino:</span> ${packageData.destino}</p>
-                `;
-
-                // Generar solo el número de seguimiento en el QR
-                new QRCode(document.getElementById("qrcode"), {
-                    text: packageData.trackingNumber, // Solo el número de seguimiento
-                    width: 128,
-                    height: 128,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-            }
-
-            async function fetchPackageDetails(trackingNumber) {
-                try {
-                    const doc = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
-                    if (!doc.empty) {
-                        doc.forEach(docSnap => displayPackageDetails(docSnap.data()));
-                    } else {
-                        document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
-                    }
-                } catch (error) {
-                    console.error('Error obteniendo los datos del paquete:', error);
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                const { trackingNumber } = getQueryParams();
-                if (trackingNumber) {
-                    fetchPackageDetails(trackingNumber);
-                } else {
-                    document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
-                }
-            });
-
-            function printTicket() {
-                window.print();
-            }
-
-            function goBack() {
-                window.location.href = 'Recepcion de Paquetes.html';
-            }
-        </script>
+        <!-- Barra de navegación inferior (con links en los iconos) -->
+        <div class="footer">
+            <a href="index.html" class="footer-link">
+                <img src="Inicio.png" alt="Inicio" class="footer-icon">
+                <div>Inicio</div>
+            </a>
+            <a href="Recepcion de Paquetes.html" class="footer-link">
+                <img src="icon1.png" alt="Recepción" class="footer-icon">
+                <div>Recepción</div>
+            </a>
+            <a href="Encargado de ruta.html" class="footer-link">
+                <img src="icon2.png" alt="Entrega" class="footer-icon">
+                <div>Entrega</div>
+            </a>
+            <a href="Seguimieto de Paquetes.html" class="footer-link">
+                <img src="icon3.png" alt="Registro" class="footer-icon">
+                <div>Registro</div>
+            </a>
+        </div>
     </div>
+
+    <script>
+        // Función para obtener el número de seguimiento de la URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                trackingNumber: params.get('trackingNumber')
+            };
+        }
+
+        // Función para mostrar los detalles del paquete desde Firestore
+        function displayPackageDetails(packageData) {
+            document.getElementById('package-details').innerHTML = `
+                <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
+                <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
+                <p><span>Nombre del Paquete:</span> ${packageData.nombrePaquete}</p>
+                <p><span>Destino:</span> ${packageData.destino}</p>
+                <p><span>Fecha de Envío:</span> ${packageData.fechaEnvio}</p>
+                <p><span>Fecha de Entrega:</span> ${packageData.diaEntrega}</p>
+                <p><span>Valor:</span> $${packageData.valor}</p>
+            `;
+
+            // Generar el código QR
+            new QRCode(document.getElementById("qrcode"), {
+                text: packageData.trackingNumber,
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        // Función para obtener los datos del paquete desde Firestore
+        async function fetchPackageDetails(trackingNumber) {
+            try {
+                const doc = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
+                if (!doc.empty) {
+                    doc.forEach(docSnap => displayPackageDetails(docSnap.data()));
+                } else {
+                    document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
+                }
+            } catch (error) {
+                console.error('Error obteniendo los datos del paquete:', error);
+            }
+        }
+
+        // Al cargar la página, obtener los datos del paquete desde Firestore
+        document.addEventListener('DOMContentLoaded', function() {
+            const { trackingNumber } = getQueryParams();
+            if (trackingNumber) {
+                fetchPackageDetails(trackingNumber);
+            } else {
+                document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
+            }
+        });
+
+        // Función para imprimir el ticket
+        function printTicket() {
+            window.print();
+        }
+
+        // Función para regresar a la página de Recepción de Paquetes
+        function goBack() {
+            window.location.href = 'Recepcion de Paquetes.html';
+        }
+    </script>
 </body>
 </html>
-
 
