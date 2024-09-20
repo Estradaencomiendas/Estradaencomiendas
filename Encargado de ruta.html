@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <!-- Biblioteca ZXing para el escaneo de QR -->
-    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest"></script>
+    <!-- Biblioteca ZXing para escaneo de QR -->
+    <script src="https://unpkg.com/@zxing/browser@latest"></script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -114,24 +114,43 @@
     <script>
         // Acción del botón de escaneo QR
         document.getElementById('qr-scan-button').addEventListener('click', function () {
-            const codeReader = new ZXing.BrowserQRCodeReader();
+            const codeReader = new ZXing.BrowserQRCodeReader(); // Objeto ZXing para leer códigos QR
             const qrReader = document.getElementById('qr-reader');
 
+            // Obtener las cámaras disponibles y seleccionar la cámara trasera
             codeReader.getVideoInputDevices().then(videoInputDevices => {
                 const rearCamera = videoInputDevices[videoInputDevices.length - 1].deviceId;
 
-                codeReader.decodeFromInputVideoDevice(rearCamera, 'qr-reader').then(result => {
+                // Iniciar el lector QR con la cámara trasera
+                codeReader.decodeOnceFromVideoDevice(rearCamera, 'qr-reader').then(result => {
                     document.getElementById('tracking-number').value = result.text;
                     fetchPackageDetails(result.text);
-                    codeReader.reset();
+                    codeReader.reset(); // Detener el lector después de leer el código QR
                 }).catch(err => console.error('Error en el escaneo:', err));
             }).catch(err => console.error('Error accediendo a las cámaras:', err));
 
-            qrReader.style.display = 'block'; // Mostrar el lector QR
+            qrReader.style.display = 'block'; // Mostrar el contenedor del lector QR
         });
+
+        // Función para buscar en Firestore por el número de seguimiento
+        async function fetchPackageDetails(trackingNumber) {
+            try {
+                const doc = await db.collection('paquetes').where("trackingNumber", "==", trackingNumber).get();
+                if (!doc.empty) {
+                    sessionStorage.setItem('trackingNumber', trackingNumber);
+                    window.location.href = 'confirmar-paquete.html';
+                } else {
+                    alert('No se encontró un paquete con este número de seguimiento.');
+                }
+            } catch (error) {
+                console.error('Error al buscar el paquete:', error);
+                alert('Error al buscar el paquete.');
+            }
+        }
     </script>
 </body>
 </html>
+
 
 
 
