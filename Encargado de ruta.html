@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@zxing/browser@latest"></script> <!-- ZXing CDN -->
+    <!-- ZXing JavaScript library para el escaneo de QR -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -28,6 +29,20 @@
             width: 100%;
             max-width: 400px;
             text-align: center;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5;
+            background-image: url('19199540.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            border-radius: 20px;
         }
 
         .logo {
@@ -69,6 +84,10 @@
             font-weight: bold;
         }
 
+        .input-wrapper input:focus {
+            border-color: #F39204;
+        }
+
         .status-buttons img {
             width: 130px;
             cursor: pointer;
@@ -81,17 +100,20 @@
             opacity: 1;
         }
 
-        #qr-video {
-            width: 300px;
-            height: 300px;
-            margin: 20px auto;
+        #video {
+            width: 100%;
+            height: auto;
+            margin-top: 20px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Imagen de fondo -->
+        <div class="background-image"></div>
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
-        
+
         <div class="title-wrapper">
             <h1>Encargado de Ruta</h1>
         </div>
@@ -103,46 +125,47 @@
         <div class="status-buttons">
             <img src="boton-de-buscar.png" alt="Buscar Paquete" id="scan-button">
         </div>
+
         <div class="status-buttons">
             <img src="boton-de-escaneo.png" alt="Escanear Código QR" id="qr-scan-button">
         </div>
 
-        <video id="qr-video" style="display: none;"></video>
+        <video id="video"></video>
     </div>
 
     <script>
-        const codeReader = new ZXingBrowser.BrowserQRCodeReader();
-        const video = document.getElementById('qr-video');
-        
-        document.getElementById('qr-scan-button').addEventListener('click', async function() {
-            try {
-                // Usar MediaDevices para listar cámaras y seleccionar la trasera
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                
-                if (videoDevices.length > 0) {
-                    // Intentar seleccionar la cámara trasera
-                    const backCamera = videoDevices[videoDevices.length - 1].deviceId;
+        // Acción del botón para escanear el código QR
+        document.getElementById('qr-scan-button').addEventListener('click', function() {
+            const video = document.getElementById('video');
+            
+            // Solicitar permisos para la cámara
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then((stream) => {
+                video.srcObject = stream;
+                video.setAttribute('playsinline', true); // para iOS
+                video.play();
+                video.style.display = 'block'; // Mostrar el video
 
-                    video.style.display = 'block';
-                    
-                    codeReader.decodeFromVideoDevice(backCamera, video, (result, err) => {
-                        if (result) {
-                            alert(`Código QR escaneado: ${result.text}`);
-                            document.getElementById('tracking-number').value = result.text;
-                            video.style.display = 'none';
-                            codeReader.reset(); // Detener la cámara después de escanear
-                        }
-                        if (err && !(err instanceof ZXingBrowser.NotFoundException)) {
-                            console.error(err);
-                        }
-                    });
-                } else {
-                    console.error('No se encontraron cámaras disponibles.');
-                }
-            } catch (error) {
-                console.error("Error al intentar acceder a la cámara: ", error);
-            }
+                // Iniciar el escaneo utilizando ZXing
+                const codeReader = new ZXing.BrowserQRCodeReader();
+                codeReader.decodeOnceFromVideoElement(video)
+                .then(result => {
+                    document.getElementById('tracking-number').value = result.text; // Colocar el resultado en el campo
+                    stream.getTracks().forEach(track => track.stop()); // Detener el stream de video
+                    video.style.display = 'none'; // Ocultar el video
+                    alert(`Código escaneado: ${result.text}`);
+                })
+                .catch(err => {
+                    console.error("Error escaneando el QR", err);
+                    alert('No se pudo leer el código QR. Inténtalo nuevamente.');
+                    stream.getTracks().forEach(track => track.stop());
+                    video.style.display = 'none';
+                });
+            })
+            .catch(err => {
+                console.error('Error al intentar acceder a la cámara: ', err);
+                alert('Error al intentar acceder a la cámara: ' + err.message);
+            });
         });
     </script>
 </body>
