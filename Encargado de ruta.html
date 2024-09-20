@@ -152,14 +152,12 @@
 
     <script>
         // Función para buscar en Firestore por el número de seguimiento
-      async function searchPackage(trackingNumber) {
+     async function searchPackage(trackingNumber) {
     try {
-        // Realizar una consulta en lugar de usar .doc
         const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
         
         if (!querySnapshot.empty) {
             querySnapshot.forEach((doc) => {
-                // Aquí asumimos que solo hay un documento con ese trackingNumber.
                 sessionStorage.setItem('trackingNumber', trackingNumber);
                 window.location.href = 'confirmar-paquete.html';
             });
