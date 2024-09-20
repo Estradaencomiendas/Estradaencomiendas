@@ -21,7 +21,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6); 
+            background-color: rgba(255, 255, 255, 0.6);
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -31,13 +31,13 @@
         }
 
         .logo {
-            width: 150px; 
-            margin: 0 auto 20px; 
+            width: 150px;
+            margin: 0 auto 20px;
             display: block;
         }
 
         h1 {
-            font-size: 22px; 
+            font-size: 22px;
             color: #333;
             font-weight: bold;
             margin: 0;
@@ -115,34 +115,57 @@
         // Iniciar la cámara y escanear
         qrReaderButton.addEventListener('click', function () {
             qrReader.style.display = 'block';
+
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                 .then(function (stream) {
                     video.srcObject = stream;
-                    const context = document.createElement('canvas').getContext('2d');
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+
                     const qrCheckInterval = setInterval(function () {
-                        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-                        const imageData = context.getImageData(0, 0, video.videoWidth, video.videoHeight);
-                        const qrCode = jsQR(imageData.data, video.videoWidth, video.videoHeight);
+                        // Ajuste de tamaño del canvas al tamaño del video
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+
+                        // Dibujar imagen del video en el canvas
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        // Obtener los datos de la imagen del canvas
+                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+                        // Intentar leer el QR
+                        const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
+
                         if (qrCode) {
-                            clearInterval(qrCheckInterval);
-                            document.getElementById('tracking-number').value = qrCode.data;
-                            alert('Código QR escaneado: ' + qrCode.data);
+                            clearInterval(qrCheckInterval); // Detener el intervalo
+                            document.getElementById('tracking-number').value = qrCode.data; // Establecer el valor del número de seguimiento
+
+                            // Buscar en la base de datos
+                            fetchPackageDetails(qrCode.data);
+
                             stream.getTracks().forEach(track => track.stop()); // Detener la cámara
-                            qrReader.style.display = 'none'; // Ocultar el lector
+                            qrReader.style.display = 'none'; // Ocultar el lector QR
                         }
                     }, 1000);
                 })
                 .catch(function (error) {
                     console.error('Error al intentar acceder a la cámara: ', error);
+                    alert('Error al intentar acceder a la cámara.');
                 });
         });
 
-        // Buscar paquete por número de seguimiento
+        // Función para buscar en la base de datos por el número de seguimiento
+        function fetchPackageDetails(trackingNumber) {
+            // Aquí iría la función para buscar en la base de datos
+            alert('Buscando paquete con número de seguimiento: ' + trackingNumber);
+            // Realizar la búsqueda en la base de datos y procesar los datos...
+        }
+
+        // Buscar paquete por número de seguimiento manualmente
         document.getElementById('scan-button').addEventListener('click', function () {
             const trackingNumber = document.getElementById('tracking-number').value.trim();
             if (trackingNumber) {
-                // Aquí iría la función para buscar el paquete en la base de datos
-                alert('Número de seguimiento: ' + trackingNumber);
+                fetchPackageDetails(trackingNumber); // Llamar la función para buscar en la base de datos
             } else {
                 alert('Por favor, ingrese el número de seguimiento.');
             }
