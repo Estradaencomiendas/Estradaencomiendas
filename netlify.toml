@@ -1,7 +1,7 @@
 [build]
-  publish = "public"  # Carpeta donde están tus archivos HTML (cámbiala si es necesario)
-  functions = "netlify/functions"  # Carpeta donde están tus funciones de Netlify
+  publish = "public"  
+  functions = "netlify/functions" 
 
-# Configuración para la función de Netlify
+
 [functions]
-  node_bundler = "esbuild"  # Configuración para la función, usa esbuild para optimizar el build
+  node_bundler = "esbuild"  
