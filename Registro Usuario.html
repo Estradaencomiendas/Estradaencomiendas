@@ -50,12 +50,13 @@
             // Cargar paquetes recepcionados
             const recepcionadosSnapshot = await db.collection('paquetes')
                 .where('recepcionadoPor', '==', userId)
-                .where('fechaEnvio', '==', today)
                 .get();
             const recepcionadosList = document.getElementById('recepcionadosList');
             recepcionadosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
                 const valorEnvio = packageData.valorEnvio || 0;
+                const fechaEnvio = packageData.fechaEnvio || 'No disponible';
+
                 totalRecepcionados += valorEnvio;
 
                 const recepcionadoItem = document.createElement('div');
@@ -64,7 +65,7 @@
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
                     <p><strong>Valor del Envío:</strong> $${valorEnvio}</p>
-                    <p><strong>Fecha:</strong> ${packageData.fechaEnvio}</p>
+                    <p><strong>Fecha:</strong> ${fechaEnvio}</p>
                 `;
                 recepcionadosList.appendChild(recepcionadoItem);
             });
@@ -73,12 +74,13 @@
             const retiradosSnapshot = await db.collection('paquetes')
                 .where('status', '==', 'Paquete Retirado')
                 .where('recepcionadoPor', '==', userId)
-                .where('fechaEnvio', '==', today)
                 .get();
             const retiradosList = document.getElementById('retiradosList');
             retiradosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
                 const valor = packageData.valor || 0;
+                const fechaEnvio = packageData.fechaEnvio || 'No disponible';
+
                 totalRetirados += valor;
 
                 const retiradoItem = document.createElement('div');
@@ -87,7 +89,7 @@
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
                     <p><strong>Valor del Paquete:</strong> $${valor}</p>
-                    <p><strong>Fecha:</strong> ${packageData.fechaEnvio}</p>
+                    <p><strong>Fecha:</strong> ${fechaEnvio}</p>
                 `;
                 retiradosList.appendChild(retiradoItem);
             });
@@ -96,12 +98,13 @@
             const pagadosSnapshot = await db.collection('paquetes')
                 .where('status', '==', 'Pagado')
                 .where('recepcionadoPor', '==', userId)
-                .where('fechaEnvio', '==', today)
                 .get();
             const pagadosList = document.getElementById('pagadosList');
             pagadosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
                 const valor = packageData.valor || 0;
+                const fechaEnvio = packageData.fechaEnvio || 'No disponible';
+
                 totalPagados += valor;
 
                 const pagadoItem = document.createElement('div');
@@ -110,19 +113,19 @@
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
                     <p><strong>Valor Pagado:</strong> $${valor}</p>
-                    <p><strong>Fecha:</strong> ${packageData.fechaEnvio}</p>
+                    <p><strong>Fecha:</strong> ${fechaEnvio}</p>
                 `;
                 pagadosList.appendChild(pagadoItem);
             });
 
             // Actualizar totales
-            document.getElementById('totalRecepcionados').textContent = `$${totalRecepcionados}`;
-            document.getElementById('totalRetirados').textContent = `$${totalRetirados}`;
-            document.getElementById('totalPagados').textContent = `$${totalPagados}`;
+            document.getElementById('totalRecepcionados').textContent = `$${totalRecepcionados.toFixed(2)}`;
+            document.getElementById('totalRetirados').textContent = `$${totalRetirados.toFixed(2)}`;
+            document.getElementById('totalPagados').textContent = `$${totalPagados.toFixed(2)}`;
 
             // Calcular total final
             const totalFinal = (totalRetirados + totalRecepcionados) - totalPagados;
-            document.getElementById('totalFinal').textContent = `$${totalFinal}`;
+            document.getElementById('totalFinal').textContent = `$${totalFinal.toFixed(2)}`;
         }
     </script>
     <style>
@@ -192,25 +195,25 @@
         <div class="section">
             <h2>Paquetes Recepcionados</h2>
             <div id="recepcionadosList"></div>
-            <div class="totals">Total Valor de Envío: <span id="totalRecepcionados">$0</span></div>
+            <div class="totals">Total Valor de Envío: <span id="totalRecepcionados">$0.00</span></div>
         </div>
 
         <!-- Paquetes Entregados -->
         <div class="section">
             <h2>Paquetes Entregados</h2>
             <div id="retiradosList"></div>
-            <div class="totals">Total Valor de Paquetes Retirados: <span id="totalRetirados">$0</span></div>
+            <div class="totals">Total Valor de Paquetes Retirados: <span id="totalRetirados">$0.00</span></div>
         </div>
 
         <!-- Paquetes Pagados -->
         <div class="section">
             <h2>Paquetes Pagados</h2>
             <div id="pagadosList"></div>
-            <div class="totals">Total Pagado: <span id="totalPagados">$0</span></div>
+            <div class="totals">Total Pagado: <span id="totalPagados">$0.00</span></div>
         </div>
 
         <!-- Total Final -->
-        <div class="final-total">Total Final: <span id="totalFinal">$0</span></div>
+        <div class="final-total">Total Final: <span id="totalFinal">$0.00</span></div>
     </div>
 </body>
 </html>
