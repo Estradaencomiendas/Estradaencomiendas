@@ -72,6 +72,31 @@
             }
         }
 
+        // Función para actualizar el estado del paquete
+        async function updatePackageStatus(status) {
+            const trackingNumber = getTrackingNumber();  // Obtener el número de seguimiento desde la URL
+            if (trackingNumber) {
+                try {
+                    const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                    querySnapshot.forEach(async (doc) => {
+                        await db.collection('paquetes').doc(doc.id).update({ status });
+                        window.location.href = 'Encargado de ruta.html';  // Redirigir después de la actualización
+                    });
+                } catch (error) {
+                    console.error('Error actualizando el estado del paquete:', error);
+                }
+            } else {
+                alert('No se encontró información del paquete.');
+            }
+        }
+
+        // Función para mostrar una confirmación antes de actualizar el estado
+        function confirmStatusUpdate(message, status) {
+            if (confirm(message)) {
+                updatePackageStatus(status);
+            }
+        }
+
         // Cargar los detalles y generar el QR al cargar el DOM
         document.addEventListener('DOMContentLoaded', function() {
             const trackingNumber = getTrackingNumber();
@@ -80,6 +105,24 @@
             } else {
                 document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
             }
+
+            // Agregar event listeners a los botones
+            document.getElementById('package-delivered').addEventListener('click', function() {
+                confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como retirado?', 'Paquete Retirado');
+            });
+
+            document.getElementById('package-not-collected').addEventListener('click', function() {
+                confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como NO retirado?', 'Paquete No Retirado');
+            });
+
+            document.getElementById('report-problem').addEventListener('click', function() {
+                const trackingNumber = getTrackingNumber();
+                if (trackingNumber) {
+                    window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
+                } else {
+                    alert('No se encontró información del paquete.');
+                }
+            });
         });
     </script>
     <style>
@@ -133,6 +176,40 @@
             justify-content: center;
         }
 
+        .status-buttons {
+            margin-top: 20px;
+        }
+
+        .status-buttons button {
+            font-size: 18px;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 5px;
+            cursor: pointer;
+            outline: none;
+            opacity: 0.85;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-buttons button:hover {
+            opacity: 1;
+        }
+
+        .retired {
+            background-color: #28a745; /* Verde */
+        }
+
+        .not-collected {
+            background-color: #dc3545; /* Rojo */
+        }
+
+        .problem {
+            background-color: #ffc107; /* Amarillo */
+            color: #000;
+        }
+
         .logo {
             width: 150px;
             margin: 0 auto 20px;
@@ -151,8 +228,15 @@
         <div id="package-details"></div>
 
         <div id="qrcode"></div> <!-- Aquí se generará el código QR -->
+
+        <div class="status-buttons">
+            <button class="retired" id="package-delivered">Paquete Retirado</button>
+            <button class="not-collected" id="package-not-collected">Paquete No Retirado</button>
+            <button class="problem" id="report-problem">Hubo un Problema</button>
+        </div>
     </div>
 </body>
 </html>
+
 
 
