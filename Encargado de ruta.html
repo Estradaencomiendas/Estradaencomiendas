@@ -119,22 +119,11 @@
         }
 
         #barcode-reader {
-            width: 300px; /* Ajustar el tamaño de la ventana de escaneo */
-            height: 300px; /* Ajustar el tamaño de la ventana de escaneo */
+            width: 250px; /* Ajustar el tamaño de la ventana de escaneo */
+            height: 250px; /* Ajustar el tamaño de la ventana de escaneo */
             margin: 20px auto;
             position: relative;
             display: none;
-        }
-
-        /* Línea verde para centrar el escaneo */
-        .center-line {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: green;
-            z-index: 1;
         }
 
         video {
@@ -161,23 +150,21 @@
             <button class="action-button" id="barcode-scan-button">Escanear</button>
         </div>
 
-        <div id="barcode-reader">
-            <div class="center-line"></div> <!-- Línea verde para ayudar al escaneo -->
-        </div>
+        <div id="barcode-reader"></div> <!-- Área de escaneo -->
     </div>
 
    <script>
     // Función para buscar en Firestore por el número de seguimiento
     async function searchPackage(trackingNumber) {
         try {
-            console.log("Código enviado a Firestore para buscar:", trackingNumber); // Verificar qué código se está enviando a Firestore
+            console.log("Código enviado a Firestore para buscar:", trackingNumber);
             
             const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
             
             if (!querySnapshot.empty) {
                 querySnapshot.forEach((doc) => {
                     sessionStorage.setItem('trackingNumber', trackingNumber);
-                    window.location.href = `confirmar-paquete.html?trackingNumber=${trackingNumber}`;  // Pasar también como parámetro en la URL
+                    window.location.href = `confirmar-paquete.html?trackingNumber=${trackingNumber}`;
                 });
             } else {
                 alert('No se encontró un paquete con este número de seguimiento.');
@@ -210,19 +197,19 @@
                 type: "LiveStream",
                 target: document.querySelector('#barcode-reader'),
                 constraints: {
-                    width: 300,
-                    height: 300,
+                    width: 250,
+                    height: 250,
                     facingMode: "environment" // Usar la cámara trasera
                 }
             },
             decoder: {
-                readers: ["code_128_reader", "qr_reader"], // Añadir lector de códigos QR para mayor precisión
+                readers: ["qr_reader"], // Solo escanear QR para más precisión
             },
             locator: {
-                patchSize: "large", // Tamaño del parche para detección más eficaz
-                halfSample: false // No usar media muestra para mayor calidad de imagen
+                patchSize: "large", // Tamaño del parche más grande para mejor precisión
+                halfSample: false // No usar media muestra para obtener mejor resolución
             },
-            locate: true // Habilitar localización de códigos automáticamente
+            locate: true // Habilitar localización automática de códigos QR
         }, function (err) {
             if (err) {
                 console.error(err);
@@ -232,14 +219,14 @@
             Quagga.start(); // Inicia el escaneo de la cámara
         });
 
-        // Detectar el código de barras o QR
+        // Detectar el código QR
         Quagga.onDetected(function (data) {
             if (data && data.codeResult && data.codeResult.code) {
-                let barcode = data.codeResult.code.trim();  // Limpiar espacios en blanco
-                console.log("Código detectado: ", barcode);
+                let qrCode = data.codeResult.code.trim();  // Limpiar espacios en blanco
+                console.log("Código QR detectado: ", qrCode);
 
-                // Llamar a searchPackage() con el código escaneado
-                searchPackage(barcode);
+                // Llamar a searchPackage() con el código QR escaneado
+                searchPackage(qrCode);
 
                 // Detener Quagga después de escanear
                 Quagga.stop();
@@ -255,4 +242,5 @@
 </script>
     </body>
 </html>
+
 
