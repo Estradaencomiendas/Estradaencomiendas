@@ -68,6 +68,10 @@
                 recepcionadoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
+                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
+                    <p><strong>Destino:</strong> ${packageData.destino}</p>
+                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
+                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor del Envío:</strong> $${valorEnvio.toFixed(2)}</p>
                 `;
                 recepcionadosList.appendChild(recepcionadoItem);
@@ -90,6 +94,10 @@
                 retiradoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
+                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
+                    <p><strong>Destino:</strong> ${packageData.destino}</p>
+                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
+                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor del Paquete:</strong> $${valor.toFixed(2)}</p>
                 `;
                 retiradosList.appendChild(retiradoItem);
@@ -112,6 +120,10 @@
                 pagadoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
+                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
+                    <p><strong>Destino:</strong> ${packageData.destino}</p>
+                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
+                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor Pagado:</strong> $${valor.toFixed(2)}</p>
                 `;
                 pagadosList.appendChild(pagadoItem);
@@ -196,8 +208,6 @@
 <body>
     <div class="container">
         <h1>Registro del Usuario</h1>
-
-        <!-- Mostrar el nombre del usuario logueado -->
         <div id="welcomeMessage"></div>
 
         <!-- Paquetes Recepcionados -->
@@ -226,3 +236,4 @@
     </div>
 </body>
 </html>
+
