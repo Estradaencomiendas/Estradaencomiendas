@@ -152,8 +152,10 @@
 
     <script>
         // Función para buscar en Firestore por el número de seguimiento
-     async function searchPackage(trackingNumber) {
+    async function searchPackage(trackingNumber) {
     try {
+        console.log("Código enviado a Firestore para buscar:", trackingNumber); // Verificar qué código se está enviando a Firestore
+        
         const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
         
         if (!querySnapshot.empty) {
@@ -169,6 +171,7 @@
         alert("Error al buscar el paquete.");
     }
 }
+
 
 // Acción del botón de búsqueda
 document.getElementById('search-button').addEventListener('click', function() {
