@@ -23,12 +23,22 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Función para buscar paquetes por número de seguimiento, nombre de página o vendedora
+        // Función para buscar paquetes por número de seguimiento o nombre de la página
         async function searchPackages() {
             const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
-            const querySnapshot = await db.collection('paquetes')
+            let querySnapshot;
+
+            // Buscar por número de seguimiento
+            querySnapshot = await db.collection('paquetes')
                 .where('trackingNumber', '==', searchInput)
                 .get();
+
+            if (querySnapshot.empty) {
+                // Si no encuentra por número de seguimiento, busca por nombre de la página
+                querySnapshot = await db.collection('paquetes')
+                    .where('nombrePaquete', '==', searchInput)
+                    .get();
+            }
 
             displayPackages(querySnapshot);
         }
@@ -45,13 +55,17 @@
                 packageItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
-                    <p><strong>Nombre de la Vendedora:</strong> ${packageData.nombreCliente}</p>
+                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
                     <p><strong>Estado:</strong> ${packageData.status || 'No disponible'}</p>
                     <p><strong>Valor:</strong> $${packageData.valor}</p>
                     <button onclick="addPackage('${doc.id}', '${packageData.trackingNumber}', '${packageData.status}', ${packageData.valor})">Agregar</button>
                 `;
                 packageList.appendChild(packageItem);
             });
+
+            if (querySnapshot.empty) {
+                packageList.innerHTML = '<p>No se encontraron paquetes con los datos ingresados.</p>';
+            }
         }
 
         // Array para almacenar los paquetes agregados
@@ -104,29 +118,33 @@
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            background-color: #f0f0f0;
-            padding: 20px;
+            min-height: 100vh;
+            background-color: #f1f1f1;
         }
 
         .container {
-            width: 80%;
-            max-width: 800px;
             background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
         }
 
         h1 {
+            text-align: center;
             font-size: 24px;
             margin-bottom: 20px;
         }
 
         .search-bar {
             display: flex;
+            justify-content: space-between;
             margin-bottom: 20px;
         }
 
@@ -134,24 +152,24 @@
             flex: 1;
             padding: 10px;
             font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 2px solid #f39200;
+            border-radius: 10px;
         }
 
         .search-bar button {
-            padding: 10px;
+            padding: 10px 20px;
             margin-left: 10px;
             background-color: #28a745;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
         }
 
         .package-item, .added-package-item {
             background-color: #f9f9f9;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 10px;
             margin-bottom: 10px;
             border: 1px solid #ddd;
         }
@@ -164,17 +182,19 @@
             font-size: 20px;
             font-weight: bold;
             margin-top: 20px;
+            text-align: center;
         }
 
         #payButton {
             margin-top: 20px;
-            padding: 10px 20px;
+            padding: 10px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
+            width: 100%;
         }
     </style>
 </head>
@@ -183,7 +203,7 @@
         <h1>Pago Remuneración en Ruta</h1>
 
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Buscar por Número de Seguimiento, Nombre de la Página o Vendedora">
+            <input type="text" id="searchInput" placeholder="Buscar por Número de Seguimiento o Nombre de la Página">
             <button onclick="searchPackages()">Buscar</button>
         </div>
 
@@ -197,3 +217,4 @@
     </div>
 </body>
 </html>
+
