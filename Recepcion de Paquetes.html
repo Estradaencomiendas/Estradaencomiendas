@@ -37,7 +37,7 @@
                 db.collection('usuarios').doc(userId).get().then((doc) => {
                     if (doc.exists) {
                         const role = doc.data().role;
-                        if (role !== 'Admin0' && role !== 'Admin1') {
+                        if (role !== 'admin0' && role !== 'admin1') {
                             window.location.href = 'login.html'; // Redirigir si el rol no es Admin0 o Admin1
                         }
                     } else {
