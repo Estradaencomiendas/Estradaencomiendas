@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmar Paquete</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
@@ -56,16 +55,6 @@ function getTrackingNumber() {
                             <p><span>Fecha de Entrega:</span> ${packageData.diaEntrega}</p>
                             <p><span>Valor:</span> $${packageData.valor}</p>
                         `;
-
-                        // Generar el código QR
-                        new QRCode(document.getElementById("qrcode"), {
-                            text: packageData.trackingNumber,
-                            width: 128,
-                            height: 128,
-                            colorDark: "#000000",
-                            colorLight: "#ffffff",
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
                     });
                 } else {
                     document.getElementById('package-details').innerHTML = '<p>No se encontraron datos del paquete.</p>';
@@ -194,10 +183,9 @@ function getTrackingNumber() {
             color: #333;
         }
 
+        /* Eliminar estilo del código QR */
         #qrcode {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
+            display: none;
         }
 
         .status-buttons {
@@ -246,7 +234,6 @@ function getTrackingNumber() {
         </div>
 
         <div id="package-details"></div>
-        <div id="qrcode"></div>
 
         <div class="status-buttons">
             <button class="retired" id="package-delivered">Paquete Retirado</button>
