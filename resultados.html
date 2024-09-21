@@ -66,6 +66,8 @@
         #qrcode {
             margin: 20px auto;
             display: block;
+            width: 200px;
+            height: 200px; /* Aumentar tamaño del código QR */
         }
 
         .btn-container {
@@ -91,6 +93,13 @@
         #print-button:hover, #back-button:hover {
             background: #B25C00;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Ocultar botones al imprimir */
+        @media print {
+            .btn-container {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -149,8 +158,8 @@
             // Generar el código QR basado en el número de seguimiento
             new QRCode(document.getElementById("qrcode"), {
                 text: packageData.trackingNumber,
-                width: 128,
-                height: 128,
+                width: 200,  // Aumentar el tamaño del código QR
+                height: 200,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
