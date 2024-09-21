@@ -72,6 +72,15 @@
             }
         }
 
+        // Función para imprimir el ticket
+        function printTicket() {
+            const originalContent = document.body.innerHTML;
+            const printContent = document.querySelector('.container').innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
+
         // Cargar los detalles y generar el QR al cargar el DOM
         document.addEventListener('DOMContentLoaded', function() {
             const trackingNumber = getTrackingNumber();
@@ -138,6 +147,28 @@
             margin: 0 auto 20px;
             display: block;
         }
+
+        .btn-container {
+            margin-top: 20px;
+        }
+
+        .btn-container button {
+            font-size: 18px;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 5px;
+            cursor: pointer;
+            outline: none;
+            opacity: 0.85;
+            transition: opacity 0.3s ease;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-container button:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -151,9 +182,13 @@
         <div id="package-details"></div>
 
         <div id="qrcode"></div> <!-- Aquí se generará el código QR -->
+
+        <div class="btn-container">
+            <button onclick="printTicket()">Imprimir Ticket</button>
+            <button onclick="window.location.href='Encargado de ruta.html'">Regresar</button>
+        </div>
     </div>
 </body>
 </html>
-
 
 
