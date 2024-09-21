@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora de Paquetes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            authDomain: "estradaencomiendas0.firebaseapp.com",
+            projectId: "estradaencomiendas0",
+            storageBucket: "estradaencomiendas0.appspot.com",
+            messagingSenderId: "247979951336",
+            appId: "1:247979951336:web:92b6b4bf615595676755d",
+            measurementId: "G-BRMC9FZBC"
+        };
+
+        // Inicialización de Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Verificar autenticación del admin
+        auth.onAuthStateChanged(async function(user) {
+            if (user) {
+                try {
+                    const userId = user.uid;
+                    const userDoc = await db.collection('users').doc(userId).get();
+                    const role = userDoc.data().role;
+
+                    // Verificar si el usuario es admin0
+                    if (role === 'admin0') {
+                        loadBitacora();  // Cargar la bitácora si es admin0
+                    } else {
+                        window.location.href = 'login.html'; // Redirigir si no es admin0
+                    }
+                } catch (error) {
+                    console.error('Error obteniendo los detalles del usuario:', error);
+                    window.location.href = 'login.html';
+                }
+            } else {
+                window.location.href = 'login.html'; // Redirigir si no está autenticado
+            }
+        });
+
+        // Función para cargar la bitácora de paquetes
+        async function loadBitacora() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ''; // Limpiar la tabla antes de cargar nuevos datos
+
+            // Obtener los paquetes entregados y ordenarlos por fecha de entrega
+            const bitacoraSnapshot = await db.collection('paquetes')
+                .orderBy('diaEntrega', 'desc') // Ordenar por fecha de entrega
+                .get();
+
+            bitacoraSnapshot.forEach((doc) => {
+                const packageData = doc.data();
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${packageData.trackingNumber}</td>
+                    <td>${packageData.nombrePaquete}</td>
+                    <td>${packageData.nombreCliente}</td>
+                    <td>${packageData.destino}</td>
+                    <td>${packageData.diaEntrega}</td>
+                    <td>${packageData.valorEnvio ? `$${parseFloat(packageData.valorEnvio).toFixed(2)}` : 'N/A'}</td>
+                    <td>${packageData.valor ? `$${parseFloat(packageData.valor).toFixed(2)}` : 'N/A'}</td>
+                    <td>${packageData.status}</td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función de búsqueda
+        function searchPackages() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const tableRows = document.querySelectorAll('#tableBody tr');
+
+            tableRows.forEach((row) => {
+                const trackingNumber = row.cells[0].textContent.toLowerCase();
+                const nombrePaquete = row.cells[1].textContent.toLowerCase();
+
+                if (trackingNumber.includes(searchTerm) || nombrePaquete.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+    <!-- Estilos -->
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f1f1f1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-bar input {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f39200;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bitácora de Paquetes - Admin</h1>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar por Número de Seguimiento o Nombre del Paquete" onkeyup="searchPackages()">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Número de Seguimiento</th>
+                    <th>Nombre del Paquete</th>
+                    <th>Nombre de la Clienta</th>
+                    <th>Destino</th>
+                    <th>Fecha de Entrega</th>
+                    <th>Valor del Envío</th>
+                    <th>Valor del Paquete</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Aquí se cargarán los paquetes -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
