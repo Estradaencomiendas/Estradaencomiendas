@@ -247,13 +247,14 @@
                 valor,
                 valorEnvio,
                 fechaEnvio,
+                status: "En Ruta", // Se agrega el estado como "En Ruta"
                 recepcionadoPor: user ? user.uid : 'Desconocido'
             };
 
             try {
                 // Guardar en Firestore
                 await db.collection('paquetes').doc(trackingNumber).set(packageData);
-                console.log('Paquete guardado en Firestore');
+                console.log('Paquete guardado en Firestore con estado "En Ruta".');
 
                 // Enviar mensaje de texto a través de Netlify Functions
                 const response = await fetch('/.netlify/functions/sendSms', {
