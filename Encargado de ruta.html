@@ -30,23 +30,31 @@
         // Configurar la persistencia de la sesión para que no cierre al recargar
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .then(function() {
-                // Verificar si el usuario está autenticado y tiene el rol adecuado
-                auth.onAuthStateChanged(function(user) {
+                auth.onAuthStateChanged(async function(user) {
                     if (user) {
-                        const userId = user.uid;
-                        db.collection('usuarios').doc(userId).get().then((doc) => {
-                            if (doc.exists) {
-                                const role = doc.data().role;
-                                if (role !== 'admin0' && role !== 'admin1') {
+                        try {
+                            // Obtener datos del usuario desde Firestore
+                            const userId = user.uid;
+                            const userDoc = await db.collection('users').doc(userId).get();
+                            if (userDoc.exists) {
+                                const role = userDoc.data().role;
+                                const firstName = userDoc.data().firstName;
+                                const lastName = userDoc.data().lastName;
+
+                                // Mostrar el nombre del usuario en el mensaje de bienvenida
+                                document.getElementById('welcomeMessage').textContent = `Paquete entregado por: ${firstName} ${lastName}`;
+
+                                // Verificar el rol del usuario
+                                if (role !== 'admin1' && role !== 'admin0') {
                                     window.location.href = 'login.html'; // Redirigir si el rol no es admin0 o admin1
                                 }
                             } else {
                                 window.location.href = 'login.html'; // Redirigir si no se encuentra el documento del usuario
                             }
-                        }).catch((error) => {
+                        } catch (error) {
                             console.error("Error al obtener el rol del usuario:", error);
                             window.location.href = 'login.html'; // Redirigir si hay error al obtener los datos del usuario
-                        });
+                        }
                     } else {
                         window.location.href = 'login.html'; // Redirigir si no está autenticado
                     }
@@ -160,6 +168,13 @@
             max-width: 100%;
             position: relative;
         }
+
+        #welcomeMessage {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #007bff;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -183,6 +198,9 @@
         <div id="barcode-reader">
             <video id="video" width="250" height="250"></video>
         </div> <!-- Área de escaneo -->
+
+        <!-- Mensaje de bienvenida con nombre y apellido -->
+        <div id="welcomeMessage"></div>
     </div>
 
    <script>
@@ -246,6 +264,5 @@
 </script>
 </body>
 </html>
-
 
 
