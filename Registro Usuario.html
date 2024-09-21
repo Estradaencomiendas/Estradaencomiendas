@@ -141,7 +141,8 @@
 
         // Función para validar la contraseña del admin0 y marcar como entregado
         async function markAsEntregado() {
-            const adminPassword = prompt("Ingrese la contraseña del Admin0 para marcar como entregado:");
+            // Usar un campo tipo password para ocultar los caracteres
+            const adminPassword = prompt("Ingrese la contraseña del Admin0 para marcar como entregado:", "");
             if (!adminPassword) return;
 
             const adminSnapshot = await db.collection('users').where('role', '==', 'admin0').get();
@@ -287,6 +288,7 @@
     </div>
 </body>
 </html>
+
 
 
 
