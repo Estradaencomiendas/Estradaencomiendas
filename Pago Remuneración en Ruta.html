@@ -80,7 +80,7 @@
                     <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
                     <p><strong>Estado:</strong> ${packageData.status || 'No disponible'}</p>
                     <p><strong>Valor:</strong> $${packageData.valor}</p>
-                    <button onclick="addPackage('${doc.id}', '${packageData.trackingNumber}', '${packageData.status}', ${packageData.valor})">Agregar</button>
+                    ${packageData.status === 'Paquete Retirado' ? `<button class="green-button" onclick="addPackage('${doc.id}', '${packageData.trackingNumber}', '${packageData.status}', ${packageData.valor})">Agregar</button>` : ''}
                 `;
                 packageList.appendChild(packageItem);
             });
@@ -188,6 +188,16 @@
             cursor: pointer;
         }
 
+        .green-button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
         .package-item, .added-package-item {
             background-color: #f9f9f9;
             padding: 15px;
@@ -231,7 +241,9 @@
 <body>
     <div class="container">
         <h1>Pago Remuneración en Ruta</h1>
-        <div id="userInfo"></div> <!-- Aquí se mostrará el mensaje con nombre y apellido del usuario -->
+
+        <!-- Información del usuario -->
+        <div id="userInfo"></div>
 
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="Buscar por Número de Seguimiento o Nombre de la Página">
