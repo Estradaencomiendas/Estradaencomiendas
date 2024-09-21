@@ -44,8 +44,14 @@
             let totalRetirados = 0;
             let totalPagados = 0;
 
+            // Obtener fecha actual
+            const today = new Date().toISOString().split('T')[0];
+
             // Cargar paquetes recepcionados
-            const recepcionadosSnapshot = await db.collection('paquetes').where('recepcionadoPor', '==', userId).get();
+            const recepcionadosSnapshot = await db.collection('paquetes')
+                .where('recepcionadoPor', '==', userId)
+                .where('fechaEnvio', '==', today)
+                .get();
             const recepcionadosList = document.getElementById('recepcionadosList');
             recepcionadosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
@@ -58,12 +64,17 @@
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
                     <p><strong>Valor del Envío:</strong> $${valorEnvio}</p>
+                    <p><strong>Fecha:</strong> ${packageData.fechaEnvio}</p>
                 `;
                 recepcionadosList.appendChild(recepcionadoItem);
             });
 
             // Cargar paquetes entregados
-            const retiradosSnapshot = await db.collection('paquetes').where('status', '==', 'Paquete Retirado').where('recepcionadoPor', '==', userId).get();
+            const retiradosSnapshot = await db.collection('paquetes')
+                .where('status', '==', 'Paquete Retirado')
+                .where('recepcionadoPor', '==', userId)
+                .where('fechaEnvio', '==', today)
+                .get();
             const retiradosList = document.getElementById('retiradosList');
             retiradosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
@@ -76,12 +87,17 @@
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
                     <p><strong>Valor del Paquete:</strong> $${valor}</p>
+                    <p><strong>Fecha:</strong> ${packageData.fechaEnvio}</p>
                 `;
                 retiradosList.appendChild(retiradoItem);
             });
 
             // Cargar paquetes pagados
-            const pagadosSnapshot = await db.collection('paquetes').where('status', '==', 'Pagado').where('recepcionadoPor', '==', userId).get();
+            const pagadosSnapshot = await db.collection('paquetes')
+                .where('status', '==', 'Pagado')
+                .where('recepcionadoPor', '==', userId)
+                .where('fechaEnvio', '==', today)
+                .get();
             const pagadosList = document.getElementById('pagadosList');
             pagadosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
@@ -94,6 +110,7 @@
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
                     <p><strong>Valor Pagado:</strong> $${valor}</p>
+                    <p><strong>Fecha:</strong> ${packageData.fechaEnvio}</p>
                 `;
                 pagadosList.appendChild(pagadoItem);
             });
@@ -197,3 +214,4 @@
     </div>
 </body>
 </html>
+
