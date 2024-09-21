@@ -29,6 +29,14 @@
             if (user) {
                 try {
                     const userId = user.uid;
+                    const userDoc = await db.collection('users').doc(userId).get();
+                    const firstName = userDoc.data().firstName;
+                    const lastName = userDoc.data().lastName;
+
+                    // Mostrar el mensaje de bienvenida con el nombre del usuario
+                    document.getElementById('welcomeMessage').textContent = `Esta gestión se está llevando a cabo por: ${firstName} ${lastName}`;
+
+                    // Cargar los paquetes del usuario
                     await loadUserPackages(userId);
                 } catch (error) {
                     console.error('Error obteniendo los detalles del usuario:', error);
@@ -44,9 +52,6 @@
             let totalRetirados = 0;
             let totalPagados = 0;
 
-            // Obtener fecha actual
-            const today = new Date().toISOString().split('T')[0];
-
             // Cargar paquetes recepcionados
             const recepcionadosSnapshot = await db.collection('paquetes')
                 .where('recepcionadoPor', '==', userId)
@@ -54,8 +59,7 @@
             const recepcionadosList = document.getElementById('recepcionadosList');
             recepcionadosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
-                const valorEnvio = packageData.valorEnvio || 0;
-                const fechaEnvio = packageData.fechaEnvio || 'No disponible';
+                const valorEnvio = parseFloat(packageData.valorEnvio || 0);
 
                 totalRecepcionados += valorEnvio;
 
@@ -64,8 +68,7 @@
                 recepcionadoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
-                    <p><strong>Valor del Envío:</strong> $${valorEnvio}</p>
-                    <p><strong>Fecha:</strong> ${fechaEnvio}</p>
+                    <p><strong>Valor del Envío:</strong> $${valorEnvio.toFixed(2)}</p>
                 `;
                 recepcionadosList.appendChild(recepcionadoItem);
             });
@@ -78,8 +81,7 @@
             const retiradosList = document.getElementById('retiradosList');
             retiradosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
-                const valor = packageData.valor || 0;
-                const fechaEnvio = packageData.fechaEnvio || 'No disponible';
+                const valor = parseFloat(packageData.valor || 0);
 
                 totalRetirados += valor;
 
@@ -88,8 +90,7 @@
                 retiradoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
-                    <p><strong>Valor del Paquete:</strong> $${valor}</p>
-                    <p><strong>Fecha:</strong> ${fechaEnvio}</p>
+                    <p><strong>Valor del Paquete:</strong> $${valor.toFixed(2)}</p>
                 `;
                 retiradosList.appendChild(retiradoItem);
             });
@@ -102,8 +103,7 @@
             const pagadosList = document.getElementById('pagadosList');
             pagadosSnapshot.forEach((doc) => {
                 const packageData = doc.data();
-                const valor = packageData.valor || 0;
-                const fechaEnvio = packageData.fechaEnvio || 'No disponible';
+                const valor = parseFloat(packageData.valor || 0);
 
                 totalPagados += valor;
 
@@ -112,8 +112,7 @@
                 pagadoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
-                    <p><strong>Valor Pagado:</strong> $${valor}</p>
-                    <p><strong>Fecha:</strong> ${fechaEnvio}</p>
+                    <p><strong>Valor Pagado:</strong> $${valor.toFixed(2)}</p>
                 `;
                 pagadosList.appendChild(pagadoItem);
             });
@@ -155,6 +154,13 @@
             margin-bottom: 20px;
         }
 
+        #welcomeMessage {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         .section {
             margin-bottom: 30px;
         }
@@ -191,6 +197,9 @@
     <div class="container">
         <h1>Registro del Usuario</h1>
 
+        <!-- Mostrar el nombre del usuario logueado -->
+        <div id="welcomeMessage"></div>
+
         <!-- Paquetes Recepcionados -->
         <div class="section">
             <h2>Paquetes Recepcionados</h2>
@@ -217,4 +226,3 @@
     </div>
 </body>
 </html>
-
