@@ -22,6 +22,25 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Verificar autenticación y cargar nombre y apellido del usuario
+        auth.onAuthStateChanged(async function(user) {
+            if (user) {
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const firstName = userDoc.data().firstName;
+                        const lastName = userDoc.data().lastName;
+                        document.getElementById('userInfo').textContent = `Esta Gestión está siendo realizada por: ${firstName} ${lastName}`;
+                    }
+                } catch (error) {
+                    console.error('Error obteniendo los detalles del usuario:', error);
+                }
+            } else {
+                window.location.href = 'login.html'; // Redirigir si no está autenticado
+            }
+        });
 
         // Función para buscar paquetes por número de seguimiento o nombre de la página
         async function searchPackages() {
@@ -56,6 +75,9 @@
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
                     <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
+                    <p><strong>Destino:</strong> ${packageData.destino}</p>
+                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
+                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
                     <p><strong>Estado:</strong> ${packageData.status || 'No disponible'}</p>
                     <p><strong>Valor:</strong> $${packageData.valor}</p>
                     <button onclick="addPackage('${doc.id}', '${packageData.trackingNumber}', '${packageData.status}', ${packageData.valor})">Agregar</button>
@@ -196,11 +218,20 @@
             font-size: 16px;
             width: 100%;
         }
+
+        /* Estilo para la información del usuario */
+        #userInfo {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Pago Remuneración en Ruta</h1>
+        <div id="userInfo"></div> <!-- Aquí se mostrará el mensaje con nombre y apellido del usuario -->
 
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="Buscar por Número de Seguimiento o Nombre de la Página">
@@ -217,5 +248,4 @@
     </div>
 </body>
 </html>
-
 
