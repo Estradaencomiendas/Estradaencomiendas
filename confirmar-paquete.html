@@ -23,29 +23,23 @@
         const db = firebase.firestore();
 
        // Función para obtener el número de seguimiento desde sessionStorage o la URL
-function getTrackingNumber() {
-    const trackingNumber = sessionStorage.getItem('trackingNumber');  // Intentar obtenerlo de sessionStorage
-    if (trackingNumber) {
-        return trackingNumber;
-    } else {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('trackingNumber');  // Obtener de la URL si no está en sessionStorage
-    }
-}
+       function getTrackingNumber() {
+           const trackingNumber = sessionStorage.getItem('trackingNumber');
+           if (trackingNumber) {
+               return trackingNumber;
+           } else {
+               const params = new URLSearchParams(window.location.search);
+               return params.get('trackingNumber');
+           }
+       }
+
         // Función para cargar detalles del paquete desde Firestore
         async function loadPackageDetails(trackingNumber) {
             try {
-                console.log("Tracking number:", trackingNumber); // Depuración para ver el número de seguimiento
-                
-                // Buscar paquete en Firestore
                 const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-                
-                console.log("Firestore response:", querySnapshot); // Depuración para ver la respuesta de Firestore
-                
                 if (!querySnapshot.empty) {
                     querySnapshot.forEach((doc) => {
                         const packageData = doc.data();
-                        console.log("Document data:", packageData); // Depuración para ver los datos del paquete
                         document.getElementById('package-details').innerHTML = `
                             <p><span>Número de Seguimiento:</span> ${packageData.trackingNumber}</p>
                             <p><span>Nombre de la Clienta:</span> ${packageData.nombreCliente}</p>
@@ -64,16 +58,21 @@ function getTrackingNumber() {
             }
         }
 
-        // Función para actualizar el estado del paquete
+        // Función para actualizar el estado del paquete en Firestore
         async function updatePackageStatus(status) {
             const trackingNumber = getTrackingNumber();  // Obtener el número de seguimiento desde la URL
             if (trackingNumber) {
                 try {
                     const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-                    querySnapshot.forEach(async (doc) => {
-                        await db.collection('paquetes').doc(doc.id).update({ status });
-                        window.location.href = 'Encargado de ruta.html';  // Redirigir después de la actualización
-                    });
+                    if (!querySnapshot.empty) {
+                        querySnapshot.forEach(async (doc) => {
+                            await db.collection('paquetes').doc(doc.id).update({ status });
+                            console.log(`Estado actualizado a ${status}`);  // Confirmación en consola
+                            window.location.href = 'Encargado de ruta.html';  // Redirigir después de la actualización
+                        });
+                    } else {
+                        alert('No se encontró el paquete.');
+                    }
                 } catch (error) {
                     console.error('Error actualizando el estado del paquete:', error);
                 }
@@ -82,23 +81,23 @@ function getTrackingNumber() {
             }
         }
 
-        // Función para mostrar una confirmación antes de actualizar el estado
+        // Función para confirmar la actualización del estado
         function confirmStatusUpdate(message, status) {
             if (confirm(message)) {
                 updatePackageStatus(status);
             }
         }
 
-        // Agregar los event listeners solo después de que el DOM esté completamente cargado
+        // Cargar detalles y configurar los botones al cargar el DOM
         document.addEventListener('DOMContentLoaded', function() {
-            const trackingNumber = getTrackingNumber();  // Obtener el número de seguimiento desde la URL
+            const trackingNumber = getTrackingNumber();
             if (trackingNumber) {
                 loadPackageDetails(trackingNumber);
             } else {
                 document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
             }
 
-            // Agregar event listeners a los botones
+            // Configurar eventos de los botones
             document.getElementById('package-delivered').addEventListener('click', function() {
                 confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como retirado?', 'Paquete Retirado');
             });
@@ -181,11 +180,6 @@ function getTrackingNumber() {
             margin: 20px 0;
             font-size: 18px;
             color: #333;
-        }
-
-        /* Eliminar estilo del código QR */
-        #qrcode {
-            display: none;
         }
 
         .status-buttons {
