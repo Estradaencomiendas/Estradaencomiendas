@@ -68,10 +68,6 @@
                 recepcionadoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
-                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
-                    <p><strong>Destino:</strong> ${packageData.destino}</p>
-                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
-                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor del Envío:</strong> $${valorEnvio.toFixed(2)}</p>
                 `;
                 recepcionadosList.appendChild(recepcionadoItem);
@@ -93,11 +89,6 @@
                 retiradoItem.classList.add('package-item');
                 retiradoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
-                    <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
-                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
-                    <p><strong>Destino:</strong> ${packageData.destino}</p>
-                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
-                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor del Paquete:</strong> $${valor.toFixed(2)}</p>
                 `;
                 retiradosList.appendChild(retiradoItem);
@@ -119,11 +110,6 @@
                 pagadoItem.classList.add('package-item');
                 pagadoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
-                    <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
-                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
-                    <p><strong>Destino:</strong> ${packageData.destino}</p>
-                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
-                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor Pagado:</strong> $${valor.toFixed(2)}</p>
                 `;
                 pagadosList.appendChild(pagadoItem);
@@ -137,6 +123,64 @@
             // Calcular total final
             const totalFinal = (totalRetirados + totalRecepcionados) - totalPagados;
             document.getElementById('totalFinal').textContent = `$${totalFinal.toFixed(2)}`;
+        }
+
+        // Función para validar la contraseña del admin0 y marcar como entregado
+        async function markAsEntregado() {
+            const adminPassword = prompt("Ingrese la contraseña del Admin0 para marcar como entregado:");
+            if (!adminPassword) return;
+
+            const adminSnapshot = await db.collection('users').where('role', '==', 'admin0').get();
+            let isValidAdmin = false;
+
+            adminSnapshot.forEach(async (doc) => {
+                const adminData = doc.data();
+                const email = adminData.email;
+
+                // Re-autenticar el administrador
+                try {
+                    await auth.signInWithEmailAndPassword(email, adminPassword);
+                    isValidAdmin = true;
+                    await moveToBitacora();
+                } catch (error) {
+                    console.error("Contraseña incorrecta o problema con la autenticación", error);
+                }
+            });
+
+            if (!isValidAdmin) {
+                alert("No se pudo autenticar al administrador. Verifique la contraseña.");
+            }
+        }
+
+        // Mover los paquetes a la bitácora y reiniciar los totales
+        async function moveToBitacora() {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            const userId = user.uid;
+            const today = new Date().toISOString().split('T')[0];
+
+            const paquetesSnapshot = await db.collection('paquetes')
+                .where('recepcionadoPor', '==', userId)
+                .get();
+
+            // Guardar los paquetes en la bitácora
+            const bitacoraRef = db.collection('bitacora').doc(userId).collection(today);
+
+            const batch = db.batch();
+
+            paquetesSnapshot.forEach((doc) => {
+                const paqueteData = doc.data();
+                const paqueteId = doc.id;
+
+                batch.set(bitacoraRef.doc(paqueteId), paqueteData);
+                batch.delete(db.collection('paquetes').doc(paqueteId));
+            });
+
+            await batch.commit();
+
+            alert("Todos los paquetes han sido marcados como entregados y guardados en la bitácora.");
+            location.reload(); // Recargar la página después de la operación
         }
     </script>
     <style>
@@ -164,13 +208,6 @@
             text-align: center;
             font-size: 24px;
             margin-bottom: 20px;
-        }
-
-        #welcomeMessage {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
         }
 
         .section {
@@ -203,6 +240,22 @@
             text-align: right;
             color: #007bff;
         }
+
+        .button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -233,7 +286,10 @@
 
         <!-- Total Final -->
         <div class="final-total">Total Final: <span id="totalFinal">$0.00</span></div>
+
+        <button class="button" onclick="markAsEntregado()">Marcar como Entregado</button>
     </div>
 </body>
 </html>
+
 
