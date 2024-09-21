@@ -68,6 +68,10 @@
                 recepcionadoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
                     <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
+                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
+                    <p><strong>Destino:</strong> ${packageData.destino}</p>
+                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
+                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor del Envío:</strong> $${valorEnvio.toFixed(2)}</p>
                 `;
                 recepcionadosList.appendChild(recepcionadoItem);
@@ -89,6 +93,11 @@
                 retiradoItem.classList.add('package-item');
                 retiradoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
+                    <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
+                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
+                    <p><strong>Destino:</strong> ${packageData.destino}</p>
+                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
+                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor del Paquete:</strong> $${valor.toFixed(2)}</p>
                 `;
                 retiradosList.appendChild(retiradoItem);
@@ -110,6 +119,11 @@
                 pagadoItem.classList.add('package-item');
                 pagadoItem.innerHTML = `
                     <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
+                    <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
+                    <p><strong>Nombre de la Clienta:</strong> ${packageData.nombreCliente}</p>
+                    <p><strong>Destino:</strong> ${packageData.destino}</p>
+                    <p><strong>Fecha de Entrega:</strong> ${packageData.diaEntrega}</p>
+                    <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
                     <p><strong>Valor Pagado:</strong> $${valor.toFixed(2)}</p>
                 `;
                 pagadosList.appendChild(pagadoItem);
@@ -141,7 +155,7 @@
                 try {
                     await auth.signInWithEmailAndPassword(email, adminPassword);
                     isValidAdmin = true;
-                    await moveToBitacora();
+                    await resetTotals(); // Reiniciar los valores
                 } catch (error) {
                     console.error("Contraseña incorrecta o problema con la autenticación", error);
                 }
@@ -152,35 +166,10 @@
             }
         }
 
-        // Mover los paquetes a la bitácora y reiniciar los totales
-        async function moveToBitacora() {
-            const user = firebase.auth().currentUser;
-            if (!user) return;
-
-            const userId = user.uid;
-            const today = new Date().toISOString().split('T')[0];
-
-            const paquetesSnapshot = await db.collection('paquetes')
-                .where('recepcionadoPor', '==', userId)
-                .get();
-
-            // Guardar los paquetes en la bitácora
-            const bitacoraRef = db.collection('bitacora').doc(userId).collection(today);
-
-            const batch = db.batch();
-
-            paquetesSnapshot.forEach((doc) => {
-                const paqueteData = doc.data();
-                const paqueteId = doc.id;
-
-                batch.set(bitacoraRef.doc(paqueteId), paqueteData);
-                batch.delete(db.collection('paquetes').doc(paqueteId));
-            });
-
-            await batch.commit();
-
-            alert("Todos los paquetes han sido marcados como entregados y guardados en la bitácora.");
-            location.reload(); // Recargar la página después de la operación
+        // Función para reiniciar los totales
+        async function resetTotals() {
+            alert("Los valores han sido reiniciados.");
+            location.reload(); // Recargar la página después de reiniciar
         }
     </script>
     <style>
@@ -208,6 +197,13 @@
             text-align: center;
             font-size: 24px;
             margin-bottom: 20px;
+        }
+
+        #welcomeMessage {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         .section {
@@ -291,5 +287,6 @@
     </div>
 </body>
 </html>
+
 
 
