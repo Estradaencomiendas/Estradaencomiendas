@@ -70,7 +70,7 @@
                     if (userDoc.exists) {
                         const firstName = userDoc.data().firstName;
                         const lastName = userDoc.data().lastName;
-                        document.getElementById('user-details').textContent = `Paquete gestionado por: ${firstName} ${lastName}`;
+                        document.getElementById('user-details').textContent = `Este Paquete está siendo Gestionado(a) por: ${firstName} ${lastName}`;
                     } else {
                         console.error("No se encontró el documento del usuario.");
                     }
@@ -242,7 +242,7 @@
         #user-details {
             font-size: 18px;
             color: #555;
-            margin-top: 20px;
+            margin-top: 10px;
             font-weight: bold;
         }
     </style>
@@ -253,13 +253,13 @@
 
         <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
 
+        <div id="user-details"></div>
+
         <div class="title-wrapper">
             <h1>Confirmar Paquete</h1>
         </div>
 
         <div id="package-details"></div>
-
-        <div id="user-details"></div>
 
         <div class="status-buttons">
             <button class="retired" id="package-delivered">Paquete Retirado</button>
