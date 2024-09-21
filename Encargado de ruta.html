@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encargado de Ruta</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <!-- Cargar la biblioteca QuaggaJS -->
-    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+    <!-- Cargar la biblioteca ZXing -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
     <!-- Firebase (Versión 8.x) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -119,11 +119,10 @@
         }
 
         #barcode-reader {
-            width: 250px; /* Ajustar el tamaño de la ventana de escaneo */
-            height: 250px; /* Ajustar el tamaño de la ventana de escaneo */
+            width: 250px;
+            height: 250px;
             margin: 20px auto;
             position: relative;
-            display: none;
         }
 
         video {
@@ -150,7 +149,9 @@
             <button class="action-button" id="barcode-scan-button">Escanear</button>
         </div>
 
-        <div id="barcode-reader"></div> <!-- Área de escaneo -->
+        <div id="barcode-reader">
+            <video id="video" width="250" height="250"></video>
+        </div> <!-- Área de escaneo -->
     </div>
 
    <script>
@@ -186,51 +187,23 @@
         }
     });
 
-    // Función para inicializar el escaneo con QuaggaJS
+    // Función para inicializar el escaneo con ZXing
     function startBarcodeScanner() {
         const barcodeReader = document.getElementById('barcode-reader');
+        const codeReader = new ZXing.BrowserQRCodeReader();
+        const videoElement = document.getElementById('video');
+
         barcodeReader.style.display = 'block'; // Mostrar el área de escaneo
 
-        Quagga.init({
-            inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: document.querySelector('#barcode-reader'),
-                constraints: {
-                    width: 250,
-                    height: 250,
-                    facingMode: "environment" // Usar la cámara trasera
-                }
-            },
-            decoder: {
-                readers: ["qr_reader"], // Solo escanear QR para más precisión
-            },
-            locator: {
-                patchSize: "large", // Tamaño del parche más grande para mejor precisión
-                halfSample: false // No usar media muestra para obtener mejor resolución
-            },
-            locate: true // Habilitar localización automática de códigos QR
-        }, function (err) {
-            if (err) {
-                console.error(err);
-                alert('No se pudo inicializar el escáner.');
-                return;
+        codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+            if (result) {
+                console.log("Código QR detectado:", result.text);
+                searchPackage(result.text);  // Llamar a searchPackage() con el código QR escaneado
+                codeReader.reset();  // Detener el escáner
+                barcodeReader.style.display = 'none'; // Ocultar el área de escaneo después de capturar el código
             }
-            Quagga.start(); // Inicia el escaneo de la cámara
-        });
-
-        // Detectar el código QR
-        Quagga.onDetected(function (data) {
-            if (data && data.codeResult && data.codeResult.code) {
-                let qrCode = data.codeResult.code.trim();  // Limpiar espacios en blanco
-                console.log("Código QR detectado: ", qrCode);
-
-                // Llamar a searchPackage() con el código QR escaneado
-                searchPackage(qrCode);
-
-                // Detener Quagga después de escanear
-                Quagga.stop();
-                barcodeReader.style.display = 'none';  // Ocultar el área de escaneo después de capturar el código
+            if (err && !(err instanceof ZXing.NotFoundException)) {
+                console.error(err);
             }
         });
     }
@@ -240,7 +213,7 @@
         startBarcodeScanner();
     });
 </script>
-    </body>
+</body>
 </html>
 
 
