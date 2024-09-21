@@ -58,7 +58,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Login</h1>
+        <h1>Iniciar Sesión</h1>
         <form id="loginForm">
             <input type="email" id="loginEmail" placeholder="Correo Electrónico" required>
             <input type="password" id="loginPassword" placeholder="Contraseña" required>
@@ -87,9 +87,8 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-    </script>
 
-    <script>
+        // Función de inicio de sesión
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
@@ -97,14 +96,20 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                // Iniciar sesión
+                // Iniciar sesión con Firebase Auth
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
-                // Obtener el rol del usuario desde Firestore
+                // Obtener el rol, nombre y apellido del usuario desde Firestore
                 const userDoc = await db.collection('usuarios').doc(user.uid).get();
                 if (userDoc.exists) {
-                    const role = userDoc.data().role;
+                    const userData = userDoc.data();
+                    const role = userData.role;
+                    const nombre = userData.nombre;
+                    const apellido = userData.apellido;
+
+                    // Mostrar el nombre completo en consola (solo para verificación)
+                    console.log(`Usuario: ${nombre} ${apellido}`);
 
                     // Redirigir según el rol
                     if (role === 'admin1') {
@@ -115,15 +120,14 @@
                         window.location.href = 'Usuario0.html';  // Redirigir a la página Usuario0
                     }
                 } else {
-                    console.error('No se encontró el documento del usuario');
+                    console.error('No se encontró el documento del usuario en Firestore');
                 }
             } catch (error) {
                 console.error('Error al iniciar sesión:', error.message);
-                alert('Error: ' + error.message);
+                alert('Error al iniciar sesión: ' + error.message);
             }
         });
     </script>
 </body>
 </html>
-
 
