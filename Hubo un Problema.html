@@ -104,15 +104,42 @@
                     const lastName = doc.data().lastName;
                     document.getElementById('welcomeMessage').textContent = `Esta gestión se está llevando a cabo por: ${firstName} ${lastName}`;
                 });
+
+                // Mostrar todos los paquetes con problemas al cargar la página
+                loadAllPackages();
             } else {
                 window.location.href = 'login.html';
             }
         });
 
+        // Función para cargar todos los paquetes con problemas
+        function loadAllPackages() {
+            const packageList = document.getElementById('packageList');
+            packageList.innerHTML = ''; // Limpiar resultados anteriores
+
+            db.collection('paquetes').where('observaciones', '!=', '').get().then(querySnapshot => {
+                querySnapshot.forEach(doc => {
+                    const packageData = doc.data();
+                    const packageItem = document.createElement('div');
+                    packageItem.classList.add('package-item');
+                    packageItem.innerHTML = `
+                        <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
+                        <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
+                        <p><strong>Observaciones:</strong> ${packageData.observaciones}</p>
+                        <p><strong>Destino:</strong> ${packageData.destino}</p>
+                        <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
+                        <p><strong>Valor del Paquete:</strong> $${packageData.valor}</p>
+                    `;
+                    packageList.appendChild(packageItem);
+                });
+            });
+        }
+
+        // Función para buscar paquetes por número de seguimiento o nombre del paquete
         function searchPackages() {
             const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
             const packageList = document.getElementById('packageList');
-            packageList.innerHTML = '';
+            packageList.innerHTML = ''; // Limpiar resultados anteriores
 
             db.collection('paquetes').where('observaciones', '!=', '').get().then(querySnapshot => {
                 querySnapshot.forEach(doc => {
