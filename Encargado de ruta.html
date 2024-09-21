@@ -205,13 +205,16 @@ function startBarcodeScanner() {
     });
 
     // Detectar el código de barras
-    Quagga.onDetected(function (data) {
-        if (data && data.codeResult && data.codeResult.code) {
-            let barcode = data.codeResult.code;
-            console.log("Código detectado: ", barcode);  // Depuración para ver el código escaneado
+  Quagga.onDetected(function (data) {
+    if (data && data.codeResult && data.codeResult.code) {
+        let barcode = data.codeResult.code.trim();  // Limpiar espacios en blanco
+        console.log("Código detectado: ", barcode);  // Verificar en consola el código escaneado
 
-            // Buscar el paquete usando el código escaneado tal como está
-            searchPackage(barcode);
+        // Llamar a searchPackage() con el código escaneado
+        searchPackage(barcode);
+    }
+});
+
 
             // Detener Quagga después de escanear
             Quagga.stop();
