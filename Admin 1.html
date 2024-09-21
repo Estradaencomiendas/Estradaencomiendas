@@ -8,49 +8,77 @@
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             background-color: #f7f7f7;
         }
 
         .container {
-            text-align: center;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 15px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 600px;
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
         }
 
         h1 {
-            font-size: 28px;
+            font-size: 36px;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .welcome-message {
             font-size: 24px;
             color: #007bff;
-            margin-bottom: 10px;
+            margin-bottom: 30px;
         }
 
-        .content {
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .button {
+            background-color: #f39204;
+            color: white;
+            padding: 20px 30px;
             font-size: 18px;
-            color: #555;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 250px;
+            text-align: center;
+        }
+
+        .button:hover {
+            background-color: #e67e00;
+        }
+
+        .button:focus {
+            outline: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Página del Administrador</h1>
+        <h1>Admin Panel</h1>
         <div class="welcome-message" id="welcomeMessage"></div>
-        <div class="content">
-            <p>Esta es la página para administradores con rol de Admin 1.</p>
+
+        <div class="button-container">
+            <button class="button" onclick="window.location.href='Recepcion de Paquetes.html'">Recepción de Paquetes</button>
+            <button class="button" onclick="window.location.href='Encargado de ruta.html'">Encargado de Ruta</button>
+            <button class="button" onclick="window.location.href='Seguimieto de Paquetes.html'">Seguimiento de Paquetes</button>
         </div>
     </div>
 
@@ -98,3 +126,4 @@
     </script>
 </body>
 </html>
+
