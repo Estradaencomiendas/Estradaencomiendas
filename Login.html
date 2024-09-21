@@ -58,13 +58,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>Iniciar Sesión</h1>
+        <h1>Login</h1>
         <form id="loginForm">
             <input type="email" id="loginEmail" placeholder="Correo Electrónico" required>
             <input type="password" id="loginPassword" placeholder="Contraseña" required>
-            <button type="submit">Ingresar</button>
+            <button type="submit">Iniciar Sesión</button>
         </form>
-        <a href="registro.html" class="link">¿No tienes una cuenta? Regístrate</a>
+        <a href="register.html" class="link">¿No tienes una cuenta? Regístrate</a>
     </div>
 
     <!-- Firebase Scripts (versión 8.10.0) -->
@@ -89,31 +89,33 @@
         const db = firebase.firestore();
     </script>
 
-    <!-- Código para redirigir según el rol del usuario -->
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-            
+
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
             try {
-                // Iniciar sesión con Firebase Authentication
+                // Iniciar sesión
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
                 // Obtener el rol del usuario desde Firestore
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                const userData = userDoc.data();
-                const userRole = userData.role;
+                const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const role = userDoc.data().role;
 
-                // Redirigir según el rol del usuario
-                if (userRole === 'admin1') {
-                    window.location.href = 'Admin 1.html';
-                } else if (userRole === 'admin0') {
-                    window.location.href = 'Admin 0.html';
+                    // Redirigir según el rol
+                    if (role === 'admin1') {
+                        window.location.href = 'Admin 1.html';  // Redirigir a la página Admin 1
+                    } else if (role === 'admin0') {
+                        window.location.href = 'Admin 0.html';  // Redirigir a la página Admin 0
+                    } else {
+                        window.location.href = 'Usuario0.html';  // Redirigir a la página Usuario0
+                    }
                 } else {
-                    window.location.href = 'Usuario0.html';
+                    console.error('No se encontró el documento del usuario');
                 }
             } catch (error) {
                 console.error('Error al iniciar sesión:', error.message);
@@ -123,4 +125,5 @@
     </script>
 </body>
 </html>
+
 
