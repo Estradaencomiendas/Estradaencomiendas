@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hubo un Problema</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f1f1f1;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .package-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hubo un Problema</h1>
+        <div id="welcomeMessage"></div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar por Nombre del Paquete o Número de Seguimiento">
+            <button onclick="searchPackages()">Buscar</button>
+        </div>
+
+        <div id="packageList"></div>
+    </div>
+
+    <script>
+        // Inicializar Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            authDomain: "estradaencomiendas0.firebaseapp.com",
+            projectId: "estradaencomiendas0",
+            storageBucket: "estradaencomiendas0.appspot.com",
+            messagingSenderId: "247979951336",
+            appId: "1:247979951336:web:92b6b4bf615595676755d"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                db.collection('users').doc(user.uid).get().then(doc => {
+                    const firstName = doc.data().firstName;
+                    const lastName = doc.data().lastName;
+                    document.getElementById('welcomeMessage').textContent = `Esta gestión se está llevando a cabo por: ${firstName} ${lastName}`;
+                });
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function searchPackages() {
+            const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
+            const packageList = document.getElementById('packageList');
+            packageList.innerHTML = '';
+
+            db.collection('paquetes').where('observaciones', '!=', '').get().then(querySnapshot => {
+                querySnapshot.forEach(doc => {
+                    const packageData = doc.data();
+                    if (packageData.trackingNumber.toLowerCase().includes(searchInput) || packageData.nombrePaquete.toLowerCase().includes(searchInput)) {
+                        const packageItem = document.createElement('div');
+                        packageItem.classList.add('package-item');
+                        packageItem.innerHTML = `
+                            <p><strong>Número de Seguimiento:</strong> ${packageData.trackingNumber}</p>
+                            <p><strong>Nombre de la Página:</strong> ${packageData.nombrePaquete}</p>
+                            <p><strong>Observaciones:</strong> ${packageData.observaciones}</p>
+                            <p><strong>Destino:</strong> ${packageData.destino}</p>
+                            <p><strong>Fecha de Envío:</strong> ${packageData.fechaEnvio}</p>
+                            <p><strong>Valor del Paquete:</strong> $${packageData.valor}</p>
+                        `;
+                        packageList.appendChild(packageItem);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
