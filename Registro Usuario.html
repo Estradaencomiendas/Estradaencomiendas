@@ -141,8 +141,7 @@
 
         // Función para validar la contraseña del admin0 y marcar como entregado
         async function markAsEntregado() {
-            // Crear un campo de entrada tipo password para ocultar la contraseña
-            const adminPassword = prompt("Ingrese la contraseña del Admin0 para marcar como entregado:", "");
+            const adminPassword = document.getElementById('adminPassword').value; // Obtener la contraseña del campo input
             if (!adminPassword) return;
 
             const adminSnapshot = await db.collection('users').where('role', '==', 'admin0').get();
@@ -192,6 +191,12 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 800px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
         }
 
         h1 {
@@ -253,10 +258,23 @@
         .button:hover {
             background-color: #218838;
         }
+
+        .password-container {
+            margin: 20px 0;
+        }
+
+        .password-input {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            width: 100%;
+            max-width: 300px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
         <h1>Registro del Usuario</h1>
         <div id="welcomeMessage"></div>
 
@@ -283,6 +301,12 @@
 
         <!-- Total Final -->
         <div class="final-total">Total Final: <span id="totalFinal">$0.00</span></div>
+
+        <!-- Campo de contraseña oculta -->
+        <div class="password-container">
+            <label for="adminPassword">Ingrese la contraseña de Admin0:</label><br>
+            <input type="password" id="adminPassword" class="password-input" placeholder="Contraseña">
+        </div>
 
         <button class="button" onclick="markAsEntregado()">Marcar como Entregado</button>
     </div>
