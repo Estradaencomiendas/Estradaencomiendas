@@ -60,6 +60,8 @@
     <div class="container">
         <h1>Registro</h1>
         <form id="registerForm">
+            <input type="text" id="registerFirstName" placeholder="Nombre" required>
+            <input type="text" id="registerLastName" placeholder="Apellido" required>
             <input type="email" id="registerEmail" placeholder="Correo Electrónico" required>
             <input type="password" id="registerPassword" placeholder="Contraseña" required>
             <button type="submit">Registrarse</button>
@@ -93,6 +95,8 @@
         document.getElementById('registerForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             
+            const firstName = document.getElementById('registerFirstName').value;
+            const lastName = document.getElementById('registerLastName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
 
@@ -101,8 +105,10 @@
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
-                // Guardar usuario en Firestore con rol 'user'
+                // Guardar usuario en Firestore con nombre, apellido y rol 'user'
                 await db.collection('users').doc(user.uid).set({
+                    firstName: firstName,
+                    lastName: lastName,
                     email: email,
                     role: 'user'  // Asignar por defecto el rol 'user'
                 });
