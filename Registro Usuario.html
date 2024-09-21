@@ -141,6 +141,12 @@
 
         // Función para validar la contraseña del admin0 y marcar como entregado
         async function markAsEntregado() {
+            // Mostrar el modal
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+
+        // Función para autenticar y marcar como entregado
+        async function confirmPassword() {
             const adminPassword = document.getElementById('adminPassword').value; // Obtener la contraseña del campo input
             if (!adminPassword) return;
 
@@ -156,8 +162,11 @@
                     await auth.signInWithEmailAndPassword(email, adminPassword);
                     isValidAdmin = true;
                     await resetTotals(); // Reiniciar los valores
+                    // Cerrar el modal
+                    document.getElementById('passwordModal').style.display = 'none';
                 } catch (error) {
                     console.error("Contraseña incorrecta o problema con la autenticación", error);
+                    alert("Contraseña incorrecta. Intente de nuevo.");
                 }
             });
 
@@ -171,7 +180,16 @@
             alert("Los valores han sido reiniciados.");
             location.reload(); // Recargar la página después de reiniciar
         }
+
+        // Cerrar el modal si el usuario hace clic fuera de la caja
+        window.onclick = function(event) {
+            const modal = document.getElementById('passwordModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
+
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -195,7 +213,7 @@
         }
 
         .logo {
-            width: 150px;
+            width: 250px;
             margin-bottom: 20px;
         }
 
@@ -259,16 +277,47 @@
             background-color: #218838;
         }
 
-        .password-container {
-            margin: 20px 0;
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
-        .password-input {
-            padding: 10px;
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
             border-radius: 10px;
-            border: 1px solid #ddd;
             width: 100%;
-            max-width: 300px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-content input {
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -302,13 +351,16 @@
         <!-- Total Final -->
         <div class="final-total">Total Final: <span id="totalFinal">$0.00</span></div>
 
-        <!-- Campo de contraseña oculta -->
-        <div class="password-container">
-            <label for="adminPassword">Ingrese la contraseña de Admin0:</label><br>
-            <input type="password" id="adminPassword" class="password-input" placeholder="Contraseña">
-        </div>
-
         <button class="button" onclick="markAsEntregado()">Marcar como Entregado</button>
+    </div>
+
+    <!-- Modal para ingresar contraseña -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <h3>Ingrese la contraseña del Admin0</h3>
+            <input type="password" id="adminPassword" placeholder="Contraseña">
+            <button onclick="confirmPassword()">Confirmar</button>
+        </div>
     </div>
 </body>
 </html>
