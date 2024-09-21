@@ -119,19 +119,19 @@
         }
 
         #barcode-reader {
-            width: 300px; /* Reducir el tamaño del área de escaneo */
-            height: 200px; /* Altura del área de escaneo */
+            width: 100px; /* Reducir el ancho del área de escaneo */
+            height: 200px; /* Mantener la altura */
             margin: 20px auto;
             position: relative;
             display: none;
         }
 
-        /* Línea verde para centrar el escaneo */
+        /* Línea verde más delgada y centrada */
         .center-line {
             position: absolute;
             top: 50%;
             left: 0;
-            width: 100%;
+            width: 100px; /* Ancho igual al de la ventana */
             height: 2px;
             background-color: green;
             z-index: 1;
@@ -162,7 +162,7 @@
         </div>
 
         <div id="barcode-reader">
-            <div class="center-line"></div> <!-- Línea verde para ayudar al escaneo -->
+            <div class="center-line"></div> <!-- Línea verde centrada -->
         </div>
     </div>
 
@@ -170,14 +170,14 @@
     // Función para buscar en Firestore por el número de seguimiento
     async function searchPackage(trackingNumber) {
         try {
-            console.log("Código enviado a Firestore para buscar:", trackingNumber); // Verificar qué código se está enviando a Firestore
+            console.log("Código enviado a Firestore para buscar:", trackingNumber);
             
             const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
             
             if (!querySnapshot.empty) {
                 querySnapshot.forEach((doc) => {
                     sessionStorage.setItem('trackingNumber', trackingNumber);
-                    window.location.href = `confirmar-paquete.html?trackingNumber=${trackingNumber}`;  // Pasar también como parámetro en la URL
+                    window.location.href = `confirmar-paquete.html?trackingNumber=${trackingNumber}`;
                 });
             } else {
                 alert('No se encontró un paquete con este número de seguimiento.');
@@ -210,16 +210,16 @@
                 type: "LiveStream",
                 target: document.querySelector('#barcode-reader'),
                 constraints: {
-                    width: 300,
+                    width: 100,
                     height: 200,
                     facingMode: "environment" // Usar la cámara trasera
                 }
             },
             decoder: {
-                readers: ["code_128_reader"] // Puedes agregar más tipos de códigos aquí si es necesario
+                readers: ["code_128_reader"]
             },
             locator: {
-                patchSize: "medium", // Tamaño de los parches de detección
+                patchSize: "medium",
                 halfSample: true
             }
         }, function (err) {
@@ -234,15 +234,15 @@
         // Detectar el código de barras
         Quagga.onDetected(function (data) {
             if (data && data.codeResult && data.codeResult.code) {
-                let barcode = data.codeResult.code.trim();  // Limpiar espacios en blanco
-                console.log("Código detectado: ", barcode);  // Verificar en consola el código escaneado
+                let barcode = data.codeResult.code.trim();
+                console.log("Código detectado: ", barcode);
 
                 // Llamar a searchPackage() con el código escaneado
                 searchPackage(barcode);
 
                 // Detener Quagga después de escanear
                 Quagga.stop();
-                barcodeReader.style.display = 'none';  // Ocultar el área de escaneo después de capturar el código
+                barcodeReader.style.display = 'none'; // Ocultar el área de escaneo después de capturar el código
             }
         });
     }
@@ -254,3 +254,4 @@
 </script>
     </body>
 </html>
+
