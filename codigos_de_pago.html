@@ -134,19 +134,13 @@
         .search-box button:hover {
             background-color: #0056b3;
         }
-
-        .welcome-message {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Códigos de Pago</h1>
-        <div id="welcome-message" class="welcome-message"></div> <!-- Mensaje de bienvenida -->
 
+        <!-- Cuadro de búsqueda -->
         <div class="search-box">
             <input type="text" id="search-input" placeholder="Buscar por Código de Pago o Nombre de Página">
             <button id="search-button">Buscar</button>
@@ -167,11 +161,11 @@
                 </tr>
             </thead>
             <tbody id="payment-table-body">
+                <!-- Los datos se llenarán dinámicamente aquí -->
             </tbody>
         </table>
 
         <button id="mark-paid" class="pay-button">Pagado</button>
-        <button id="delete-history" class="delete-history-button">Borrar Historial</button>
     </div>
 
     <script>
@@ -191,13 +185,15 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Función para cargar códigos de pago desde Firestore
-        async function loadPaymentCodes(userId) {
+        // Función para cargar todos los paquetes con un código de pago
+        async function loadPaymentCodes() {
             const paymentTableBody = document.getElementById('payment-table-body');
             paymentTableBody.innerHTML = ''; // Limpiar la tabla antes de agregar los paquetes
 
             try {
-                const querySnapshot = await db.collection('paquetes').where('userId', '==', userId).where('paymentCode', '!=', '').get();
+                // Obtener todos los paquetes que tienen un paymentCode asignado
+                const querySnapshot = await db.collection('paquetes').where('paymentCode', '!=', '').get();
+
                 if (querySnapshot.empty) {
                     paymentTableBody.innerHTML = '<tr><td colspan="9">No hay paquetes con código de pago asignado.</td></tr>';
                     return;
@@ -225,18 +221,10 @@
             }
         }
 
-        // Verificación de autenticación y cargar datos
-        auth.onAuthStateChanged(async (user) => {
+        // Verificación de autenticación y cargar todos los paquetes con código de pago
+        auth.onAuthStateChanged((user) => {
             if (user) {
-                // Obtener nombre y apellido del usuario
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (userDoc.exists) {
-                    const firstName = userDoc.data().firstName;
-                    const lastName = userDoc.data().lastName;
-                    document.getElementById('welcome-message').textContent = `Bienvenido(a), ${firstName} ${lastName}`; // Mostrar mensaje de bienvenida
-                }
-
-                loadPaymentCodes(user.uid); // Cargar códigos de pago del usuario autenticado
+                loadPaymentCodes(); // Cargar todos los paquetes independientemente del usuario autenticado
             } else {
                 window.location.href = 'login.html'; // Redirigir si no está autenticado
             }
@@ -244,64 +232,39 @@
 
         // Marcar como pagado
         document.getElementById('mark-paid').addEventListener('click', async function() {
-            const user = auth.currentUser;
-            if (user) {
-                try {
-                    const querySnapshot = await db.collection('paquetes').where('userId', '==', user.uid).where('paymentCode', '!=', '').get();
-                    querySnapshot.forEach(async (doc) => {
-                        await db.collection('paquetes').doc(doc.id).update({
-                            status: 'Pagado'
-                        });
-                    });
-                    loadPaymentCodes(user.uid); // Recargar la tabla después de actualizar el estado
-                } catch (error) {
-                    console.error("Error marcando como pagado:", error);
-                    alert('Ocurrió un error marcando los paquetes como pagados.');
-                }
-            } else {
-                alert('Debes estar autenticado para marcar los pagos.');
-            }
-        });
+            try {
+                // Obtener todos los paquetes que tienen un código de pago asignado
+                const querySnapshot = await db.collection('paquetes').where('paymentCode', '!=', '').get();
 
-        // Borrar historial
-        document.getElementById('delete-history').addEventListener('click', async function() {
-            if (confirm('¿Estás seguro de que deseas borrar todo el historial de pagos? Esta acción no se puede deshacer.')) {
-                const user = auth.currentUser;
-                if (user) {
-                    try {
-                        const querySnapshot = await db.collection('paquetes').where('userId', '==', user.uid).get();
-                        querySnapshot.forEach(async (doc) => {
-                            await db.collection('paquetes').doc(doc.id).delete();
-                        });
-                        loadPaymentCodes(user.uid); // Recargar la tabla después de eliminar
-                    } catch (error) {
-                        console.error("Error borrando historial:", error);
-                        alert('Ocurrió un error al borrar el historial.');
-                    }
-                } else {
-                    alert('Debes estar autenticado para borrar el historial.');
-                }
+                querySnapshot.forEach(async (doc) => {
+                    await db.collection('paquetes').doc(doc.id).update({
+                        status: 'Pagado'
+                    });
+                });
+
+                loadPaymentCodes(); // Recargar la tabla después de actualizar el estado
+            } catch (error) {
+                console.error("Error marcando como pagado:", error);
+                alert('Ocurrió un error marcando los paquetes como pagados.');
             }
         });
 
         // Búsqueda por código de pago o nombre de página
         document.getElementById('search-button').addEventListener('click', async function() {
             const searchInput = document.getElementById('search-input').value.toLowerCase();
-            const user = auth.currentUser;
-            if (user) {
-                try {
-                    const querySnapshot = await db.collection('paquetes').where('userId', '==', user.uid).where('paymentCode', '!=', '').get();
-                    const filteredShipments = [];
-                    querySnapshot.forEach(doc => {
-                        const packageData = doc.data();
-                        if (packageData.paymentCode.toLowerCase().includes(searchInput) || packageData.nombrePaquete.toLowerCase().includes(searchInput)) {
-                            filteredShipments.push(packageData);
-                        }
-                    });
-                    displayShipments(filteredShipments);
-                } catch (error) {
-                    console.error("Error buscando paquetes:", error);
-                }
+
+            try {
+                const querySnapshot = await db.collection('paquetes').where('paymentCode', '!=', '').get();
+                const filteredShipments = [];
+                querySnapshot.forEach(doc => {
+                    const packageData = doc.data();
+                    if (packageData.paymentCode.toLowerCase().includes(searchInput) || packageData.nombrePaquete.toLowerCase().includes(searchInput)) {
+                        filteredShipments.push(packageData);
+                    }
+                });
+                displayShipments(filteredShipments);
+            } catch (error) {
+                console.error("Error buscando paquetes:", error);
             }
         });
 
