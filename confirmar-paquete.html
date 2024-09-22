@@ -81,8 +81,8 @@
             }
         }
 
-        // Actualizar el estado del paquete en Firestore
-        async function updatePackageStatus(status) {
+        // Actualizar el estado del paquete en Firestore y redirigir a observaciones
+        async function updatePackageStatusAndRedirect(status) {
             const trackingNumber = getTrackingNumber();
             if (trackingNumber) {
                 try {
@@ -91,7 +91,8 @@
                         querySnapshot.forEach(async (doc) => {
                             await db.collection('paquetes').doc(doc.id).update({ status });
                             console.log(`Estado actualizado a ${status}`);
-                            window.location.href = 'Encargado de ruta.html';  // Redirigir después de la actualización
+                            // Redirigir a la página de observaciones después de actualizar el estado
+                            window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
                         });
                     } else {
                         alert('No se encontró el paquete.');
@@ -107,7 +108,7 @@
         // Confirmar actualización de estado
         function confirmStatusUpdate(message, status) {
             if (confirm(message)) {
-                updatePackageStatus(status);
+                updatePackageStatusAndRedirect(status);
             }
         }
 
