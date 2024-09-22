@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script> <!-- Firestore -->
     <style>
-        /* Los estilos se mantienen igual como solicitaste */
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
             margin: 0;
@@ -143,6 +142,22 @@
             color: #004085;
         }
 
+        /* Tamaño específico para imágenes */
+        .status-image {
+            width: 360px;
+            height: auto;
+        }
+
+        .status-image-paid {
+            width: 125px;
+            height: auto;
+        }
+
+        .status-image-processing {
+            width: 125px;
+            height: auto;
+        }
+
         .package-actions {
             display: flex;
             gap: 10px;
@@ -239,8 +254,19 @@
                 actionButton = `<button class="action-button-small resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>`;
             }
 
+            // Mostrar imagen según el estado
+            let statusImage = packageData.status === 'Pagado' ? 'Pagado.png' :
+                              packageData.status === 'En Proceso de Pago' ? 'ProcesandoPago.png' :
+                              packageData.status === 'Paquete Retirado' ? 'retirado.png' :
+                              packageData.status === 'En Ruta' ? 'enRuta.png' :
+                              packageData.status === 'Paquete No Retirado' ? 'noRetirado.png' : 'enProceso.png';
+
+            const imageClass = packageData.status === 'Pagado' ? 'status-image-paid' :
+                               packageData.status === 'En Proceso de Pago' ? 'status-image-processing' : 'status-image';
+
             const packageHtml = `
                 <div class="package-container" id="package-${packageData.trackingNumber}">
+                    <img src="${statusImage}" class="${imageClass}" alt="Estado del paquete">
                     <div class="package-info">
                         <h3>${packageData.trackingNumber}</h3>
                         <p>Cliente: ${packageData.nombreCliente}</p>
@@ -286,5 +312,6 @@
     </script>
 </body>
 </html>
+
 
 
