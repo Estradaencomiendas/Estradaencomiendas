@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pago Bancario</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -182,76 +185,98 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            loadPendingShipments(); // Cargar el valor total de todos los paquetes
-        });
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            authDomain: "estradaencomiendas0.firebaseapp.com",
+            projectId: "estradaencomiendas0",
+            storageBucket: "estradaencomiendas0.appspot.com",
+            messagingSenderId: "247979951336",
+            appId: "1:247979951336:web:92b6b4bf615595676755d",
+            measurementId: "G-BRMC9FZBC"
+        };
 
-        // Mostrar el valor total de todos los paquetes de la página de Mis Envíos
-        function loadPendingShipments() {
-            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
-            const totalAmount = myShipments.reduce((total, pkg) => total + parseFloat(pkg.valor), 0);
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-            if (totalAmount > 0) {
-                document.getElementById('amount').value = totalAmount.toFixed(2); // Monto total automático
+        // Cargar el monto total de todos los paquetes que están en "Depósito Bancario en Proceso"
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const querySnapshot = await db.collection('paquetes')
+                    .where('userId', '==', user.uid)
+                    .where('status', '==', 'Paquete Retirado')
+                    .get();
+                
+                let totalAmount = 0;
+                const trackingNumbers = [];
+
+                querySnapshot.forEach(doc => {
+                    const packageData = doc.data();
+                    totalAmount += parseFloat(packageData.valor);
+                    trackingNumbers.push(packageData.trackingNumber);
+                });
+
+                document.getElementById('amount').value = totalAmount.toFixed(2);
+
+                // Manejar el formulario de envío de pago bancario
+                document.getElementById('bank-payment-form').addEventListener('submit', async function(event) {
+                    event.preventDefault();
+
+                    // Verificar si algún número de seguimiento ya fue ingresado en Firestore
+                    const bankDepositSnapshot = await db.collection('bankDeposits')
+                        .where('trackingNumbers', 'array-contains-any', trackingNumbers)
+                        .get();
+
+                    if (!bankDepositSnapshot.empty) {
+                        document.getElementById('alert-message').style.display = 'block';
+                        return;
+                    }
+
+                    // Obtener los valores del formulario
+                    const accountType = document.getElementById('account-type').value;
+                    const institution = document.getElementById('institution').value;
+                    const accountNumber = document.getElementById('account-number').value;
+                    const accountHolder = document.getElementById('account-holder').value;
+                    const accountSurname = document.getElementById('account-surname').value;
+                    const email = document.getElementById('email').value;
+                    const amount = document.getElementById('amount').value;
+
+                    // Crear un objeto de depósito bancario
+                    const bankDeposit = {
+                        userId: user.uid,
+                        accountType,
+                        institution,
+                        accountNumber,
+                        accountHolder,
+                        accountSurname,
+                        email,
+                        amount: parseFloat(amount),
+                        trackingNumbers: trackingNumbers,  // Guardar como array
+                        status: 'Depósito Bancario en Proceso',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    // Guardar el objeto en Firestore
+                    await db.collection('bankDeposits').add(bankDeposit);
+
+                    // Actualizar el estado de los paquetes en Firestore
+                    querySnapshot.forEach(async (doc) => {
+                        await db.collection('paquetes').doc(doc.id).update({
+                            status: 'Depósito Bancario en Proceso'
+                        });
+                    });
+
+                    // Mostrar mensaje de éxito y redirigir a la página de Mis Envíos
+                    alert('Pago enviado con éxito. Los paquetes están en proceso de depósito bancario.');
+                    window.location.href = 'mis_envios.html';
+                });
+            } else {
+                window.location.href = 'login.html'; // Redirigir si no está autenticado
             }
-        }
-
-        document.getElementById('bank-payment-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const myShipments = JSON.parse(localStorage.getItem('myShipments')) || [];
-            const bankDeposits = JSON.parse(localStorage.getItem('bankDeposits')) || [];
-
-            // Verificar si algún número de seguimiento ya fue ingresado
-            const trackingNumbers = myShipments.map(pkg => pkg.trackingNumber);
-            const duplicatedTracking = bankDeposits.some(deposit =>
-                deposit.trackingNumbers && deposit.trackingNumbers.some(tracking => trackingNumbers.includes(tracking))
-            );
-
-            if (duplicatedTracking) {
-                document.getElementById('alert-message').style.display = 'block';
-                return;
-            }
-
-            // Obtener los valores del formulario
-            const accountType = document.getElementById('account-type').value;
-            const institution = document.getElementById('institution').value;
-            const accountNumber = document.getElementById('account-number').value;
-            const accountHolder = document.getElementById('account-holder').value;
-            const accountSurname = document.getElementById('account-surname').value;
-            const email = document.getElementById('email').value;
-            const amount = document.getElementById('amount').value;
-
-            // Crear un objeto de depósito bancario con números de seguimiento como array
-            const bankDeposit = {
-                accountType,
-                institution,
-                accountNumber,
-                accountHolder,
-                accountSurname,
-                email,
-                amount: parseFloat(amount),
-                trackingNumbers: trackingNumbers,  // Guardar como array
-                status: 'Depósito Bancario en Proceso'
-            };
-
-            // Guardar el objeto en localStorage
-            bankDeposits.push(bankDeposit);
-            localStorage.setItem('bankDeposits', JSON.stringify(bankDeposits));
-
-            // Actualizar el estado de los paquetes
-            myShipments.forEach(pkg => {
-                if (pkg.status !== 'Pagado') {
-                    pkg.status = 'Depósito Bancario en Proceso';
-                }
-            });
-
-            localStorage.setItem('myShipments', JSON.stringify(myShipments));
-
-            // Mostrar mensaje de éxito y redirigir a la página de Mis Envíos
-            alert('Pago enviado con éxito. Los paquetes están en proceso de depósito bancario.');
-            window.location.href = 'mis_envios.html';
         });
     </script>
 </body>
 </html>
+
