@@ -210,7 +210,7 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            apiKey: "TU_API_KEY",
             authDomain: "estradaencomiendas0.firebaseapp.com",
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
@@ -250,7 +250,7 @@
             let totalValue = 0;
 
             try {
-                const querySnapshot = await db.collection('envios').where('userId', '==', userId).get();
+                const querySnapshot = await db.collection('paquetes').where('userId', '==', userId).get();
                 querySnapshot.forEach(doc => {
                     const packageData = doc.data();
                     const statusClass = packageData.status === 'Paquete Retirado' ? 'status-retired' :
