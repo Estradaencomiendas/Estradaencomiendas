@@ -11,7 +11,7 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            apiKey: "TU_API_KEY",
             authDomain: "estradaencomiendas0.firebaseapp.com",
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
@@ -24,11 +24,10 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Función para verificar que la sesión esté activa y cargar el nombre y apellido
+        // Verificar sesión activa y cargar detalles del usuario
         function checkSessionAndLoadUserDetails() {
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
-                    // Si el usuario está autenticado, obtenemos los detalles
                     const userId = user.uid;
                     try {
                         const userDoc = await db.collection('users').doc(userId).get();
@@ -36,20 +35,17 @@
                             const firstName = userDoc.data().firstName;
                             const lastName = userDoc.data().lastName;
                             document.getElementById('user-details').textContent = `Este Paquete está siendo Gestionado(a) por: ${firstName} ${lastName}`;
-                        } else {
-                            console.error("No se encontró el documento del usuario.");
                         }
                     } catch (error) {
                         console.error("Error al obtener los detalles del usuario:", error);
                     }
                 } else {
-                    // Si no está autenticado, redirigir al login
                     window.location.href = 'login.html';
                 }
             });
         }
 
-        // Función para obtener el número de seguimiento desde sessionStorage o la URL
+        // Obtener el número de seguimiento
         function getTrackingNumber() {
             const trackingNumber = sessionStorage.getItem('trackingNumber');
             if (trackingNumber) {
@@ -60,7 +56,7 @@
             }
         }
 
-        // Función para cargar detalles del paquete desde Firestore
+        // Cargar detalles del paquete
         async function loadPackageDetails(trackingNumber) {
             try {
                 const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
@@ -85,16 +81,16 @@
             }
         }
 
-        // Función para actualizar el estado del paquete en Firestore
+        // Actualizar el estado del paquete en Firestore
         async function updatePackageStatus(status) {
-            const trackingNumber = getTrackingNumber();  // Obtener el número de seguimiento desde la URL
+            const trackingNumber = getTrackingNumber();
             if (trackingNumber) {
                 try {
                     const querySnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
                     if (!querySnapshot.empty) {
                         querySnapshot.forEach(async (doc) => {
                             await db.collection('paquetes').doc(doc.id).update({ status });
-                            console.log(`Estado actualizado a ${status}`);  // Confirmación en consola
+                            console.log(`Estado actualizado a ${status}`);
                             window.location.href = 'Encargado de ruta.html';  // Redirigir después de la actualización
                         });
                     } else {
@@ -108,19 +104,19 @@
             }
         }
 
-        // Función para confirmar la actualización del estado
+        // Confirmar actualización de estado
         function confirmStatusUpdate(message, status) {
             if (confirm(message)) {
                 updatePackageStatus(status);
             }
         }
 
-        // Cargar detalles y configurar los botones al cargar el DOM
+        // Cargar detalles y configurar eventos de botones al cargar el DOM
         document.addEventListener('DOMContentLoaded', function() {
             const trackingNumber = getTrackingNumber();
             if (trackingNumber) {
                 loadPackageDetails(trackingNumber);
-                checkSessionAndLoadUserDetails();  // Verificar la sesión y cargar los detalles del usuario
+                checkSessionAndLoadUserDetails();
             } else {
                 document.getElementById('package-details').innerHTML = '<p>No se encontró el número de seguimiento.</p>';
             }
@@ -135,12 +131,7 @@
             });
 
             document.getElementById('report-problem').addEventListener('click', function() {
-                const trackingNumber = getTrackingNumber();
-                if (trackingNumber) {
-                    window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
-                } else {
-                    alert('No se encontró información del paquete.');
-                }
+                confirmStatusUpdate('¿Estás seguro que deseas reportar un problema con este paquete?', 'Hubo un Problema');
             });
         });
     </script>
@@ -160,7 +151,7 @@
 
         .container {
             position: relative;
-            background-color: rgba(255, 255, 255, 0.6); /* Fondo con 60% de transparencia */
+            background-color: rgba(255, 255, 255, 0.6);
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
