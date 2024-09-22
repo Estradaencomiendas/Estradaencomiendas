@@ -81,6 +81,26 @@
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
 
+        .add-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-button:hover {
+            background-color: #218838;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
         .package-container {
             background-color: #f9f9f9;
             padding: 15px;
@@ -265,9 +285,9 @@
 
             let actionButton = '';
             if (packageData.status === 'Paquete Retirado') {
-                actionButton = `<button class="action-button-small add-button" onclick="addToMyShipments('${packageData.trackingNumber}')">Agregar</button>`;
+                actionButton = `<button class="add-button" onclick="addToMyShipments('${packageData.trackingNumber}')">Agregar</button>`;
             } else if (packageData.status === 'Paquete No Retirado') {
-                actionButton = `<button class="action-button-small resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>`;
+                actionButton = `<button class="add-button resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>`;
             }
 
             // Mostrar imagen según el estado
@@ -323,11 +343,15 @@
 
             if (user) {
                 try {
-                    // Aquí actualizamos el paquete con el userId del usuario autenticado
-                    await db.collection('paquetes').doc(trackingNumber).update({
-                        userId: user.uid
-                    });
-                    alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
+                    const packageDoc = await db.collection('paquetes').doc(trackingNumber).get();
+                    if (packageDoc.exists && packageDoc.data().userId) {
+                        alert(`Este paquete ya ha sido agregado a Mis Envíos.`);
+                    } else {
+                        await db.collection('paquetes').doc(trackingNumber).update({
+                            userId: user.uid
+                        });
+                        alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
+                    }
                 } catch (error) {
                     console.error('Error al agregar el paquete a Mis Envíos:', error);
                     alert('Ocurrió un error al agregar el paquete.');
@@ -347,5 +371,4 @@
     </script>
 </body>
 </html>
-
 
