@@ -142,6 +142,11 @@
             color: #004085;
         }
 
+        .status-problem {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
         /* Tamaño específico para imágenes */
         .status-image {
             width: 360px;
@@ -245,7 +250,8 @@
                                 packageData.status === 'Paquete Retirado' ? 'status-retired' :
                                 packageData.status === 'En Proceso de Pago' ? 'status-in-process' :
                                 packageData.status === 'Paquete No Retirado' ? 'status-not-collected' :
-                                packageData.status === 'En Ruta' ? 'status-in-route' : 'status-in-route';
+                                packageData.status === 'En Ruta' ? 'status-in-route' :
+                                packageData.status === 'Hubo un Problema' ? 'status-problem' : 'status-in-route';
 
             let actionButton = '';
             if (packageData.status === 'Paquete Retirado') {
@@ -256,10 +262,11 @@
 
             // Mostrar imagen según el estado
             let statusImage = packageData.status === 'Pagado' ? 'Pagado.png' :
-                              packageData.status === 'En Proceso de Pago' ? 'ProcesandoPago.png' :
-                              packageData.status === 'Paquete Retirado' ? 'retirado.png' :
-                              packageData.status === 'En Ruta' ? 'enRuta.png' :
-                              packageData.status === 'Paquete No Retirado' ? 'noRetirado.png' : 'enProceso.png';
+                              packageData.status === 'En Proceso de Pago' ? 'Procesando Pago.png' :
+                              packageData.status === 'Paquete Retirado' ? 'retired.png' :
+                              packageData.status === 'En Ruta' ? 'in-process.png' :
+                              packageData.status === 'Paquete No Retirado' ? 'not-collected.png' :
+                              packageData.status === 'Hubo un Problema' ? 'Hubo un problema.png' : 'in-process.png';
 
             const imageClass = packageData.status === 'Pagado' ? 'status-image-paid' :
                                packageData.status === 'En Proceso de Pago' ? 'status-image-processing' : 'status-image';
@@ -312,6 +319,5 @@
     </script>
 </body>
 </html>
-
 
 
