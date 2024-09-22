@@ -81,8 +81,8 @@
             }
         }
 
-        // Actualizar el estado del paquete en Firestore y redirigir a observaciones
-        async function updatePackageStatusAndRedirect(status) {
+        // Actualizar el estado del paquete en Firestore y redirigir a la página correcta
+        async function updatePackageStatus(status, redirectUrl) {
             const trackingNumber = getTrackingNumber();
             if (trackingNumber) {
                 try {
@@ -91,8 +91,7 @@
                         querySnapshot.forEach(async (doc) => {
                             await db.collection('paquetes').doc(doc.id).update({ status });
                             console.log(`Estado actualizado a ${status}`);
-                            // Redirigir a la página de observaciones después de actualizar el estado
-                            window.location.href = `observaciones.html?trackingNumber=${trackingNumber}`;
+                            window.location.href = redirectUrl;  // Redirigir a la página especificada
                         });
                     } else {
                         alert('No se encontró el paquete.');
@@ -106,9 +105,9 @@
         }
 
         // Confirmar actualización de estado
-        function confirmStatusUpdate(message, status) {
+        function confirmStatusUpdate(message, status, redirectUrl) {
             if (confirm(message)) {
-                updatePackageStatusAndRedirect(status);
+                updatePackageStatus(status, redirectUrl);
             }
         }
 
@@ -124,15 +123,15 @@
 
             // Configurar eventos de los botones
             document.getElementById('package-delivered').addEventListener('click', function() {
-                confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como retirado?', 'Paquete Retirado');
+                confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como retirado?', 'Paquete Retirado', 'Encargado de ruta.html');
             });
 
             document.getElementById('package-not-collected').addEventListener('click', function() {
-                confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como NO retirado?', 'Paquete No Retirado');
+                confirmStatusUpdate('¿Estás seguro que deseas reportar este paquete como NO retirado?', 'Paquete No Retirado', 'Encargado de ruta.html');
             });
 
             document.getElementById('report-problem').addEventListener('click', function() {
-                confirmStatusUpdate('¿Estás seguro que deseas reportar un problema con este paquete?', 'Hubo un Problema');
+                confirmStatusUpdate('¿Estás seguro que deseas reportar un problema con este paquete?', 'Hubo un Problema', `observaciones.html?trackingNumber=${getTrackingNumber()}`);
             });
         });
     </script>
@@ -266,5 +265,4 @@
     </div>
 </body>
 </html>
-
 
