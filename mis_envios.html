@@ -243,7 +243,105 @@
             });
         }
 
-        // Función para cargar los envíos desde Firestore
+        let generatedPaymentCode = null;
+
+        // Función para generar código de pago
+        document.getElementById('generate-payment-code').addEventListener('click', async function() {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    const querySnapshot = await db.collection('paquetes').where('userId', '==', user.uid).where('status', '==', 'Paquete Retirado').get();
+                    
+                    if (querySnapshot.empty) {
+                        alert('No tienes paquetes para procesar.');
+                        return;
+                    }
+
+                    if (!generatedPaymentCode) {
+                        generatedPaymentCode = 'PAY-' + Math.floor(Math.random() * 1000000); // Generar código único
+                        document.getElementById('payment-code').textContent = generatedPaymentCode;
+                        document.getElementById('payment-code-message').style.display = 'block';
+                        document.getElementById('success-message').style.display = 'block';
+                    }
+
+                    querySnapshot.forEach(async (doc) => {
+                        const packageData = doc.data();
+                        if (!packageData.paymentCode) {
+                            await db.collection('paquetes').doc(doc.id).update({
+                                status: 'En Proceso de Pago',
+                                paymentCode: generatedPaymentCode
+                            });
+                            alert(`Paquete ${packageData.trackingNumber} ha sido agregado al proceso de pago.`);
+                        }
+                    });
+
+                    loadShipments(user.uid); // Actualizar la lista
+                } catch (error) {
+                    console.error("Error generando código de pago:", error);
+                    alert('Ocurrió un error generando el código de pago.');
+                }
+            } else {
+                alert('Debes estar autenticado para generar un código de pago.');
+            }
+        });
+
+        // Función para cambiar el estado a "Depósito Bancario en Proceso"
+        document.getElementById('bank-payment').addEventListener('click', async function() {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    const querySnapshot = await db.collection('paquetes').where('userId', '==', user.uid).where('status', '==', 'Paquete Retirado').get();
+
+                    if (querySnapshot.empty) {
+                        alert('No tienes paquetes para procesar.');
+                        return;
+                    }
+
+                    querySnapshot.forEach(async (doc) => {
+                        const packageData = doc.data();
+                        if (!packageData.paymentCode) {
+                            await db.collection('paquetes').doc(doc.id).update({
+                                status: 'Depósito Bancario en Proceso'
+                            });
+                            alert(`Paquete ${packageData.trackingNumber} está en proceso de depósito bancario.`);
+                        }
+                    });
+
+                    loadShipments(user.uid); // Actualizar la lista
+                    window.location.href = 'pago_bancario.html'; // Redirigir a la página de pago bancario
+                } catch (error) {
+                    console.error("Error iniciando pago bancario:", error);
+                    alert('Ocurrió un error iniciando el pago bancario.');
+                }
+            } else {
+                alert('Debes estar autenticado para realizar el pago bancario.');
+            }
+        });
+
+        // Función para borrar historial de envíos
+        document.getElementById('delete-history').addEventListener('click', async function() {
+            if (confirm('¿Estás seguro de que deseas borrar todo el historial? Esta acción no se puede deshacer.')) {
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        const querySnapshot = await db.collection('paquetes').where('userId', '==', user.uid).get();
+                        querySnapshot.forEach(async (doc) => {
+                            await db.collection('paquetes').doc(doc.id).delete(); // Eliminar cada paquete del usuario
+                        });
+
+                        document.getElementById('shipment-list').innerHTML = ''; // Limpiar la lista
+                        document.getElementById('total-value').textContent = '$0.00'; // Resetear el valor total
+                    } catch (error) {
+                        console.error("Error borrando historial:", error);
+                        alert('Ocurrió un error al borrar el historial.');
+                    }
+                } else {
+                    alert('Debes estar autenticado para borrar el historial.');
+                }
+            }
+        });
+
+        // Función para cargar envíos desde Firestore
         async function loadShipments(userId) {
             const shipmentList = document.getElementById('shipment-list');
             shipmentList.innerHTML = ''; // Limpiar antes de agregar los envíos
@@ -276,7 +374,7 @@
 
                 document.getElementById('total-value').textContent = `$${totalValue.toFixed(2)}`;
             } catch (error) {
-                console.error("Error cargando envíos desde Firestore: ", error);
+                console.error("Error cargando envíos desde Firestore:", error);
             }
         }
 
