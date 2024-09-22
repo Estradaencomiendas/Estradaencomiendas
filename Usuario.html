@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuario</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script> <!-- Font Awesome -->
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -147,36 +148,41 @@
             color: #721c24;
         }
 
-        .package-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+        /* Tamaño específico para imágenes */
+        .status-image {
+            width: 360px;
+            height: auto;
         }
 
-        .action-button-small {
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
+        .status-image-paid {
+            width: 125px;
+            height: auto;
         }
 
-        .add-button {
-            background-color: #28a745;
-            color: white;
+        .status-image-processing {
+            width: 125px;
+            height: auto;
         }
 
-        .resend-button {
-            background-color: #dc3545;
-            color: white;
+        .logo {
+            width: 150px;
+            margin: 0 auto;
+            display: block;
         }
 
-        .resend-button:hover {
-            background-color: #c82333;
+        .welcome-message {
+            font-size: 20px;
+            color: #333;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Logo -->
+        <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
+        <div id="welcome-message" class="welcome-message"></div>
+
         <h1>Buscar Paquete</h1>
         <div class="input-wrapper">
             <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
@@ -196,6 +202,7 @@
     </div>
 
     <script>
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "TU_API_KEY",
             authDomain: "estradaencomiendas0.firebaseapp.com",
@@ -209,6 +216,25 @@
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Función para verificar la autenticación y obtener el nombre del usuario
+        function checkAuthAndLoadUserDetails() {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const firstName = userDoc.data().firstName;
+                        const lastName = userDoc.data().lastName;
+                        document.getElementById('welcome-message').textContent = `Bienvenido(a), ${firstName} ${lastName}`;
+                    } else {
+                        console.error("No se encontraron detalles del usuario.");
+                    }
+                } else {
+                    window.location.href = 'login.html'; // Redirigir al login si no está autenticado
+                }
+            });
+        }
 
         // Función para buscar paquete en Firestore
         async function searchPackage(trackingNumber) {
@@ -244,7 +270,8 @@
                 actionButton = `<button class="action-button-small resend-button" onclick="resendPackage('${packageData.trackingNumber}')">Reenvío</button>`;
             }
 
-            const statusImage = packageData.status === 'Pagado' ? 'Pagado.png' :
+            // Mostrar imagen según el estado
+            let statusImage = packageData.status === 'Pagado' ? 'Pagado.png' :
                               packageData.status === 'En Proceso de Pago' ? 'Procesando Pago.png' :
                               packageData.status === 'Paquete Retirado' ? 'retired.png' :
                               packageData.status === 'En Ruta' ? 'in-process.png' :
@@ -291,31 +318,20 @@
         });
 
         // Función para agregar paquetes a 'Mis Envíos'
-        async function addToMyShipments(trackingNumber) {
-            try {
-                const packageData = await searchPackage(trackingNumber);
-                if (packageData) {
-                    // Guardar el paquete en Firestore en la colección 'envios'
-                    await db.collection('envios').doc(trackingNumber).set(packageData);
-
-                    alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
-                } else {
-                    alert('No se pudo agregar el paquete. Inténtelo de nuevo.');
-                }
-            } catch (error) {
-                console.error('Error al agregar el paquete a Mis Envíos:', error);
-                alert('Ocurrió un error al agregar el paquete.');
-            }
+        function addToMyShipments(trackingNumber) {
+            alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
         }
 
         // Función para reenviar paquete
         function resendPackage(trackingNumber) {
             alert(`Paquete con número de seguimiento ${trackingNumber} reenviado.`);
         }
+
+        // Iniciar la verificación de autenticación y cargar el mensaje de bienvenida
+        checkAuthAndLoadUserDetails();
     </script>
 </body>
 </html>
-
 
 
 
