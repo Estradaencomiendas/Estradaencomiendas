@@ -307,28 +307,29 @@
         }
 
        .button-bar a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    color: black;
-    padding: 15px;
-    text-decoration: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s ease;
-    gap: 20px; /* Esta propiedad añade espacio entre el ícono y el texto */
-}
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            color: black;
+            padding: 15px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease;
+            gap: 20px; /* Esta propiedad añade espacio entre el ícono y el texto */
+        }
+
         .button-bar a:hover {
             background-color: #f7f7f7;
         }
 
-    .button-bar i {
-    font-size: 24px;
-    color: #F39200;
-}
+        .button-bar i {
+            font-size: 24px;
+            color: #F39200;
+        }
     </style>
 </head>
 <body>
@@ -347,7 +348,7 @@
         <ul>
             <li><a href="Destinos Estrada.html">Destinos</a></li>
             <li><a href="cotizar.html">Cotizar Envío</a></li>
-            <li><a href="mis_envios.html">Mis Envíos</a></li> <!-- Agregado al menú -->
+            <li><a href="mis_envios.html">Mis Envíos</a></li>
             <li><a href="contacto.html">Contáctanos</a></li>
         </ul>
     </nav>
@@ -428,7 +429,7 @@
             }
         });
 
-        // Función para mostrar el paquete
+        // Función para mostrar el paquete y el botón de "Agregar"
         function displayPackage(packageData) {
             const packageList = document.getElementById('package-list');
             const statusClass = getStatusClass(packageData.status);
@@ -446,9 +447,23 @@
                         <p>Valor: $${packageData.valor}</p>
                     </div>
                     <span class="status ${statusClass}">${packageData.status}</span>
+                    ${packageData.status === 'Paquete Retirado' ? `
+                    <div class="button-group">
+                        <button class="action-button" onclick="agregarPaquete('${packageData.trackingNumber}')">
+                            <i class="fas fa-plus"></i>
+                            Agregar
+                        </button>
+                    </div>
+                    ` : ''}
                 </div>
             `;
             packageList.innerHTML += packageHtml;
+        }
+
+        // Función para agregar el paquete
+        function agregarPaquete(trackingNumber) {
+            // Lógica para agregar el paquete a "Mis Envíos"
+            alert(`Paquete ${trackingNumber} agregado correctamente.`);
         }
 
         // Funciones para obtener clase e imagen según el estado
@@ -467,10 +482,10 @@
         function getStatusImage(status) {
             switch (status) {
                 case 'Pagado': return 'Pagado.png';
-                case 'En Proceso de Pago': return 'Procesando Pago.png';
                 case 'Paquete Retirado': return 'retired.png';
-                case 'En Ruta': return 'in-process.png';
+                case 'En Proceso de Pago': return 'Procesando Pago.png';
                 case 'Paquete No Retirado': return 'not-collected.png';
+                case 'En Ruta': return 'in-process.png';
                 case 'Hubo un Problema': return 'Hubo un problema.png';
                 default: return 'in-process.png';
             }
@@ -492,4 +507,5 @@
     </script>
 </body>
 </html>
+
 
