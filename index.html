@@ -15,7 +15,7 @@
             padding: 0;
             box-sizing: border-box;
             background-color: #f7f7f7;
-            overflow-x: hidden; /* Evitar desplazamiento horizontal */
+            overflow-x: hidden; /* Evitar completamente el desplazamiento horizontal */
             position: relative;
             min-height: 100vh;
             width: 100vw;
@@ -139,7 +139,7 @@
         /* Imagen de fondo con overlay */
         .background-section {
             position: relative;
-            width: 100vw;
+            width: 100%;
             height: 100vh;
             background-image: url('Catedral Santa Ana.jpg');
             background-size: cover;
@@ -275,9 +275,9 @@
             color: #666;
         }
 
-        /* Aumentar tamaño de imagen */
+        /* Aumentar más el tamaño de la imagen */
         .result-item img {
-            width: 150px; /* Aumentado el tamaño */
+            width: 200px; /* Tamaño aumentado */
             height: auto;
             display: block;
             margin: 10px auto;
@@ -319,7 +319,7 @@
             }
 
             .result-item img {
-                width: 120px; /* Ajustado también en pantallas pequeñas */
+                width: 150px; /* Tamaño ajustado en pantallas pequeñas */
             }
 
             .background-section {
@@ -472,5 +472,6 @@
     </script>
 </body>
 </html>
+
 
 
