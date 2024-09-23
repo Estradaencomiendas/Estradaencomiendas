@@ -222,12 +222,6 @@
             background-color: #0056b3;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
-
-        .logo {
-            width: 150px;
-            margin: 30px auto 0 auto;
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -239,7 +233,7 @@
 
     <nav id="menu">
         <div class="menu-header">
-            <h2>Bienvenido</h2>
+            <h2 id="user-name">Nombre Apellido</h2>
             <p>Accede a tu cuenta o regístrate</p>
             <a href="login.html" class="button-ingresar">Ingresar</a>
             <a href="registro.html" class="button-registrarse">Registrarse</a>
@@ -254,7 +248,7 @@
     <!-- Sección con fondo y overlay -->
     <div class="background-section">
         <div class="overlay">
-            <h1>Bienvenido, <span id="user-name" class="highlight"></span></h1>
+            <h1>Bienvenido, <span id="user-welcome-name" class="highlight"></span></h1>
             <div class="input-wrapper">
                 <input type="text" id="tracking-number" placeholder="Número de Seguimiento">
             </div>
@@ -266,9 +260,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Logo de Estrada Encomiendas abajo -->
-    <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
 
     <!-- Firebase Scripts -->
     <script>
@@ -286,7 +277,7 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Función para cargar el nombre del usuario
+        // Función para cargar el nombre del usuario en el menú y en el saludo
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 const userDoc = await db.collection('users').doc(user.uid).get();
@@ -294,6 +285,7 @@
                     const firstName = userDoc.data().firstName;
                     const lastName = userDoc.data().lastName;
                     document.getElementById('user-name').textContent = `${firstName} ${lastName}`;
+                    document.getElementById('user-welcome-name').textContent = `${firstName} ${lastName}`;
                 }
             } else {
                 window.location.href = 'login.html';
