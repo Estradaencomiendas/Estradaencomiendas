@@ -6,53 +6,70 @@
     <title>Registro - Estrada Encomiendas</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f7f7f7;
-            margin: 0;
+            overflow-x: hidden;
         }
 
         .container {
-            background-color: white;
             padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            background-color: white;
             border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
             text-align: center;
         }
 
         input {
             display: block;
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
+            background-color: #fffbea;
         }
 
         button {
-            background-color: #007bff;
+            background-color: #dc3545;
             color: white;
-            padding: 10px 20px;
+            padding: 15px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
             width: 100%;
+            margin-top: 20px;
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #bb2d3b;
         }
 
         .link {
             margin-top: 10px;
             font-size: 14px;
             display: block;
+            color: #dc3545;
+            text-align: center;
         }
     </style>
 </head>
@@ -123,5 +140,3 @@
     </script>
 </body>
 </html>
-
-
