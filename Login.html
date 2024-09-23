@@ -8,63 +8,107 @@
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f7f7f7;
             margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        header {
+            background-color: #F39200;
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
         }
 
         .container {
-            background-color: white;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .instruction {
+            font-size: 16px;
+            color: #666;
             text-align: center;
+            margin-bottom: 20px;
         }
 
         input {
             display: block;
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
+            background-color: #fffbea;
+        }
+
+        .input-password {
+            position: relative;
+        }
+
+        .input-password input {
+            padding-right: 40px;
+        }
+
+        .input-password .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+        }
+
+        .forgot-password, .register-link {
+            font-size: 14px;
+            color: #dc3545;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .register-link {
+            float: right;
         }
 
         button {
-            background-color: #007bff;
+            background-color: #dc3545;
             color: white;
-            padding: 10px 20px;
+            padding: 15px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
             width: 100%;
+            margin-top: 20px;
         }
 
         button:hover {
-            background-color: #0056b3;
-        }
-
-        .link {
-            margin-top: 10px;
-            font-size: 14px;
-            display: block;
+            background-color: #bb2d3b;
         }
     </style>
 </head>
 <body>
+    <header>Ingresar</header>
     <div class="container">
-        <h1>Iniciar Sesión</h1>
+        <p class="instruction">Ingrese con su correo electrónico y contraseña de Estrada Encomiendas.</p>
+
         <form id="loginForm">
-            <input type="email" id="loginEmail" placeholder="Correo Electrónico" required>
-            <input type="password" id="loginPassword" placeholder="Contraseña" required>
-            <button type="submit">Iniciar Sesión</button>
+            <input type="email" id="loginEmail" placeholder="Correo electrónico o número de teléfono..." required>
+
+            <div class="input-password">
+                <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span>
+            </div>
+
+            <a href="#" class="forgot-password">¿Olvidó su contraseña?</a>
+            <a href="register.html" class="register-link">Registrarse</a>
+
+            <button type="submit">Ingresar</button>
         </form>
-        <a href="register.html" class="link">¿No tienes una cuenta? Regístrate</a>
     </div>
 
     <!-- Firebase Scripts (versión 8.10.0) -->
@@ -88,6 +132,14 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Función para alternar visibilidad de contraseña
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('loginPassword');
+            const passwordToggle = document.querySelector('.toggle-password');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+        }
+
         // Función de inicio de sesión
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -107,9 +159,6 @@
                     const role = userData.role;
                     const firstName = userData.firstName;
                     const lastName = userData.lastName;
-
-                    // Mostrar el nombre completo en consola (solo para verificación)
-                    console.log(`Bienvenido: ${firstName} ${lastName}`);
 
                     // Redirigir según el rol
                     if (role === 'admin1') {
