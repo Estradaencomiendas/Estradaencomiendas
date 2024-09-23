@@ -345,7 +345,7 @@
             <a href="login.html" class="button-ingresar">Cerrar sesión</a>
         </div>
         <ul>
-            <li><a href="Destinos Estrada.html">Destinos</a></li>
+            <li><a href="destinos.html">Destinos</a></li>
             <li><a href="cotizar.html">Cotizar Envío</a></li>
             <li><a href="mis_envios.html">Mis Envíos</a></li> <!-- Agregado al menú -->
             <li><a href="contacto.html">Contáctanos</a></li>
@@ -377,7 +377,7 @@
     <!-- Botones estilo DHL con iconos -->
     <div class="button-bar">
         <a href="mis_envios.html"><i class="fas fa-box"></i> Mis Envíos</a>
-        <a href="Destinos Estrada.html"><i class="fas fa-map-marker-alt"></i> Mis Destinos</a>
+        <a href="mis_destinos.html"><i class="fas fa-map-marker-alt"></i> Mis Destinos</a>
         <a href="calcula_tarifa.html"><i class="fas fa-calculator"></i> Calcula tu Tarifa</a>
     </div>
 
@@ -428,12 +428,28 @@
             }
         });
 
-       <div class="button-group">
-    <button class="action-button" onclick="agregarPaquete('${packageData.trackingNumber}')">
-        <i class="fas fa-plus"></i>
-        Agregar
-    </button>
-</div>
+        // Función para mostrar el paquete
+        function displayPackage(packageData) {
+            const packageList = document.getElementById('package-list');
+            const statusClass = getStatusClass(packageData.status);
+            const statusImage = getStatusImage(packageData.status);
+            const imageClass = getStatusImageClass(packageData.status);
+
+            const packageHtml = `
+                <div class="package-container">
+                    <img src="${statusImage}" class="${imageClass}" alt="Estado del paquete">
+                    <div class="package-info">
+                        <h3>${packageData.trackingNumber}</h3>
+                        <p>Cliente: ${packageData.nombreCliente}</p>
+                        <p>Destino: ${packageData.destino}</p>
+                        <p>Fecha de Envío: ${packageData.fechaEnvio}</p>
+                        <p>Valor: $${packageData.valor}</p>
+                    </div>
+                    <span class="status ${statusClass}">${packageData.status}</span>
+                </div>
+            `;
+            packageList.innerHTML += packageHtml;
+        }
 
         // Funciones para obtener clase e imagen según el estado
         function getStatusClass(status) {
@@ -476,5 +492,4 @@
     </script>
 </body>
 </html>
-
 
