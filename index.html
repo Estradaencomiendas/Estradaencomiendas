@@ -23,31 +23,22 @@
             overflow-x: hidden;
         }
 
-/* Sección con imagen de fondo y overlay */
+        /* Imagen de fondo responsive */
         .background-section {
-            position: relative;
-            width: 100vw; /* Asegura que la imagen cubra todo el ancho */
-            height: 100vh; /* Ajuste para cubrir toda la altura de la pantalla */
-            background-image: url('Catedral Santa Ana.jpg'); /* Imagen de fondo */
-            background-size: cover; /* Asegura que la imagen cubra todo el fondo */
-            background-position: center center; /* Centra la imagen */
-            background-repeat: no-repeat; /* Evita que la imagen se repita */
-            margin-bottom: 0;
-            padding-bottom: 0;
+            width: 100vw; /* La imagen debe ocupar el 100% del ancho de la ventana */
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-image: url('Catedral Santa Ana.jpg');
         }
 
-        .overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* Centra horizontal y verticalmente */
-            width: 100%;
-            max-width: 600px;
-            background-color: rgba(255, 255, 255, 0.8); /* Fondo con transparencia */
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
+        /* Ajustar cualquier posible desbordamiento en los márgenes y paddings */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
+
         /* Header */
         header {
             background-color: #FFD700;
@@ -476,5 +467,4 @@
     </script>
 </body>
 </html>
-
 
