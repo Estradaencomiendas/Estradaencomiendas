@@ -36,6 +36,22 @@
             top: 0;
             z-index: 1000;
         }
+        /* Estilo para el cuadro de búsqueda */
+.search-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#search-bar {
+    width: 80%;
+    max-width: 400px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 
         .logo {
             width: 120px;
@@ -188,6 +204,10 @@
     <div class="destinations-section">
         <h1>Bienvenido, <span id="user-welcome-name">Nombre Apellido</span></h1>
         <div class="grid-container">
+            <!-- Cuadro de búsqueda -->
+<div class="search-container">
+    <input type="text" id="search-bar" placeholder="Buscar destino..." onkeyup="filterDestinations()">
+</div>
             <!-- Bloque para cada destino -->
             <div class="destination">
                 <img src="Destinos Estrada/Destino Mejicanos.png" alt="Destino Mejicanos">
@@ -382,6 +402,20 @@
 
     <!-- Firebase Scripts -->
     <script>
+        function filterDestinations() {
+    const searchInput = document.getElementById('search-bar').value.toLowerCase();
+    const destinations = document.getElementsByClassName('destination');
+
+    Array.from(destinations).forEach(destination => {
+        const title = destination.querySelector('.destination-title').textContent.toLowerCase();
+        if (title.includes(searchInput)) {
+            destination.style.display = 'block';
+        } else {
+            destination.style.display = 'none';
+        }
+    });
+}
+
         // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
