@@ -276,6 +276,13 @@
             color: #666;
         }
 
+        .result-item img {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+
         @media (max-width: 600px) {
             .logo {
                 width: 90px;
@@ -308,6 +315,10 @@
 
             .start-section {
                 font-size: 16px;
+            }
+
+            .result-item img {
+                width: 80px;
             }
         }
     </style>
@@ -410,6 +421,7 @@
                             <p>Fecha de Envío: ${packageData.fechaEnvio}</p>
                             <p>Valor: $${packageData.valor}</p>
                             <p>Estado: ${packageData.estado}</p>
+                            <img src="images/${packageData.estado.toLowerCase()}.png" alt="${packageData.estado}">
                         </div>
                     `;
                     resultsDiv.innerHTML += packageHtml;
@@ -429,6 +441,16 @@
                 alert('Por favor, ingrese el número de seguimiento.');
             }
         });
+
+        // Función para desplegar menú
+        function toggleMenu() {
+            var menu = document.getElementById('menu');
+            if (menu.classList.contains('open-menu')) {
+                menu.classList.remove('open-menu');
+            } else {
+                menu.classList.add('open-menu');
+            }
+        }
     </script>
 </body>
 </html>
