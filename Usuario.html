@@ -102,7 +102,7 @@
             margin-bottom: 20px;
         }
 
-        .button-ingresar, .button-registrarse {
+        .button-ingresar {
             display: block;
             width: 80%;
             margin: 10px auto;
@@ -111,35 +111,25 @@
             border-radius: 5px;
             font-size: 16px;
             font-family: 'Acumin Variable Concept', sans-serif;
-        }
-
-        .button-ingresar {
             background-color: red;
             color: white;
             text-decoration: none;
         }
 
-        .button-registrarse {
-            background-color: transparent;
-            color: red;
-            text-decoration: none;
-            border: 1px solid red;
-        }
-
-        /* Imagen de fondo */
+        /* Imagen de fondo responsive */
         .background-section {
-            width: 100vw;
-            height: 100vh;
-            background-image: url('Ahuachapan.jpg');
+            width: 100vw; /* La imagen debe ocupar el 100% del ancho de la ventana */
+            height: auto;
             background-size: cover;
             background-position: center;
-            position: relative;
+            background-image: url('Ahuachapan.jpg');
         }
 
         .overlay {
+            position: relative;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            padding: 120px 0 90px; /* Ajustar para terminar después del botón de buscar */
+            background-color: rgba(0, 0, 0, 0.5); /* Overlay más oscuro */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -317,9 +307,8 @@
     <nav id="menu">
         <div class="menu-header">
             <h2 id="user-name">Nombre Apellido</h2>
-            <p>Accede a tu cuenta o regístrate</p>
-            <a href="login.html" class="button-ingresar">Ingresar</a>
-            <a href="registro.html" class="button-registrarse">Registrarse</a>
+            <p>¡Nos alegra tenerte con nosotros! Realiza un seguimiento fácil y rápido de tus paquetes.</p>
+            <a href="login.html" class="button-ingresar">Cerrar sesión</a>
         </div>
         <ul>
             <li><a href="destinos.html">Destinos</a></li>
