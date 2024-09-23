@@ -428,28 +428,12 @@
             }
         });
 
-        // Función para mostrar el paquete
-        function displayPackage(packageData) {
-            const packageList = document.getElementById('package-list');
-            const statusClass = getStatusClass(packageData.status);
-            const statusImage = getStatusImage(packageData.status);
-            const imageClass = getStatusImageClass(packageData.status);
-
-            const packageHtml = `
-                <div class="package-container">
-                    <img src="${statusImage}" class="${imageClass}" alt="Estado del paquete">
-                    <div class="package-info">
-                        <h3>${packageData.trackingNumber}</h3>
-                        <p>Cliente: ${packageData.nombreCliente}</p>
-                        <p>Destino: ${packageData.destino}</p>
-                        <p>Fecha de Envío: ${packageData.fechaEnvio}</p>
-                        <p>Valor: $${packageData.valor}</p>
-                    </div>
-                    <span class="status ${statusClass}">${packageData.status}</span>
-                </div>
-            `;
-            packageList.innerHTML += packageHtml;
-        }
+       <div class="button-group">
+    <button class="action-button" onclick="agregarPaquete('${packageData.trackingNumber}')">
+        <i class="fas fa-plus"></i>
+        Agregar
+    </button>
+</div>
 
         // Funciones para obtener clase e imagen según el estado
         function getStatusClass(status) {
