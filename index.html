@@ -299,14 +299,6 @@
             font-family: 'Acumin Variable Concept', sans-serif; /* Aplicado aquí */
         }
 
-        /* Aumentar más el tamaño de la imagen */
-        .result-item img {
-            width: 250px; /* Tamaño aumentado */
-            height: auto;
-            display: block;
-            margin: 10px auto;
-        }
-
         /* Responsive */
         @media (max-width: 600px) {
             .logo {
@@ -340,10 +332,6 @@
 
             .start-section {
                 font-size: 16px;
-            }
-
-            .result-item img {
-                width: 200px; /* Tamaño ajustado para móviles */
             }
         }
     </style>
@@ -439,20 +427,8 @@
                     const packageData = doc.data();
                     const status = packageData.status ? packageData.status.toLowerCase() : 'in-process'; // Si el status no existe, se asigna "in-process"
 
-                    // Mostrar imagen según el estado
-                    let statusImage = packageData.status === 'Pagado' ? 'Pagado.png' :
-                                      packageData.status === 'En Proceso de Pago' ? 'Procesando Pago.png' :
-                                      packageData.status === 'Paquete Retirado' ? 'retired.png' :
-                                      packageData.status === 'En Ruta' ? 'in-process.png' :
-                                      packageData.status === 'Paquete No Retirado' ? 'not-collected.png' :
-                                      packageData.status === 'Hubo un Problema' ? 'Hubo un problema.png' : 'in-process.png';
-
-                    const imageClass = packageData.status === 'Pagado' ? 'status-image-paid' :
-                                       packageData.status === 'En Proceso de Pago' ? 'status-image-processing' : 'status-image';
-
                     const packageHtml = `
                         <div class="result-item">
-                            <img src="${statusImage}" class="${imageClass}" alt="${status}">
                             <h3>Número de Seguimiento: ${packageData.trackingNumber}</h3>
                             <p>Nombre del Cliente: ${packageData.nombreCliente}</p>
                             <p>Destino: ${packageData.destino}</p>
@@ -491,6 +467,5 @@
     </script>
 </body>
 </html>
-
 
 
