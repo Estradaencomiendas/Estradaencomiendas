@@ -18,7 +18,7 @@
             position: relative;
             min-height: 100vh;
             width: 100vw;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Evitar desplazamiento horizontal */
         }
 
         header {
@@ -413,6 +413,7 @@
 
                 snapshot.forEach(doc => {
                     const packageData = doc.data();
+                    const estado = packageData.estado ? packageData.estado.toLowerCase() : 'no-info'; // Si el estado no existe, se asigna un valor por defecto
                     const packageHtml = `
                         <div class="result-item">
                             <h3>Número de Seguimiento: ${packageData.trackingNumber}</h3>
@@ -421,7 +422,7 @@
                             <p>Fecha de Envío: ${packageData.fechaEnvio}</p>
                             <p>Valor: $${packageData.valor}</p>
                             <p>Estado: ${packageData.estado}</p>
-                            <img src="images/${packageData.estado.toLowerCase()}.png" alt="${packageData.estado}">
+                            <img src="images/${estado}.png" alt="${estado}">
                         </div>
                     `;
                     resultsDiv.innerHTML += packageHtml;
