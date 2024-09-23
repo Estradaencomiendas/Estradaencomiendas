@@ -23,22 +23,42 @@
             overflow-x: hidden;
         }
 
-        /* Imagen de fondo responsive */
-        .background-section {
-            width: 100vw; /* La imagen debe ocupar el 100% del ancho de la ventana */
-            height: 100vh;
-            background-size: cover;
-            background-position: center;
-            background-image: url('Catedral Santa Ana.jpg');
-        }
+      /* Imagen de fondo responsive ajustada en altura */
+.background-section {
+    width: 100%; /* Mantener el 100% del ancho */
+    height: auto; /* Dejar que la altura se ajuste automáticamente */
+    min-height: 400px; /* Altura mínima para asegurar que la imagen se vea en pantallas grandes */
+    background-size: cover;
+    background-position: center;
+    background-image: url('Catedral Santa Ana.jpg');
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        /* Ajustar cualquier posible desbordamiento en los márgenes y paddings */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+.overlay {
+    width: 100%;
+    height: auto; /* Ajustar la altura del overlay automáticamente según el contenido */
+    padding: 20px 0; /* Espaciado interno para asegurar que el contenido no toque los bordes */
+    background-color: rgba(0, 0, 0, 0.5); /* Mantener el overlay */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
+/* Ajustes adicionales para pantallas más pequeñas */
+@media (max-width: 600px) {
+    .background-section {
+        min-height: 300px; /* Reducir el alto mínimo en dispositivos pequeños */
+        background-size: cover; /* Mantener la imagen ajustada al ancho */
+    }
+
+    .overlay {
+        padding: 15px 0; /* Ajustar el padding en pantallas pequeñas */
+    }
+}
         /* Header */
         header {
             background-color: #FFD700;
