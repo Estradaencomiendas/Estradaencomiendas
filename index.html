@@ -23,42 +23,30 @@
             overflow-x: hidden;
         }
 
-      /* Imagen de fondo responsive ajustada en altura */
+  /* Imagen de fondo responsive */
 .background-section {
-    width: 100%; /* Mantener el 100% del ancho */
-    height: auto; /* Dejar que la altura se ajuste automáticamente */
-    min-height: 400px; /* Altura mínima para asegurar que la imagen se vea en pantallas grandes */
+    width: 100vw; /* La imagen debe ocupar el 100% del ancho de la ventana */
+    height: 100vh; /* Ocupa el 100% de la altura de la ventana */
     background-size: cover;
     background-position: center;
-    background-image: url('Catedral Santa Ana.jpg');
     background-repeat: no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.overlay {
-    width: 100%;
-    height: auto; /* Ajustar la altura del overlay automáticamente según el contenido */
-    padding: 20px 0; /* Espaciado interno para asegurar que el contenido no toque los bordes */
-    background-color: rgba(0, 0, 0, 0.5); /* Mantener el overlay */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Ajustes adicionales para pantallas más pequeñas */
+/* Ajustes adicionales para asegurarse de que la imagen responda bien en pantallas pequeñas */
 @media (max-width: 600px) {
     .background-section {
-        min-height: 300px; /* Reducir el alto mínimo en dispositivos pequeños */
-        background-size: cover; /* Mantener la imagen ajustada al ancho */
-    }
-
-    .overlay {
-        padding: 15px 0; /* Ajustar el padding en pantallas pequeñas */
+        height: auto; /* La altura se ajusta automáticamente en pantallas más pequeñas */
+        background-size: contain; /* Asegura que toda la imagen esté visible en pantallas pequeñas */
     }
 }
+
+        /* Ajustar cualquier posible desbordamiento en los márgenes y paddings */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         /* Header */
         header {
             background-color: #FFD700;
