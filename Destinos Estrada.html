@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Destinos - Estrada Encomiendas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            overflow-x: hidden;
+        }
+
+        /* Header con el menú */
+        header {
+            background-color: #FFD700;
+            width: 100%;
+            padding: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            width: 120px;
+            margin-left: 20px;
+        }
+
+        .menu-icon {
+            font-size: 30px;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        nav {
+            position: fixed;
+            right: -100%;
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: right 0.3s ease;
+            padding-top: 60px;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 18px;
+            display: block;
+        }
+
+        .open-menu {
+            right: 0;
+        }
+
+        .menu-header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .menu-header h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .menu-header p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .button-ingresar {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: 'Acumin Variable Concept', sans-serif;
+            background-color: red;
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Estilo para la sección de destinos */
+        .destinations-section {
+            margin-top: 100px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .destination {
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .destination img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .destination-title {
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Estilo para hover */
+        .destination:hover {
+            transform: scale(1.05);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con menú -->
+    <header>
+        <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+    </header>
+
+    <nav id="menu">
+        <div class="menu-header">
+            <h2 id="user-name">Nombre Apellido</h2>
+            <p>¡Nos alegra tenerte con nosotros! Explora nuestros destinos.</p>
+            <a href="login.html" class="button-ingresar">Cerrar sesión</a>
+        </div>
+        <ul>
+            <li><a href="mis_envios.html">Mis Envíos</a></li>
+            <li><a href="cotizar.html">Cotizar Envío</a></li>
+            <li><a href="contacto.html">Contáctanos</a></li>
+        </ul>
+    </nav>
+
+    <!-- Sección de destinos -->
+    <div class="destinations-section">
+        <h1>Bienvenido, <span id="user-welcome-name">Nombre Apellido</span></h1>
+        <div class="grid-container">
+            <!-- Ejemplo de cómo se verá cada destino -->
+            <div class="destination">
+                <img src="Destinos Estrada/Destino Mejicanos.png" alt="Destino Mejicanos">
+                <div class="destination-title">Destino Mejicanos</div>
+            </div>
+            <div class="destination">
+                <img src="Destinos Estrada/Destino Cuscatancingo.png" alt="Destino Cuscatancingo">
+                <div class="destination-title">Destino Cuscatancingo</div>
+            </div>
+            <!-- Repite el bloque para todos los destinos -->
+            <div class="destination">
+                <img src="Destinos Estrada/Destino Nahuilingo.png" alt="Destino Nahuilingo">
+                <div class="destination-title">Destino Nahuilingo</div>
+            </div>
+            <div class="destination">
+                <img src="Destinos Estrada/Destino Masahuat Metapan.png" alt="Destino Masahuat Metapan">
+                <div class="destination-title">Destino Masahuat Metapan</div>
+            </div>
+            <!-- Continúa con las demás imágenes... -->
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            authDomain: "estradaencomiendas0.firebaseapp.com",
+            projectId: "estradaencomiendas0",
+            storageBucket: "estradaencomiendas0.appspot.com",
+            messagingSenderId: "247979951336",
+            appId: "1:247979951336:web:92b6b4bf615595676755d"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Función para cargar el nombre del usuario en el menú y en el saludo
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const firstName = userDoc.data().firstName;
+                    const lastName = userDoc.data().lastName;
+                    document.getElementById('user-name').textContent = `${firstName} ${lastName}`;
+                    document.getElementById('user-welcome-name').textContent = `${firstName} ${lastName}`;
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Función para desplegar menú
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.classList.toggle('open-menu');
+        }
+    </script>
+</body>
+</html>
