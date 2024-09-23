@@ -22,13 +22,22 @@
             overflow-x: hidden;
         }
 
-        /* Imagen de fondo responsive */
-        .background-section {
-            width: 100vw; /* La imagen debe ocupar el 100% del ancho de la ventana */
-            height: auto; /* Mantener la proporción correcta */
-            background-size: cover;
-            background-position: center;
-        }
+       /* Imagen de fondo responsive */
+.background-section {
+    width: 100vw; /* La imagen debe ocupar el 100% del ancho de la ventana */
+    height: 100vh; /* Ocupa el 100% de la altura de la ventana */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Ajustes adicionales para asegurarse de que la imagen responda bien en pantallas pequeñas */
+@media (max-width: 600px) {
+    .background-section {
+        height: auto; /* La altura se ajusta automáticamente en pantallas más pequeñas */
+        background-size: contain; /* Asegura que toda la imagen esté visible en pantallas pequeñas */
+    }
+}
 
         /* Ajustar cualquier posible desbordamiento en los márgenes y paddings */
         * {
