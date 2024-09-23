@@ -222,6 +222,89 @@
             background-color: #0056b3;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
+
+        .package-container {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .package-info {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .package-info h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .package-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+        }
+
+        .status-retired {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-not-collected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-in-route {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-in-process {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-paid {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-problem {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Tamaño específico para imágenes */
+        .status-image {
+            width: 360px;
+            height: auto;
+        }
+
+        .status-image-paid {
+            width: 125px;
+            height: auto;
+        }
+
+        .status-image-processing {
+            width: 125px;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -261,6 +344,12 @@
         </div>
     </div>
 
+    <div class="container">
+        <div id="package-list">
+            <!-- Aquí se insertarán dinámicamente los paquetes -->
+        </div>
+    </div>
+
     <!-- Firebase Scripts -->
     <script>
         // Configuración de Firebase
@@ -294,13 +383,75 @@
 
         // Función para buscar paquetes
         document.getElementById('search-button').addEventListener('click', async () => {
-            const trackingNumber = document.getElementById('tracking-number').value;
+            const trackingNumber = document.getElementById('tracking-number').value.trim();
             if (trackingNumber) {
-                // Lógica para buscar paquete en Firestore
+                const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                if (!packageSnapshot.empty) {
+                    const packageData = packageSnapshot.docs[0].data();
+                    displayPackage(packageData);
+                } else {
+                    alert('No se encontró ningún paquete con ese número de seguimiento.');
+                }
             } else {
                 alert('Por favor, ingrese el número de seguimiento.');
             }
         });
+
+        // Función para mostrar el paquete
+        function displayPackage(packageData) {
+            const packageList = document.getElementById('package-list');
+            const statusClass = getStatusClass(packageData.status);
+            const statusImage = getStatusImage(packageData.status);
+            const imageClass = getStatusImageClass(packageData.status);
+
+            const packageHtml = `
+                <div class="package-container">
+                    <img src="${statusImage}" class="${imageClass}" alt="Estado del paquete">
+                    <div class="package-info">
+                        <h3>${packageData.trackingNumber}</h3>
+                        <p>Cliente: ${packageData.nombreCliente}</p>
+                        <p>Destino: ${packageData.destino}</p>
+                        <p>Fecha de Envío: ${packageData.fechaEnvio}</p>
+                        <p>Valor: $${packageData.valor}</p>
+                    </div>
+                    <span class="status ${statusClass}">${packageData.status}</span>
+                </div>
+            `;
+            packageList.innerHTML += packageHtml;
+        }
+
+        // Funciones para obtener clase e imagen según el estado
+        function getStatusClass(status) {
+            switch (status) {
+                case 'Pagado': return 'status-paid';
+                case 'Paquete Retirado': return 'status-retired';
+                case 'En Proceso de Pago': return 'status-in-process';
+                case 'Paquete No Retirado': return 'status-not-collected';
+                case 'En Ruta': return 'status-in-route';
+                case 'Hubo un Problema': return 'status-problem';
+                default: return 'status-in-route';
+            }
+        }
+
+        function getStatusImage(status) {
+            switch (status) {
+                case 'Pagado': return 'Pagado.png';
+                case 'En Proceso de Pago': return 'Procesando Pago.png';
+                case 'Paquete Retirado': return 'retired.png';
+                case 'En Ruta': return 'in-process.png';
+                case 'Paquete No Retirado': return 'not-collected.png';
+                case 'Hubo un Problema': return 'Hubo un problema.png';
+                default: return 'in-process.png';
+            }
+        }
+
+        function getStatusImageClass(status) {
+            switch (status) {
+                case 'Pagado': return 'status-image-paid';
+                case 'En Proceso de Pago': return 'status-image-processing';
+                default: return 'status-image';
+            }
+        }
 
         // Función para desplegar menú
         function toggleMenu() {
