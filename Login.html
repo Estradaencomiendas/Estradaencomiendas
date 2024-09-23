@@ -6,11 +6,20 @@
     <title>Login - Estrada Encomiendas</title>
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f7f7f7;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
         }
 
         header {
@@ -20,12 +29,17 @@
             color: white;
             font-size: 20px;
             font-weight: bold;
+            width: 100%;
         }
 
         .container {
             padding: 20px;
             max-width: 500px;
+            width: 100%;
             margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .instruction {
@@ -92,8 +106,8 @@
     </style>
 </head>
 <body>
-    <header>Ingresar</header>
     <div class="container">
+        <header>Ingresar</header>
         <p class="instruction">Ingrese con su correo electrónico y contraseña de Estrada Encomiendas.</p>
 
         <form id="loginForm">
