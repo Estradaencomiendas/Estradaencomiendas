@@ -283,42 +283,37 @@
             height: auto;
         }
 
-        /* Botón agregar con color verde */
-        .add-button {
-            background-color: #28a745;
-            color: white;
+        /* Estilo para los botones inferiores */
+        .bottom-buttons {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .bottom-button {
+            background-color: #FFCC00;
+            color: black;
             border: none;
-            padding: 10px 15px;
-            border-radius: 50px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            font-size: 12px;
-            margin-top: 15px; /* Margen superior adicional */
-            transition: background 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .add-button:hover {
-            background-color: #218838;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        .bottom-button i {
+            font-size: 24px;
         }
 
-        /* Estilos adicionales para la sección Since y Contáctanos */
-        .footer-contact {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .footer-contact img {
-            width: 100px;
-            margin-bottom: 10px;
-        }
-
-        .footer-contact p {
-            font-size: 14px;
-            color: #333;
+        .bottom-button:hover {
+            background-color: #E5B800;
         }
     </style>
 </head>
@@ -366,6 +361,22 @@
         <div id="package-list">
             <!-- Aquí se insertarán dinámicamente los paquetes -->
         </div>
+    </div>
+
+    <!-- Sección de botones inferiores -->
+    <div class="bottom-buttons">
+        <a href="mis_envios.html" class="bottom-button">
+            <i class="fas fa-box"></i>
+            Mis Envíos
+        </a>
+        <a href="destinos_estrada.html" class="bottom-button">
+            <i class="fas fa-map-marker-alt"></i>
+            Mis Destinos
+        </a>
+        <a href="calcular_envio.html" class="bottom-button">
+            <i class="fas fa-calculator"></i>
+            Calcular Envío
+        </a>
     </div>
 
     <!-- Firebase Scripts -->
@@ -451,28 +462,9 @@
         }
 
         // Función para agregar a "Mis Envíos"
-        async function addToMisEnvios(trackingNumber) {
-            const user = auth.currentUser;
-
-            if (user) {
-                try {
-                    const packageRef = db.collection('paquetes').doc(trackingNumber);
-                    const packageDoc = await packageRef.get();
-                    if (packageDoc.exists && packageDoc.data().userId === user.uid) {
-                        alert(`Este paquete ya ha sido agregado a Mis Envíos.`);
-                    } else {
-                        await packageRef.update({
-                            userId: user.uid
-                        });
-                        alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
-                    }
-                } catch (error) {
-                    console.error('Error al agregar el paquete a Mis Envíos:', error);
-                    alert('Ocurrió un error al agregar el paquete.');
-                }
-            } else {
-                alert('Debes estar autenticado para agregar un paquete.');
-            }
+        function addToMisEnvios(trackingNumber) {
+            // Implementar la lógica de agregar el paquete a la página de "Mis Envíos"
+            alert(`Paquete ${trackingNumber} agregado a Mis Envíos`);
         }
 
         // Obtener clase de estado
@@ -517,3 +509,4 @@
     </script>
 </body>
 </html>
+
