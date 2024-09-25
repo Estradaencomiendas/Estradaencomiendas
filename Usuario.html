@@ -10,6 +10,37 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     <style>
+        /* Estilos para los botones grandes en la parte inferior */
+.footer-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 40px;
+}
+
+.footer-buttons a {
+    display: block;
+    text-align: center;
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 18px;
+    font-family: 'Acumin Variable Concept', sans-serif;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease;
+}
+
+.footer-buttons a:hover {
+    background-color: #0056b3;
+}
+
+/* Iconos de los botones */
+.footer-buttons i {
+    margin-right: 10px;
+}
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -322,6 +353,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Header con menú -->
     <header>
@@ -515,5 +547,10 @@
             menu.classList.toggle('open-menu');
         }
     </script>
+        <div class="footer-buttons">
+    <a href="mis_envios.html"><i class="fas fa-box"></i> Mis Envíos</a>
+    <a href="destinos_estrada.html"><i class="fas fa-map-marker-alt"></i> Mis Destinos</a>
+    <a href="calcular_envio.html"><i class="fas fa-calculator"></i> Calcular Envío</a>
+</div>
 </body>
 </html>
