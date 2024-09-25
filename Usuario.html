@@ -451,9 +451,28 @@
         }
 
         // Función para agregar a "Mis Envíos"
-        function addToMisEnvios(trackingNumber) {
-            // Implementar la lógica de agregar el paquete a la página de "Mis Envíos"
-            alert(`Paquete ${trackingNumber} agregado a Mis Envíos`);
+        async function addToMisEnvios(trackingNumber) {
+            const user = auth.currentUser;
+
+            if (user) {
+                try {
+                    const packageRef = db.collection('paquetes').doc(trackingNumber);
+                    const packageDoc = await packageRef.get();
+                    if (packageDoc.exists && packageDoc.data().userId === user.uid) {
+                        alert(`Este paquete ya ha sido agregado a Mis Envíos.`);
+                    } else {
+                        await packageRef.update({
+                            userId: user.uid
+                        });
+                        alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
+                    }
+                } catch (error) {
+                    console.error('Error al agregar el paquete a Mis Envíos:', error);
+                    alert('Ocurrió un error al agregar el paquete.');
+                }
+            } else {
+                alert('Debes estar autenticado para agregar un paquete.');
+            }
         }
 
         // Obtener clase de estado
@@ -498,6 +517,3 @@
     </script>
 </body>
 </html>
-
-
-
