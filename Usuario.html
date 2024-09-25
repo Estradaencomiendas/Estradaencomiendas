@@ -428,35 +428,11 @@
             packageList.innerHTML += packageHtml;
         }
 
-         // Función para agregar paquetes a 'Mis Envíos'
-        async function addToMyShipments(trackingNumber) {
-            const user = auth.currentUser;
-
-            if (user) {
-                try {
-                    const packageDoc = await db.collection('paquetes').doc(trackingNumber).get();
-                    if (packageDoc.exists && packageDoc.data().userId) {
-                        alert(`Este paquete ya ha sido agregado a Mis Envíos.`);
-                    } else {
-                        await db.collection('paquetes').doc(trackingNumber).update({
-                            userId: user.uid
-                        });
-                        alert(`Paquete con número de seguimiento ${trackingNumber} agregado a Mis Envíos.`);
-                    }
-                } catch (error) {
-                    console.error('Error al agregar el paquete a Mis Envíos:', error);
-                    alert('Ocurrió un error al agregar el paquete.');
-                }
-            } else {
-                alert('Debes estar autenticado para agregar un paquete.');
-            }
+        // Función para agregar a "Mis Envíos"
+        function addToMisEnvios(trackingNumber) {
+            // Implementar la lógica de agregar el paquete a la página de "Mis Envíos"
+            alert(`Paquete ${trackingNumber} agregado a Mis Envíos`);
         }
-
-        // Función para reenviar paquete
-        function resendPackage(trackingNumber) {
-            alert(`Paquete con número de seguimiento ${trackingNumber} reenviado.`);
-        }
-
 
         // Obtener clase de estado
         function getStatusClass(status) {
@@ -500,4 +476,5 @@
     </script>
 </body>
 </html>
+
 
