@@ -102,30 +102,6 @@
             margin-bottom: 20px;
         }
 
-        .button-ingresar, .button-registrarse {
-            display: block;
-            width: 80%;
-            margin: 10px auto;
-            text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-family: 'Acumin Variable Concept', sans-serif;
-        }
-
-        .button-ingresar {
-            background-color: red;
-            color: white;
-            text-decoration: none;
-        }
-
-        .button-registrarse {
-            background-color: transparent;
-            color: red;
-            text-decoration: none;
-            border: 1px solid red;
-        }
-
         /* Imagen de fondo con overlay */
         .background-section {
             position: relative;
@@ -136,12 +112,11 @@
             background-repeat: no-repeat;
         }
 
-
         .overlay {
             position: relative;
             width: 100%;
-            padding: 120px 0 90px; /* Ajustar para terminar después del botón de buscar */
-            background-color: rgba(0, 0, 0, 0.5); /* Overlay más oscuro */
+            padding: 120px 0 90px;
+            background-color: rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -307,6 +282,22 @@
             width: 125px;
             height: auto;
         }
+
+        /* Estilos adicionales para la sección Since y Contáctanos */
+        .footer-contact {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .footer-contact img {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+
+        .footer-contact p {
+            font-size: 14px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -319,15 +310,18 @@
     <nav id="menu">
         <div class="menu-header">
             <h2 id="user-name">Nombre Apellido</h2>
-            <p>Accede a tu cuenta o regístrate</p>
-            <a href="login.html" class="button-ingresar">Ingresar</a>
-            <a href="registro.html" class="button-registrarse">Registrarse</a>
+            <p>¡Bienvenido a Estrada Encomiendas!</p>
         </div>
         <ul>
             <li><a href="destinos.html">Destinos</a></li>
             <li><a href="cotizar.html">Cotizar Envío</a></li>
             <li><a href="contacto.html">Contáctanos</a></li>
         </ul>
+        <!-- Sección Since y Contáctanos -->
+        <div class="footer-contact">
+            <img src="since.png" alt="Since Logo">
+            <p>Contáctanos: 79150159 / 70933658</p>
+        </div>
     </nav>
 
     <!-- Sección con fondo y overlay -->
@@ -399,12 +393,23 @@
             }
         });
 
-        // Función para mostrar el paquete
+        // Función para mostrar el paquete y agregar botón "Agregar" si está retirado
         function displayPackage(packageData) {
             const packageList = document.getElementById('package-list');
             const statusClass = getStatusClass(packageData.status);
             const statusImage = getStatusImage(packageData.status);
             const imageClass = getStatusImageClass(packageData.status);
+            let buttonHtml = '';
+
+            // Si el paquete está retirado, mostrar el botón "Agregar"
+            if (packageData.status === 'Paquete Retirado') {
+                buttonHtml = `
+                    <button class="action-button" onclick="addToMisEnvios('${packageData.trackingNumber}')">
+                        <i class="fas fa-plus"></i>
+                        Agregar a Mis Envíos
+                    </button>
+                `;
+            }
 
             const packageHtml = `
                 <div class="package-container">
@@ -417,12 +422,19 @@
                         <p>Valor: $${packageData.valor}</p>
                     </div>
                     <span class="status ${statusClass}">${packageData.status}</span>
+                    ${buttonHtml}
                 </div>
             `;
             packageList.innerHTML += packageHtml;
         }
 
-        // Funciones para obtener clase e imagen según el estado
+        // Función para agregar a "Mis Envíos"
+        function addToMisEnvios(trackingNumber) {
+            // Implementar la lógica de agregar el paquete a la página de "Mis Envíos"
+            alert(`Paquete ${trackingNumber} agregado a Mis Envíos`);
+        }
+
+        // Obtener clase de estado
         function getStatusClass(status) {
             switch (status) {
                 case 'Pagado': return 'status-paid';
@@ -435,6 +447,7 @@
             }
         }
 
+        // Obtener imagen de estado
         function getStatusImage(status) {
             switch (status) {
                 case 'Pagado': return 'Pagado.png';
@@ -455,7 +468,7 @@
             }
         }
 
-        // Función para desplegar menú
+        // Desplegar menú
         function toggleMenu() {
             const menu = document.getElementById('menu');
             menu.classList.toggle('open-menu');
@@ -463,3 +476,4 @@
     </script>
 </body>
 </html>
+
