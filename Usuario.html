@@ -283,6 +283,28 @@
             height: auto;
         }
 
+        /* Botón agregar con color verde */
+        .add-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 15px; /* Margen superior adicional */
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-button:hover {
+            background-color: #218838;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
         /* Estilos adicionales para la sección Since y Contáctanos */
         .footer-contact {
             text-align: center;
@@ -404,7 +426,7 @@
             // Si el paquete está retirado, mostrar el botón "Agregar"
             if (packageData.status === 'Paquete Retirado') {
                 buttonHtml = `
-                    <button class="action-button" onclick="addToMisEnvios('${packageData.trackingNumber}')">
+                    <button class="add-button" onclick="addToMisEnvios('${packageData.trackingNumber}')">
                         <i class="fas fa-plus"></i>
                         Agregar a Mis Envíos
                     </button>
@@ -476,5 +498,6 @@
     </script>
 </body>
 </html>
+
 
 
