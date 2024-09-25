@@ -233,26 +233,28 @@
             text-align: center;
         }
 
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            position: relative;
-            width: 80%;
-            max-width: 500px;
-        }
+       .input-wrapper {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;
+    margin-bottom: 15px;
+    position: relative;
+    width: 100%; /* Asegura que el contenedor tome el 100% del ancho disponible */
+}
 
-        .input-wrapper input {
-            width: calc(100% - 40px);
-            padding: 8px 10px 8px 40px;
-            border: 2px solid #EDE309;
-            border-radius: 10px;
-            background-color: #E8E8E8;
-            color: #333;
-            font-size: 14px;
-            font-weight: bold;
-            box-sizing: border-box;
-        }
+.input-wrapper input {
+    width: 80%; /* Ajusta este valor si quieres que el campo sea más o menos ancho */
+    max-width: 500px; /* Limita el ancho máximo */
+    padding: 8px 10px;
+    border: 2px solid #EDE309;
+    border-radius: 10px;
+    background-color: #E8E8E8;
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
 
         .button-group {
             display: flex;
