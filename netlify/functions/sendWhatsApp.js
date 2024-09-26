@@ -10,26 +10,17 @@ exports.handler = async function(event, context) {
     const { to, trackingNumber, nombreCliente, destino, valor } = data;
 
     try {
+        // Enviar mensaje usando la plantilla aprobada
         const message = await client.messages.create({
-            from: 'whatsapp:+50369228310', // Número de WhatsApp de Estrada Encomiendas
-            to: `whatsapp:${to}`, // Número del destinatario
-            template: {
-                name: 'notificacion_paquete', // Nombre de la plantilla aprobada
-                language: {
-                    code: 'es' // Lenguaje en el que fue aprobada la plantilla
-                },
-                components: [
-                    {
-                        type: 'body',
-                        parameters: [
-                            { type: 'text', text: trackingNumber }, // Variable 1
-                            { type: 'text', text: nombreCliente },  // Variable 2
-                            { type: 'text', text: destino },        // Variable 3
-                            { type: 'text', text: valor }           // Variable 4
-                        ]
-                    }
-                ]
-            }
+            from: 'whatsapp:+50369228310', // Número de WhatsApp de Twilio
+            to: `whatsapp:${to}`, // Número de la vendedora en formato de WhatsApp
+            contentSid: 'HXaa47c3432408116e5941f4fe37a809c5', // SID de la plantilla
+            contentVariables: JSON.stringify({
+                '1': trackingNumber,     // Variable 1 es el número de seguimiento
+                '2': nombreCliente,      // Variable 2 es el nombre de la clienta
+                '3': destino,            // Variable 3 es el destino
+                '4': valor               // Variable 4 es el valor del paquete
+            })
         });
 
         return {
