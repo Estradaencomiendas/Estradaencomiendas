@@ -11,9 +11,25 @@ exports.handler = async function(event, context) {
 
     try {
         const message = await client.messages.create({
-            body: `Hola ${nombreCliente}, tu paquete con destino a ${destino} ha sido registrado con el número de seguimiento ${trackingNumber}. Valor: $${valor}`,
-            from: 'whatsapp:+50369228310', // Número de WhatsApp de tu empresa
-            to: `whatsapp:${to}` // Número de la vendedora en formato de WhatsApp
+            from: 'whatsapp:+50369228310', // Número de WhatsApp de Estrada Encomiendas
+            to: `whatsapp:${to}`, // Número del destinatario
+            template: {
+                name: 'notificacion_paquete', // Nombre de la plantilla aprobada
+                language: {
+                    code: 'es' // Lenguaje en el que fue aprobada la plantilla
+                },
+                components: [
+                    {
+                        type: 'body',
+                        parameters: [
+                            { type: 'text', text: trackingNumber }, // Variable 1
+                            { type: 'text', text: nombreCliente },  // Variable 2
+                            { type: 'text', text: destino },        // Variable 3
+                            { type: 'text', text: valor }           // Variable 4
+                        ]
+                    }
+                ]
+            }
         });
 
         return {
