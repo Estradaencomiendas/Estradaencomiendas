@@ -222,69 +222,69 @@
     </div>
 
     <script>
-        document.getElementById('package-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
+       document.getElementById('package-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-            const nombreCliente = document.getElementById('nombreCliente').value;
-            const nombrePaquete = document.getElementById('nombrePaquete').value;
-            const destino = document.getElementById('destino').value;
-            const diaEntrega = document.getElementById('dia-entrega').value;
-            const valor = document.getElementById('valor').value;
-            const valorEnvio = document.getElementById('valorEnvio').value;
-            const telefonoVendedora = '+503' + document.getElementById('telefonoVendedora').value;
+    const nombreCliente = document.getElementById('nombreCliente').value;
+    const nombrePaquete = document.getElementById('nombrePaquete').value;
+    const destino = document.getElementById('destino').value;
+    const diaEntrega = document.getElementById('dia-entrega').value;
+    const valor = document.getElementById('valor').value;
+    const valorEnvio = document.getElementById('valorEnvio').value;
+    const telefonoVendedora = '+503' + document.getElementById('telefonoVendedora').value;
 
-            const fechaEnvio = new Date().toISOString().split('T')[0];
-            const trackingNumber = 'PKG-' + Date.now();
+    const fechaEnvio = new Date().toISOString().split('T')[0];
+    const trackingNumber = 'PKG-' + Date.now();
 
-            const user = firebase.auth().currentUser;
+    const user = firebase.auth().currentUser;
 
-            const packageData = {
-                trackingNumber,
-                nombreCliente,
-                nombrePaquete,
-                destino,
-                diaEntrega,
-                valor,
-                valorEnvio,
-                fechaEnvio,
-                status: "En Ruta", // Estado inicial como "En Ruta"
-                recepcionadoPor: user ? user.uid : 'Desconocido'
-            };
+    const packageData = {
+        trackingNumber,
+        nombreCliente,
+        nombrePaquete,
+        destino,
+        diaEntrega,
+        valor,
+        valorEnvio,
+        fechaEnvio,
+        status: "En Ruta", 
+        recepcionadoPor: user ? user.uid : 'Desconocido'
+    };
 
-            try {
-                // Guardar en Firestore
-                await db.collection('paquetes').doc(trackingNumber).set(packageData);
-                console.log('Paquete guardado en Firestore con estado "En Ruta".');
+    try {
+        // Guardar en Firestore
+        await db.collection('paquetes').doc(trackingNumber).set(packageData);
 
-                // Enviar mensaje de texto a través de Netlify Functions
-                const response = await fetch('/.netlify/functions/sendSms', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        to: telefonoVendedora,
-                        trackingNumber: trackingNumber,
-                        nombreCliente: nombreCliente,
-                        destino: destino,
-                        valor: valor
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error enviando el SMS');
-                }
-
-                const result = await response.json();
-                console.log('SMS enviado con éxito:', result);
-
-                alert('Datos ingresados con éxito y mensaje enviado');
-                window.location.href = `resultados.html?trackingNumber=${trackingNumber}&fechaEnvio=${fechaEnvio}`;
-            } catch (error) {
-                console.error('Error al guardar el paquete o enviar el mensaje:', error);
-                alert('Hubo un error al procesar la solicitud. Por favor, intenta de nuevo.');
-            }
+        // Enviar mensaje de WhatsApp a través de Netlify Functions
+        const response = await fetch('/.netlify/functions/sendWhatsApp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                to: telefonoVendedora,
+                trackingNumber: trackingNumber,
+                nombreCliente: nombreCliente,
+                destino: destino,
+                valor: valor
+            })
         });
+
+        if (!response.ok) {
+            throw new Error('Error enviando el mensaje de WhatsApp');
+        }
+
+        const result = await response.json();
+        console.log('Mensaje de WhatsApp enviado con éxito:', result);
+
+        alert('Datos ingresados con éxito y mensaje de WhatsApp enviado');
+        window.location.href = `resultados.html?trackingNumber=${trackingNumber}&fechaEnvio=${fechaEnvio}`;
+    } catch (error) {
+        console.error('Error al guardar el paquete o enviar el mensaje:', error);
+        alert('Hubo un error al procesar la solicitud. Por favor, intenta de nuevo.');
+    }
+});
+
     </script>
 </body>
 </html>
