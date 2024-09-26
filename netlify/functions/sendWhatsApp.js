@@ -12,7 +12,7 @@ exports.handler = async function(event, context) {
     try {
         const message = await client.messages.create({
             body: `Hola ${nombreCliente}, tu paquete con destino a ${destino} ha sido registrado con el número de seguimiento ${trackingNumber}. Valor: $${valor}`,
-            from: 'whatsapp:+14155238886', // Número de WhatsApp de Twilio
+            from: 'whatsapp:+50369228310', // Número de WhatsApp de tu empresa
             to: `whatsapp:${to}` // Número de la vendedora en formato de WhatsApp
         });
 
