@@ -170,9 +170,46 @@
             color: #007bff;
             text-align: center;
         }
+
+        /* Botón de retroceso */
+        .back-button-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+        }
+
+        .back-button {
+            background-color: #F39200;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: 'Acumin Variable Concept', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #dc3545;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
+
+    <!-- Botón de retroceso -->
+    <div class="back-button-container">
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Volver
+        </button>
+    </div>
+
     <div class="container">
         <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
         <h1>Recepción de Paquetes</h1>
@@ -286,6 +323,10 @@
     }
 });
 
+    // Función de retroceso
+    function goBack() {
+        window.history.back();
+    }
     </script>
 </body>
 </html>
