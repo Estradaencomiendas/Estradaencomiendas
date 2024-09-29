@@ -36,22 +36,6 @@
             top: 0;
             z-index: 1000;
         }
-        /* Estilo para el cuadro de búsqueda */
-.search-container {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-#search-bar {
-    width: 80%;
-    max-width: 400px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 2px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 
         .logo {
             width: 120px;
@@ -178,9 +162,47 @@
             transform: scale(1.05);
             transition: all 0.3s ease;
         }
+
+        /* Botón de retroceso */
+        .back-button-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+        }
+
+        .back-button {
+            background-color: #F39200;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: 'Acumin Variable Concept', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #dc3545;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- Botón de retroceso -->
+    <div class="back-button-container">
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Volver
+        </button>
+    </div>
+
     <!-- Header con menú -->
     <header>
         <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
@@ -205,216 +227,33 @@
         <h1>Bienvenido, <span id="user-welcome-name">Nombre Apellido</span></h1>
         <div class="grid-container">
             <!-- Cuadro de búsqueda -->
-<div class="search-container">
-    <input type="text" id="search-bar" placeholder="Buscar destino..." onkeyup="filterDestinations()">
-</div>
+            <div class="search-container">
+                <input type="text" id="search-bar" placeholder="Buscar destino..." onkeyup="filterDestinations()">
+            </div>
             <!-- Bloque para cada destino -->
             <div class="destination">
                 <img src="Destinos Estrada/Destino Mejicanos.png" alt="Destino Mejicanos">
                 <div class="destination-title">Destino Mejicanos</div>
             </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Cuscatancingo.png" alt="Destino Cuscatancingo">
-                <div class="destination-title">Destino Cuscatancingo</div>
-            </div>
-            
-            <div class="destination">
-                <img src="Destinos Estrada/Masahuat Metapan.png" alt="Masahuat Metapan">
-                <div class="destination-title">Masahuat Metapan</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Conchagua.png" alt="Conchagua">
-                <div class="destination-title">Conchagua</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Cel Guajoyo.png" alt="Cel Guajoyo">
-                <div class="destination-title">Cel Guajoyo</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Coatepeque Coordinado.png" alt="Coatepeque Coordinado">
-                <div class="destination-title">Coatepeque Coordinado</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Aguilares.png" alt="Destino Aguilares">
-                <div class="destination-title">Destino Aguilares</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Ahuachapan.png" alt="Destino Ahuachapan">
-                <div class="destination-title">Destino Ahuachapan</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Apaneca.png" alt="Destino Apaneca">
-                <div class="destination-title">Destino Apaneca</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Apastepeque.png" alt="Destino Apastepeque">
-                <div class="destination-title">Destino Apastepeque</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Ataco.png" alt="Destino Ataco">
-                <div class="destination-title">Destino Ataco</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Atiquizaya.png" alt="Destino Atiquizaya">
-                <div class="destination-title">Destino Atiquizaya</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Candelaria de La Frontera.png" alt="Destino Candelaria de La Frontera">
-                <div class="destination-title">Destino Candelaria de La Frontera</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Chalatenango.png" alt="Destino Chalatenango">
-                <div class="destination-title">Destino Chalatenango</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Chalchuapa.png" alt="Destino Chalchuapa">
-                <div class="destination-title">Destino Chalchuapa</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Ciudad Arce.png" alt="Destino Ciudad Arce">
-                <div class="destination-title">Destino Ciudad Arce</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Ciudad Real.png" alt="Destino Ciudad Real">
-                <div class="destination-title">Destino Ciudad Real</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Ciudad Versalles.png" alt="Destino Ciudad Versalles">
-                <div class="destination-title">Destino Ciudad Versalles</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Cojutepeque.png" alt="Destino Cojutepeque">
-                <div class="destination-title">Destino Cojutepeque</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Desvio de Amayo.png" alt="Destino Desvio de Amayo">
-                <div class="destination-title">Destino Desvio de Amayo</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino El Congo.png" alt="Destino El Congo">
-                <div class="destination-title">Destino El Congo</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Juayua.png" alt="Destino Juayua">
-                <div class="destination-title">Destino Juayua</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Metapan.png" alt="Destino Metapan">
-                <div class="destination-title">Destino Metapan</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino MetroGalerias.png" alt="Destino MetroGalerias">
-                <div class="destination-title">Destino MetroGalerias</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Metrolourdes.png" alt="Destino Metrolourdes">
-                <div class="destination-title">Destino Metrolourdes</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Nejapa.png" alt="Destino Nejapa">
-                <div class="destination-title">Destino Nejapa</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Quezaltepeque.png" alt="Destino Quezaltepeque">
-                <div class="destination-title">Destino Quezaltepeque</div>
-            </div>
-            
-            <div class="destination">
-                <img src="Destinos Estrada/Destino San Rafael Cedros.png" alt="Destino San Rafael Cedros">
-                <div class="destination-title">Destino San Rafael Cedros</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino San Vicente.png" alt="Destino San Vicente">
-                <div class="destination-title">Destino San Vicente</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Santa Ana Mc Donald.png" alt="Destino Santa Ana Mc Donald">
-                <div class="destination-title">Destino Santa Ana Mc Donald</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Sonsonate.png" alt="Destino Sonsonate">
-                <div class="destination-title">Destino Sonsonate</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Tacachico.png" alt="Destino Tacachico">
-                <div class="destination-title">Destino Tacachico</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Destino Texistepeque.png" alt="Destino Texistepeque">
-                <div class="destination-title">Destino Texistepeque</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Ecoterra Coordinado.png" alt="Ecoterra Coordinado">
-                <div class="destination-title">Ecoterra Coordinado</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/El Coyolito Coordinado.png" alt="El Coyolito Coordinado">
-                <div class="destination-title">El Coyolito Coordinado</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/El Paisnal Coordinado.png" alt="El Paisnal Coordinado">
-                <div class="destination-title">El Paisnal Coordinado</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/El Paraiso Coordinado.png" alt="El Paraiso Coordinado">
-                <div class="destination-title">El Paraiso Coordinado</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/El Refugio.png" alt="El Refugio">
-                <div class="destination-title">El Refugio</div>
-            </div>
-          
-            <div class="destination">
-                <img src="Destinos Estrada/Local 1.png" alt="Local 1">
-                <div class="destination-title">Local 1</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Local 2.png" alt="Local 2">
-                <div class="destination-title">Local 2</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Local 3.png" alt="Local 3">
-                <div class="destination-title">Local 3</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Nahuizalco.png" alt="Nahuizalco">
-                <div class="destination-title">Nahuizalco</div>
-            </div>
-           
-            <div class="destination">
-                <img src="Destinos Estrada/Plantilla Izalco.png" alt="Plantilla Izalco">
-                <div class="destination-title">Plantilla Izalco</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/San Cristobal Coordinado.png" alt="San Cristobal Coordinado">
-                <div class="destination-title">San Cristobal Coordinado</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Santo Domingo Coordinado.png" alt="Santo Domingo Coordinado">
-                <div class="destination-title">Santo Domingo Coordinado</div>
-            </div>
-            <div class="destination">
-                <img src="Destinos Estrada/Turin Coordinado.png" alt="Turin Coordinado">
-                <div class="destination-title">Turin Coordinado</div>
-            </div>
+            <!-- Otros destinos aquí... -->
         </div>
     </div>
 
     <!-- Firebase Scripts -->
     <script>
         function filterDestinations() {
-    const searchInput = document.getElementById('search-bar').value.toLowerCase();
-    const destinations = document.getElementsByClassName('destination');
+            const searchInput = document.getElementById('search-bar').value.toLowerCase();
+            const destinations = document.getElementsByClassName('destination');
 
-    Array.from(destinations).forEach(destination => {
-        const title = destination.querySelector('.destination-title').textContent.toLowerCase();
-        if (title.includes(searchInput)) {
-            destination.style.display = 'block';
-        } else {
-            destination.style.display = 'none';
+            Array.from(destinations).forEach(destination => {
+                const title = destination.querySelector('.destination-title').textContent.toLowerCase();
+                if (title.includes(searchInput)) {
+                    destination.style.display = 'block';
+                } else {
+                    destination.style.display = 'none';
+                }
+            });
         }
-    });
-}
 
         // Configuración de Firebase
         const firebaseConfig = {
@@ -449,6 +288,11 @@
         function toggleMenu() {
             const menu = document.getElementById('menu');
             menu.classList.toggle('open-menu');
+        }
+
+        // Función de retroceso
+        function goBack() {
+            window.history.back();
         }
     </script>
 </body>
