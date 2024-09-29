@@ -296,6 +296,35 @@
             font-family: 'Acumin Variable Concept', sans-serif; /* Aplicado aquí */
         }
 
+        /* Botón de retroceso */
+        .back-button-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001; /* Asegura que esté encima de otros elementos */
+        }
+
+        .back-button {
+            background-color: #FFD700;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: 'Acumin Variable Concept', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #F39200;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .logo {
@@ -338,6 +367,13 @@
         <img src="Logo.png" alt="Logo Estrada Encomiendas" class="logo">
         <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
     </header>
+
+    <!-- Botón de retroceso -->
+    <div class="back-button-container">
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Volver
+        </button>
+    </div>
 
     <nav id="menu">
         <div class="menu-header">
@@ -460,6 +496,11 @@
             } else {
                 menu.classList.add('open-menu');
             }
+        }
+
+        // Función de retroceso
+        function goBack() {
+            window.history.back();
         }
     </script>
 </body>
