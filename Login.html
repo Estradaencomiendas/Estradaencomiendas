@@ -218,6 +218,13 @@
                     const firstName = userData.firstName;
                     const lastName = userData.lastName;
 
+                    // Depurar antes de redirigir
+                    console.log('Role:', role);
+                    console.log('First Name:', firstName);
+                    console.log('Last Name:', lastName);
+
+                    // Comentar la redirección por ahora para depuración
+                    /*
                     // Redirigir según el rol
                     if (role === 'admin1') {
                         window.location.href = 'Admin 1.html';  // Redirigir a la página Admin 1
@@ -226,6 +233,7 @@
                     } else {
                         window.location.href = 'Usuario.html';  // Redirigir a la página Usuario
                     }
+                    */
                 } else {
                     console.error('No se encontró el documento del usuario en Firestore');
                     alert('No se encontraron datos del usuario.');
