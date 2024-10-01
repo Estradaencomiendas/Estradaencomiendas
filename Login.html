@@ -204,39 +204,24 @@
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
-                // Mostrar los datos del usuario autenticado en la consola
-                console.log('Datos de autenticación:', userCredential);
-                console.log('ID del usuario autenticado:', user.uid);
-
                 // Obtener el rol, firstName y lastName del usuario desde Firestore
                 const userDoc = await db.collection('users').doc(user.uid).get();
-                
                 if (userDoc.exists) {
                     const userData = userDoc.data();
-                    console.log('Datos de Firestore:', userData);
                     const role = userData.role;
                     const firstName = userData.firstName;
                     const lastName = userData.lastName;
 
-                    // Depurar antes de redirigir
-                    console.log('Role:', role);
-                    console.log('First Name:', firstName);
-                    console.log('Last Name:', lastName);
-
-                    // Comentar la redirección por ahora para depuración
-                    /*
                     // Redirigir según el rol
                     if (role === 'admin1') {
                         window.location.href = 'Admin 1.html';  // Redirigir a la página Admin 1
                     } else if (role === 'admin0') {
                         window.location.href = 'Admin 0.html';  // Redirigir a la página Admin 0
                     } else {
-                        window.location.href = 'Usuario.html';  // Redirigir a la página Usuario
+                        window.location.href = 'Usuario.html';  // Redirigir a la página Usuario0
                     }
-                    */
                 } else {
                     console.error('No se encontró el documento del usuario en Firestore');
-                    alert('No se encontraron datos del usuario.');
                 }
             } catch (error) {
                 console.error('Error al iniciar sesión:', error.message);
@@ -251,4 +236,3 @@
     </script>
 </body>
 </html>
-
