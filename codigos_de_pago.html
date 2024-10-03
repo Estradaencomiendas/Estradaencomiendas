@@ -204,15 +204,15 @@
                     const rowClass = packageData.status === 'Pagado' ? 'paid-row' : ''; // Aplicar clase si está pagado
                     paymentTableBody.innerHTML += `
                         <tr class="${rowClass}">
-                            <td>${packageData.trackingNumber}</td>
-                            <td>${packageData.nombreCliente}</td>
-                            <td>${packageData.nombrePagina}</td>
-                            <td>${packageData.destino}</td>
-                            <td>$${packageData.valor}</td>
-                            <td>${packageData.fechaEnvio}</td>
-                            <td>${packageData.fechaEntrega}</td>
-                            <td>${packageData.paymentCode}</td>
-                            <td>${packageData.status}</td>
+                            <td>${packageData.trackingNumber ?? 'No disponible'}</td>
+                            <td>${packageData.nombreCliente ?? 'No disponible'}</td>
+                            <td>${packageData.nombrePagina ?? 'No disponible'}</td>
+                            <td>${packageData.destino ?? 'No disponible'}</td>
+                            <td>$${packageData.valor ?? 'No disponible'}</td>
+                            <td>${packageData.fechaEnvio ?? 'No disponible'}</td>
+                            <td>${packageData.fechaEntrega ?? 'No disponible'}</td>
+                            <td>${packageData.paymentCode ?? 'No disponible'}</td>
+                            <td>${packageData.status ?? 'No disponible'}</td>
                         </tr>
                     `;
                 });
@@ -282,15 +282,15 @@
                 const rowClass = pkg.status === 'Pagado' ? 'paid-row' : '';
                 paymentTableBody.innerHTML += `
                     <tr class="${rowClass}">
-                        <td>${pkg.trackingNumber}</td>
-                        <td>${pkg.nombreCliente}</td>
-                        <td>${pkg.nombrePagina}</td>
-                        <td>${pkg.destino}</td>
-                        <td>$${pkg.valor}</td>
-                        <td>${pkg.fechaEnvio}</td>
-                        <td>${pkg.fechaEntrega}</td>
-                        <td>${pkg.paymentCode}</td>
-                        <td>${pkg.status}</td>
+                        <td>${pkg.trackingNumber ?? 'No disponible'}</td>
+                        <td>${pkg.nombreCliente ?? 'No disponible'}</td>
+                        <td>${pkg.nombrePagina ?? 'No disponible'}</td>
+                        <td>${pkg.destino ?? 'No disponible'}</td>
+                        <td>$${pkg.valor ?? 'No disponible'}</td>
+                        <td>${pkg.fechaEnvio ?? 'No disponible'}</td>
+                        <td>${pkg.fechaEntrega ?? 'No disponible'}</td>
+                        <td>${pkg.paymentCode ?? 'No disponible'}</td>
+                        <td>${pkg.status ?? 'No disponible'}</td>
                     </tr>
                 `;
             });
