@@ -206,11 +206,11 @@
                         <tr class="${rowClass}">
                             <td>${packageData.trackingNumber}</td>
                             <td>${packageData.nombreCliente}</td>
-                            <td>${packageData.nombrePaquete}</td>
+                            <td>${packageData.nombrePagina}</td>
                             <td>${packageData.destino}</td>
                             <td>$${packageData.valor}</td>
                             <td>${packageData.fechaEnvio}</td>
-                            <td>${packageData.diaEntrega}</td>
+                            <td>${packageData.fechaEntrega}</td>
                             <td>${packageData.paymentCode}</td>
                             <td>${packageData.status}</td>
                         </tr>
@@ -258,7 +258,7 @@
                 const filteredShipments = [];
                 querySnapshot.forEach(doc => {
                     const packageData = doc.data();
-                    if (packageData.paymentCode.toLowerCase().includes(searchInput) || packageData.nombrePaquete.toLowerCase().includes(searchInput)) {
+                    if (packageData.paymentCode.toLowerCase().includes(searchInput) || packageData.nombrePagina.toLowerCase().includes(searchInput)) {
                         filteredShipments.push(packageData);
                     }
                 });
@@ -284,11 +284,11 @@
                     <tr class="${rowClass}">
                         <td>${pkg.trackingNumber}</td>
                         <td>${pkg.nombreCliente}</td>
-                        <td>${pkg.nombrePaquete}</td>
+                        <td>${pkg.nombrePagina}</td>
                         <td>${pkg.destino}</td>
                         <td>$${pkg.valor}</td>
                         <td>${pkg.fechaEnvio}</td>
-                        <td>${pkg.diaEntrega}</td>
+                        <td>${pkg.fechaEntrega}</td>
                         <td>${pkg.paymentCode}</td>
                         <td>${pkg.status}</td>
                     </tr>
@@ -298,4 +298,3 @@
     </script>
 </body>
 </html>
-
