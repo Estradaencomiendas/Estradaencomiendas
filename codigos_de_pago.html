@@ -273,22 +273,26 @@
             try {
                 const querySnapshot = await db.collection('paquetes').where('paymentCode', '!=', '').get();
                 const filteredShipments = [];
+                let totalValue = 0;
                 querySnapshot.forEach(doc => {
                     const packageData = doc.data();
                     if (packageData.paymentCode.toLowerCase().includes(searchInput) ||
                         packageData.trackingNumber.toLowerCase().includes(searchInput) ||
                         packageData.nombrePaquete.toLowerCase().includes(searchInput)) {
                         filteredShipments.push(packageData);
+                        if (packageData.status !== 'Pagado') {
+                            totalValue += parseFloat(packageData.valor ?? 0);
+                        }
                     }
                 });
-                displayShipments(filteredShipments);
+                displayShipments(filteredShipments, totalValue);
             } catch (error) {
                 console.error("Error buscando paquetes:", error);
             }
         });
 
         // Mostrar los paquetes filtrados
-        function displayShipments(shipments) {
+        function displayShipments(shipments, totalValue) {
             const paymentTableBody = document.getElementById('payment-table-body');
             paymentTableBody.innerHTML = '';
 
@@ -297,8 +301,11 @@
                 return;
             }
 
+            let allPaid = true;
+
             shipments.forEach(pkg => {
                 const rowClass = pkg.status === 'Pagado' ? 'paid-row' : '';
+                allPaid = allPaid && pkg.status === 'Pagado';
                 paymentTableBody.innerHTML += `
                     <tr class="${rowClass}">
                         <td>${pkg.trackingNumber ?? 'No disponible'}</td>
@@ -313,7 +320,21 @@
                     </tr>
                 `;
             });
+
+            // Mostrar el total y el botón de pago si es necesario
+            if (!allPaid) {
+                paymentTableBody.innerHTML += `
+                    <tr>
+                        <td colspan="9" style="text-align: right;"><strong>Total de los paquetes: $${totalValue.toFixed(2)}</strong>
+                            <button class="pay-button" onclick="markAsPaid('${shipments[0].paymentCode}')">Pagado</button>
+                        </td>
+                    </tr>
+                `;
+            }
         }
     </script>
+</body>
+</html>
+
 </body>
 </html>
