@@ -149,7 +149,7 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            apiKey: "AIzaSyArUFYUqobSmqu0Em_Z4EbIOZKGF1mRHh4",
             authDomain: "estradaencomiendas0.firebaseapp.com",
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
@@ -239,21 +239,53 @@
             }
         }
 
-        // Marcar como pagado todos los paquetes con el mismo código de pago
+        // Marcar como pagado todos los paquetes con el mismo código de pago y enviar notificación
         async function markAsPaid(paymentCode) {
             try {
                 const querySnapshot = await db.collection('paquetes').where('paymentCode', '==', paymentCode).get();
 
                 querySnapshot.forEach(async (doc) => {
+                    const packageData = doc.data();
                     await db.collection('paquetes').doc(doc.id).update({
                         status: 'Pagado'
                     });
+
+                    // Enviar notificación push
+                    await sendPushNotification(packageData.trackingNumber);
                 });
 
                 loadPaymentCodes(); // Recargar la tabla después de actualizar el estado
             } catch (error) {
                 console.error("Error marcando como pagado:", error);
                 alert('Ocurrió un error marcando los paquetes como pagados.');
+            }
+        }
+
+        // Función para enviar notificación push con el número de seguimiento
+        async function sendPushNotification(trackingNumber) {
+            try {
+                const message = {
+                    notification: {
+                        title: 'Pago recibido',
+                        body: `Tu paquete con número de seguimiento ${trackingNumber} ha sido Pagado.`,
+                    },
+                    topic: 'pagos'
+                };
+
+                const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'key=TU_KEY_FCM'  // Reemplaza TU_KEY_FCM con tu API Key de FCM
+                    },
+                    body: JSON.stringify(message)
+                });
+
+                if (!response.ok) {
+                    console.error('Error enviando la notificación:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error enviando la notificación:', error);
             }
         }
 
@@ -315,7 +347,8 @@
                         <td>$${pkg.valor ?? 'No disponible'}</td>
                         <td>${pkg.fechaEnvio ?? 'No disponible'}</td>
                         <td>${pkg.diaEntrega ?? 'No disponible'}</td>
-                        <td>${pkg.paymentCode ?? 'No disponible'}</td>
+                        <td>${pkg.paymentCode ??Aquí te dejo el resto del código:
+                        </td>
                         <td>${pkg.status ?? 'No disponible'}</td>
                     </tr>
                 `;
@@ -333,8 +366,5 @@
             }
         }
     </script>
-</body>
-</html>
-
 </body>
 </html>
