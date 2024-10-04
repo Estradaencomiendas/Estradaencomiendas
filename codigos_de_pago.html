@@ -145,9 +145,7 @@
             </tbody>
         </table>
     </div>
-
     <script>
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyArUFYUqobSmqu0Em_Z4EbIOZKGF1mRHh4",
             authDomain: "estradaencomiendas0.firebaseapp.com",
@@ -158,15 +156,13 @@
             measurementId: "G-BRMC9FZBC"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Función para cargar los paquetes agrupados por código de pago
         async function loadPaymentCodes() {
             const paymentTableBody = document.getElementById('payment-table-body');
-            paymentTableBody.innerHTML = ''; // Limpiar la tabla
+            paymentTableBody.innerHTML = '';
 
             try {
                 const querySnapshot = await db.collection('paquetes').where('paymentCode', '!=', '').get();
@@ -199,8 +195,8 @@
                     let allPaid = true;
 
                     group.packages.forEach(packageData => {
-                        const rowClass = packageData.status === 'Pagado' ? 'paid-row' : '';
-                        allPaid = allPaid && packageData.status === 'Pagado'; // Verificar si todos están pagados
+                        const rowClass = packageData.status === 'Pagado' ? 'status-paid' : '';
+                        allPaid = allPaid && packageData.status === 'Pagado';
 
                         paymentTableBody.innerHTML += `
                             <tr class="${rowClass}">
@@ -217,19 +213,12 @@
                         `;
                     });
 
-                    // Solo mostrar el botón de pagado si al menos uno no está pagado
                     if (!allPaid) {
                         paymentTableBody.innerHTML += `
                             <tr>
                                 <td colspan="9" style="text-align: right;"><strong>Total del Código de Pago ${paymentCode}: $${group.totalValue.toFixed(2)}</strong>
                                     <button class="pay-button" onclick="markAsPaid('${paymentCode}')">Pagado</button>
                                 </td>
-                            </tr>
-                        `;
-                    } else {
-                        paymentTableBody.innerHTML += `
-                            <tr>
-                                <td colspan="9" style="text-align: right;"><strong>Total del Código de Pago ${paymentCode}: $${group.totalValue.toFixed(2)}</strong> - Todos pagados</td>
                             </tr>
                         `;
                     }
@@ -239,7 +228,6 @@
             }
         }
 
-        // Marcar como pagado todos los paquetes con el mismo código de pago y enviar notificación
         async function markAsPaid(paymentCode) {
             try {
                 const querySnapshot = await db.collection('paquetes').where('paymentCode', '==', paymentCode).get();
@@ -250,18 +238,16 @@
                         status: 'Pagado'
                     });
 
-                    // Enviar notificación push
                     await sendPushNotification(packageData.trackingNumber);
                 });
 
-                loadPaymentCodes(); // Recargar la tabla después de actualizar el estado
+                loadPaymentCodes();
             } catch (error) {
                 console.error("Error marcando como pagado:", error);
                 alert('Ocurrió un error marcando los paquetes como pagados.');
             }
         }
 
-        // Función para enviar notificación push con el número de seguimiento
         async function sendPushNotification(trackingNumber) {
             try {
                 const message = {
@@ -276,7 +262,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'key=TU_KEY_FCM'  // Reemplaza TU_KEY_FCM con tu API Key de FCM
+                        'Authorization': 'key=TU_KEY_FCM'
                     },
                     body: JSON.stringify(message)
                 });
@@ -289,16 +275,14 @@
             }
         }
 
-        // Verificación de autenticación y cargar los códigos de pago
         auth.onAuthStateChanged((user) => {
             if (user) {
-                loadPaymentCodes(); // Cargar todos los paquetes
+                loadPaymentCodes();
             } else {
-                window.location.href = 'login.html'; // Redirigir si no está autenticado
+                window.location.href = 'login.html';
             }
         });
 
-        // Búsqueda por código de pago, número de seguimiento o nombre de página
         document.getElementById('search-button').addEventListener('click', async function() {
             const searchInput = document.getElementById('search-input').value.toLowerCase();
 
@@ -323,7 +307,6 @@
             }
         });
 
-        // Mostrar los paquetes filtrados
         function displayShipments(shipments, totalValue) {
             const paymentTableBody = document.getElementById('payment-table-body');
             paymentTableBody.innerHTML = '';
@@ -348,13 +331,11 @@
                         <td>${pkg.fechaEnvio ?? 'No disponible'}</td>
                         <td>${pkg.diaEntrega ?? 'No disponible'}</td>
                         <td>${pkg.paymentCode ?? 'No disponible'}</td>
-                        </td>
                         <td>${pkg.status ?? 'No disponible'}</td>
                     </tr>
                 `;
             });
 
-            // Mostrar el total y el botón de pago si es necesario
             if (!allPaid) {
                 paymentTableBody.innerHTML += `
                     <tr>
