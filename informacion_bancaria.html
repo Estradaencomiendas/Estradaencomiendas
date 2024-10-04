@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-messaging-compat.js"></script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -122,7 +123,7 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            apiKey: "TU_API_KEY",
             authDomain: "estradaencomiendas0.firebaseapp.com",
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
@@ -135,7 +136,27 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
+        const messaging = firebase.messaging();
+        
+        // Función para enviar notificación push
+        async function sendPushNotification(trackingNumber) {
+            const message = {
+                notification: {
+                    title: 'Pago recibido',
+                    body: `Tu paquete con número de seguimiento ${trackingNumber} ha sido pagado.`,
+                },
+                topic: 'pagos'
+            };
 
+            await fetch('https://fcm.googleapis.com/fcm/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'key=TU_KEY_FCM' // Reemplaza TU_KEY_FCM con tu clave de FCM
+                },
+                body: JSON.stringify(message)
+            });
+        }
         // Cargar la información bancaria desde Firestore
         async function loadBankInfo() {
             const trackingNumber = sessionStorage.getItem('trackingNumber');
@@ -147,7 +168,8 @@
 
             try {
                 // Buscar el depósito bancario relacionado con el número de seguimiento
-                const bankDepositSnapshot = await db.collection('bankDeposits').where('trackingNumbers', 'array-contains', trackingNumber).get();
+                const bankDepositSnapshot = await db.collection('bankDeposits')
+                    .where('trackingNumbers', 'array-contains', trackingNumber).get();
 
                 if (bankDepositSnapshot.empty) {
                     document.getElementById('bank-info').innerHTML = `<p>No se encontraron datos para el número de seguimiento: ${trackingNumber}.</p>`;
@@ -173,8 +195,8 @@
             }
         }
 
-        // Función para marcar el depósito como "Pagado"
-        document.getElementById('mark-paid').addEventListener('click', async function() {
+        // Función para marcar el depósito y el paquete como "Pagado"
+        document.getElementById('mark-paid').addEventListener('click', async function () {
             const trackingNumber = sessionStorage.getItem('trackingNumber');
             if (!trackingNumber) {
                 alert('No se encontró el número de seguimiento.');
@@ -182,8 +204,9 @@
             }
 
             try {
-                // Actualizar el estado del depósito y el paquete a "Pagado"
-                const bankDepositSnapshot = await db.collection('bankDeposits').where('trackingNumbers', 'array-contains', trackingNumber).get();
+                // Actualizar el estado del depósito bancario
+                const bankDepositSnapshot = await db.collection('bankDeposits')
+                    .where('trackingNumbers', 'array-contains', trackingNumber).get();
                 if (!bankDepositSnapshot.empty) {
                     bankDepositSnapshot.forEach(async (doc) => {
                         await db.collection('bankDeposits').doc(doc.id).update({
@@ -192,12 +215,17 @@
                     });
                 }
 
-                const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                // Actualizar el estado del paquete a "Pagado"
+                const packageSnapshot = await db.collection('paquetes')
+                    .where('trackingNumber', '==', trackingNumber).get();
                 if (!packageSnapshot.empty) {
                     packageSnapshot.forEach(async (doc) => {
                         await db.collection('paquetes').doc(doc.id).update({
                             status: 'Pagado'
                         });
+
+                        // Enviar notificación push
+                        await sendPushNotification(trackingNumber);
                     });
                 }
 
@@ -209,11 +237,10 @@
             }
         });
 
-        // Cargar la información bancaria cuando se cargue la página
-        document.addEventListener('DOMContentLoaded', function() {
+        // Cargar la información bancaria al cargar la página
+        document.addEventListener('DOMContentLoaded', function () {
             loadBankInfo();
         });
     </script>
 </body>
 </html>
-
