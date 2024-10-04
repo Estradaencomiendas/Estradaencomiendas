@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-messaging-compat.js"></script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -117,20 +116,13 @@
             <!-- Aquí se mostrará la información bancaria -->
         </div>
 
-        <button id="mark-paid" class="pay-button" style="display: none;">Marcar como Pagado</button>
-
-        <div id="login-container" style="display: none;">
-            <h2>Iniciar Sesión</h2>
-            <input type="email" id="login-email" placeholder="Correo Electrónico">
-            <input type="password" id="login-password" placeholder="Contraseña">
-            <button id="login-button">Iniciar Sesión</button>
-        </div>
+        <button id="mark-paid" class="pay-button">Marcar como Pagado</button>
     </div>
 
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
             authDomain: "estradaencomiendas0.firebaseapp.com",
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
@@ -143,56 +135,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const messaging = firebase.messaging();
-        
-        // Función para enviar notificación push
-        async function sendPushNotification(trackingNumber) {
-            const message = {
-                notification: {
-                    title: 'Pago recibido',
-                    body: `Tu paquete con número de seguimiento ${trackingNumber} ha sido pagado.`,
-                },
-                topic: 'pagos'
-            };
-
-            await fetch('https://fcm.googleapis.com/fcm/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'key=TU_KEY_FCM' // Reemplaza TU_KEY_FCM con tu clave de FCM
-                },
-                body: JSON.stringify(message)
-            });
-        }
-
-        // Verificar autenticación
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('login-container').style.display = 'none';
-                document.getElementById('mark-paid').style.display = 'block';
-                loadBankInfo();
-            } else {
-                document.getElementById('login-container').style.display = 'block';
-                document.getElementById('mark-paid').style.display = 'none';
-            }
-        });
-
-        // Función para iniciar sesión
-        document.getElementById('login-button').addEventListener('click', function() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-
-            firebase.auth().signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Sesión iniciada
-                    document.getElementById('login-container').style.display = 'none';
-                    loadBankInfo();
-                })
-                .catch((error) => {
-                    console.error("Error de inicio de sesión:", error);
-                    alert('Error de inicio de sesión: ' + error.message);
-                });
-        });
 
         // Cargar la información bancaria desde Firestore
         async function loadBankInfo() {
@@ -204,14 +146,15 @@
             }
 
             try {
-                const bankDepositSnapshot = await db.collection('bankDeposits')
-                    .where('trackingNumbers', 'array-contains', trackingNumber).get();
+                // Buscar el depósito bancario relacionado con el número de seguimiento
+                const bankDepositSnapshot = await db.collection('bankDeposits').where('trackingNumbers', 'array-contains', trackingNumber).get();
 
                 if (bankDepositSnapshot.empty) {
                     document.getElementById('bank-info').innerHTML = `<p>No se encontraron datos para el número de seguimiento: ${trackingNumber}.</p>`;
                     return;
                 }
 
+                // Mostrar la información bancaria
                 bankDepositSnapshot.forEach(doc => {
                     const deposit = doc.data();
                     document.getElementById('bank-info').innerHTML = `
@@ -220,6 +163,7 @@
                         <p><strong>Institución de Destino:</strong> ${deposit.institution}</p>
                         <p><strong>Número de Cuenta:</strong> ${deposit.accountNumber}</p>
                         <p><strong>Titular de la Cuenta:</strong> ${deposit.accountHolder} ${deposit.accountSurname}</p>
+                        <p><strong>Correo Electrónico:</strong> ${deposit.email || 'N/A'}</p>
                         <p><strong>Monto a Pagar:</strong> $${deposit.amount.toFixed(2)}</p>
                     `;
                 });
@@ -229,8 +173,23 @@
             }
         }
 
-        // Función para marcar el depósito y el paquete como "Pagado"
-        document.getElementById('mark-paid').addEventListener('click', async function () {
+        // Función para enviar notificación a Firestore
+        async function sendNotificationToFirestore(trackingNumber) {
+            try {
+                await db.collection('notifications').add({
+                    title: 'Pago recibido',
+                    body: `El paquete con número de seguimiento ${trackingNumber} ha sido marcado como pagado.`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    trackingNumber: trackingNumber
+                });
+                console.log("Notificación enviada a Firestore");
+            } catch (error) {
+                console.error("Error enviando notificación a Firestore:", error);
+            }
+        }
+
+        // Función para marcar el depósito como "Pagado"
+        document.getElementById('mark-paid').addEventListener('click', async function() {
             const trackingNumber = sessionStorage.getItem('trackingNumber');
             if (!trackingNumber) {
                 alert('No se encontró el número de seguimiento.');
@@ -238,14 +197,8 @@
             }
 
             try {
-                const user = firebase.auth().currentUser;
-                if (!user) {
-                    alert('Debes estar autenticado para realizar esta acción.');
-                    return;
-                }
-
-                const bankDepositSnapshot = await db.collection('bankDeposits')
-                    .where('trackingNumbers', 'array-contains', trackingNumber).get();
+                // Actualizar el estado del depósito y el paquete a "Pagado"
+                const bankDepositSnapshot = await db.collection('bankDeposits').where('trackingNumbers', 'array-contains', trackingNumber).get();
                 if (!bankDepositSnapshot.empty) {
                     bankDepositSnapshot.forEach(async (doc) => {
                         await db.collection('bankDeposits').doc(doc.id).update({
@@ -254,19 +207,19 @@
                     });
                 }
 
-                const packageSnapshot = await db.collection('paquetes')
-                    .where('trackingNumber', '==', trackingNumber).get();
+                const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
                 if (!packageSnapshot.empty) {
                     packageSnapshot.forEach(async (doc) => {
                         await db.collection('paquetes').doc(doc.id).update({
                             status: 'Pagado'
                         });
-
-                        await sendPushNotification(trackingNumber);
                     });
                 }
 
-                alert('El pago ha sido marcado como Pagado.');
+                // Enviar notificación a Firestore
+                await sendNotificationToFirestore(trackingNumber);
+
+                alert('El pago ha sido marcado como Pagado y la notificación ha sido enviada.');
                 window.location.href = 'depositos_bancarios_admin.html';
             } catch (error) {
                 console.error("Error actualizando el estado a Pagado:", error);
@@ -274,13 +227,14 @@
             }
         });
 
-        // Cargar la información bancaria al cargar la página
-        document.addEventListener('DOMContentLoaded', function () {
+        // Cargar la información bancaria cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', function() {
             loadBankInfo();
         });
     </script>
 </body>
 </html>
+
 
     </script>
 </body>
