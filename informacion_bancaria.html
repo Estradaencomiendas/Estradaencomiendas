@@ -157,90 +157,107 @@
                 body: JSON.stringify(message)
             });
         }
-        // Cargar la información bancaria desde Firestore
-        async function loadBankInfo() {
-            const trackingNumber = sessionStorage.getItem('trackingNumber');
-            if (!trackingNumber) {
-                console.error('No se encontró el número de seguimiento en sessionStorage.');
-                document.getElementById('bank-info').innerHTML = "<p>No hay número de seguimiento en la sesión.</p>";
-                return;
-            }
+       // Cargar la información bancaria desde Firestore
+async function loadBankInfo() {
+    const trackingNumber = sessionStorage.getItem('trackingNumber');
+    if (!trackingNumber) {
+        console.error('No se encontró el número de seguimiento en sessionStorage.');
+        document.getElementById('bank-info').innerHTML = "<p>No hay número de seguimiento en la sesión.</p>";
+        return;
+    }
 
-            try {
-                // Buscar el depósito bancario relacionado con el número de seguimiento
-                const bankDepositSnapshot = await db.collection('bankDeposits')
-                    .where('trackingNumbers', 'array-contains', trackingNumber).get();
-
-                if (bankDepositSnapshot.empty) {
-                    document.getElementById('bank-info').innerHTML = `<p>No se encontraron datos para el número de seguimiento: ${trackingNumber}.</p>`;
-                    return;
-                }
-
-                // Mostrar la información bancaria
-                bankDepositSnapshot.forEach(doc => {
-                    const deposit = doc.data();
-                    document.getElementById('bank-info').innerHTML = `
-                        <p><strong>Números de Seguimiento:</strong> ${deposit.trackingNumbers.join(', ')}</p>
-                        <p><strong>Tipo de Cuenta:</strong> ${deposit.accountType}</p>
-                        <p><strong>Institución de Destino:</strong> ${deposit.institution}</p>
-                        <p><strong>Número de Cuenta:</strong> ${deposit.accountNumber}</p>
-                        <p><strong>Titular de la Cuenta:</strong> ${deposit.accountHolder} ${deposit.accountSurname}</p>
-                        <p><strong>Correo Electrónico:</strong> ${deposit.email || 'N/A'}</p>
-                        <p><strong>Monto a Pagar:</strong> $${deposit.amount.toFixed(2)}</p>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error cargando la información bancaria:", error);
-                document.getElementById('bank-info').innerHTML = `<p>Error cargando los datos.</p>`;
-            }
+    try {
+        // Verificar si el usuario está autenticado
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            console.error('Usuario no autenticado.');
+            alert('Debes estar autenticado para ver esta información.');
+            return;
         }
 
-        // Función para marcar el depósito y el paquete como "Pagado"
-        document.getElementById('mark-paid').addEventListener('click', async function () {
-            const trackingNumber = sessionStorage.getItem('trackingNumber');
-            if (!trackingNumber) {
-                alert('No se encontró el número de seguimiento.');
-                return;
-            }
+        // Buscar el depósito bancario relacionado con el número de seguimiento
+        const bankDepositSnapshot = await db.collection('bankDeposits')
+            .where('trackingNumbers', 'array-contains', trackingNumber).get();
 
-            try {
-                // Actualizar el estado del depósito bancario
-                const bankDepositSnapshot = await db.collection('bankDeposits')
-                    .where('trackingNumbers', 'array-contains', trackingNumber).get();
-                if (!bankDepositSnapshot.empty) {
-                    bankDepositSnapshot.forEach(async (doc) => {
-                        await db.collection('bankDeposits').doc(doc.id).update({
-                            status: 'Pagado'
-                        });
-                    });
-                }
+        if (bankDepositSnapshot.empty) {
+            document.getElementById('bank-info').innerHTML = `<p>No se encontraron datos para el número de seguimiento: ${trackingNumber}.</p>`;
+            return;
+        }
 
-                // Actualizar el estado del paquete a "Pagado"
-                const packageSnapshot = await db.collection('paquetes')
-                    .where('trackingNumber', '==', trackingNumber).get();
-                if (!packageSnapshot.empty) {
-                    packageSnapshot.forEach(async (doc) => {
-                        await db.collection('paquetes').doc(doc.id).update({
-                            status: 'Pagado'
-                        });
-
-                        // Enviar notificación push
-                        await sendPushNotification(trackingNumber);
-                    });
-                }
-
-                alert('El pago ha sido marcado como Pagado.');
-                window.location.href = 'depositos_bancarios_admin.html';
-            } catch (error) {
-                console.error("Error actualizando el estado a Pagado:", error);
-                alert('Ocurrió un error marcando el pago como Pagado.');
-            }
+        // Mostrar la información bancaria
+        bankDepositSnapshot.forEach(doc => {
+            const deposit = doc.data();
+            document.getElementById('bank-info').innerHTML = `
+                <p><strong>Números de Seguimiento:</strong> ${deposit.trackingNumbers.join(', ')}</p>
+                <p><strong>Tipo de Cuenta:</strong> ${deposit.accountType}</p>
+                <p><strong>Institución de Destino:</strong> ${deposit.institution}</p>
+                <p><strong>Número de Cuenta:</strong> ${deposit.accountNumber}</p>
+                <p><strong>Titular de la Cuenta:</strong> ${deposit.accountHolder} ${deposit.accountSurname}</p>
+                <p><strong>Correo Electrónico:</strong> ${deposit.email || 'N/A'}</p>
+                <p><strong>Monto a Pagar:</strong> $${deposit.amount.toFixed(2)}</p>
+            `;
         });
+    } catch (error) {
+        console.error("Error cargando la información bancaria:", error);
+        document.getElementById('bank-info').innerHTML = `<p>Error cargando los datos.</p>`;
+    }
+}
 
-        // Cargar la información bancaria al cargar la página
-        document.addEventListener('DOMContentLoaded', function () {
-            loadBankInfo();
-        });
+// Función para marcar el depósito y el paquete como "Pagado"
+document.getElementById('mark-paid').addEventListener('click', async function () {
+    const trackingNumber = sessionStorage.getItem('trackingNumber');
+    if (!trackingNumber) {
+        alert('No se encontró el número de seguimiento.');
+        return;
+    }
+
+    try {
+        // Verificar si el usuario está autenticado
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            console.error('Usuario no autenticado.');
+            alert('Debes estar autenticado para realizar esta acción.');
+            return;
+        }
+
+        // Actualizar el estado del depósito bancario
+        const bankDepositSnapshot = await db.collection('bankDeposits')
+            .where('trackingNumbers', 'array-contains', trackingNumber).get();
+        if (!bankDepositSnapshot.empty) {
+            bankDepositSnapshot.forEach(async (doc) => {
+                await db.collection('bankDeposits').doc(doc.id).update({
+                    status: 'Pagado'
+                });
+            });
+        }
+
+        // Actualizar el estado del paquete a "Pagado"
+        const packageSnapshot = await db.collection('paquetes')
+            .where('trackingNumber', '==', trackingNumber).get();
+        if (!packageSnapshot.empty) {
+            packageSnapshot.forEach(async (doc) => {
+                await db.collection('paquetes').doc(doc.id).update({
+                    status: 'Pagado'
+                });
+
+                // Enviar notificación push
+                await sendPushNotification(trackingNumber);
+            });
+        }
+
+        alert('El pago ha sido marcado como Pagado.');
+        window.location.href = 'depositos_bancarios_admin.html';
+    } catch (error) {
+        console.error("Error actualizando el estado a Pagado:", error);
+        alert('Ocurrió un error marcando el pago como Pagado.');
+    }
+});
+
+// Cargar la información bancaria al cargar la página
+document.addEventListener('DOMContentLoaded', function () {
+    loadBankInfo();
+});
+
     </script>
 </body>
 </html>
