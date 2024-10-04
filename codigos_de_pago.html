@@ -142,7 +142,7 @@
 
         <!-- Cuadro de búsqueda -->
         <div class="search-box">
-            <input type="text" id="search-input" placeholder="Buscar por Código de Pago o Nombre de Página">
+            <input type="text" id="search-input" placeholder="Buscar por Número de Seguimiento, Nombre de Página o Código de Pago">
             <button id="search-button">Buscar</button>
         </div>
 
@@ -150,7 +150,7 @@
             <thead>
                 <tr>
                     <th>Número de Seguimiento</th>
-                    <th>Nombre de la Clienta</th>
+                    <th>Nombre de la Cliente</th>
                     <th>Nombre de la Página</th>
                     <th>Destino</th>
                     <th>Valor</th>
@@ -158,14 +158,14 @@
                     <th>Fecha de Entrega</th>
                     <th>Código de Pago</th>
                     <th>Estado</th>
+                    <th>Valor Total</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody id="payment-table-body">
                 <!-- Los datos se llenarán dinámicamente aquí -->
             </tbody>
         </table>
-
-        <button id="mark-paid" class="pay-button">Pagado</button>
     </div>
 
     <script>
@@ -185,56 +185,65 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Función para cargar todos los paquetes con un código de pago
+        // Función para cargar los paquetes agrupados por código de pago
         async function loadPaymentCodes() {
             const paymentTableBody = document.getElementById('payment-table-body');
-            paymentTableBody.innerHTML = ''; // Limpiar la tabla antes de agregar los paquetes
+            paymentTableBody.innerHTML = ''; // Limpiar la tabla
 
             try {
-                // Obtener todos los paquetes que tienen un paymentCode asignado
                 const querySnapshot = await db.collection('paquetes').where('paymentCode', '!=', '').get();
 
                 if (querySnapshot.empty) {
-                    paymentTableBody.innerHTML = '<tr><td colspan="9">No hay paquetes con código de pago asignado.</td></tr>';
+                    paymentTableBody.innerHTML = '<tr><td colspan="11">No hay paquetes con código de pago asignado.</td></tr>';
                     return;
                 }
 
+                const paymentGroups = {};
+
                 querySnapshot.forEach(doc => {
                     const packageData = doc.data();
-                    const rowClass = packageData.status === 'Pagado' ? 'paid-row' : ''; // Aplicar clase si está pagado
-                    paymentTableBody.innerHTML += `
-                        <tr class="${rowClass}">
-                            <td>${packageData.trackingNumber ?? 'No disponible'}</td>
-                            <td>${packageData.nombreCliente ?? 'No disponible'}</td>
-                            <td>${packageData.nombrePagina ?? 'No disponible'}</td>
-                            <td>${packageData.destino ?? 'No disponible'}</td>
-                            <td>$${packageData.valor ?? 'No disponible'}</td>
-                            <td>${packageData.fechaEnvio ?? 'No disponible'}</td>
-                            <td>${packageData.fechaEntrega ?? 'No disponible'}</td>
-                            <td>${packageData.paymentCode ?? 'No disponible'}</td>
-                            <td>${packageData.status ?? 'No disponible'}</td>
-                        </tr>
-                    `;
+                    const paymentCode = packageData.paymentCode ?? 'No disponible';
+
+                    if (!paymentGroups[paymentCode]) {
+                        paymentGroups[paymentCode] = {
+                            totalValue: 0,
+                            packages: []
+                        };
+                    }
+
+                    paymentGroups[paymentCode].totalValue += parseFloat(packageData.valor ?? 0);
+                    paymentGroups[paymentCode].packages.push(packageData);
                 });
+
+                for (const [paymentCode, group] of Object.entries(paymentGroups)) {
+                    group.packages.forEach(packageData => {
+                        const rowClass = packageData.status === 'Pagado' ? 'paid-row' : '';
+                        paymentTableBody.innerHTML += `
+                            <tr class="${rowClass}">
+                                <td>${packageData.trackingNumber ?? 'No disponible'}</td>
+                                <td>${packageData.nombreCliente ?? 'No disponible'}</td>
+                                <td>${packageData.nombrePagina ?? 'No disponible'}</td>
+                                <td>${packageData.destino ?? 'No disponible'}</td>
+                                <td>$${packageData.valor ?? 'No disponible'}</td>
+                                <td>${packageData.fechaEnvio ?? 'No disponible'}</td>
+                                <td>${packageData.fechaEntrega ?? 'No disponible'}</td>
+                                <td>${packageData.paymentCode ?? 'No disponible'}</td>
+                                <td>${packageData.status ?? 'No disponible'}</td>
+                                <td>$${group.totalValue.toFixed(2)}</td>
+                                <td><button class="pay-button" onclick="markAsPaid('${paymentCode}')">Pagado</button></td>
+                            </tr>
+                        `;
+                    });
+                }
             } catch (error) {
                 console.error("Error cargando códigos de pago:", error);
             }
         }
 
-        // Verificación de autenticación y cargar todos los paquetes con código de pago
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                loadPaymentCodes(); // Cargar todos los paquetes independientemente del usuario autenticado
-            } else {
-                window.location.href = 'login.html'; // Redirigir si no está autenticado
-            }
-        });
-
-        // Marcar como pagado
-        document.getElementById('mark-paid').addEventListener('click', async function() {
+        // Marcar como pagado todos los paquetes con el mismo código de pago
+        async function markAsPaid(paymentCode) {
             try {
-                // Obtener todos los paquetes que tienen un código de pago asignado
-                const querySnapshot = await db.collection('paquetes').where('paymentCode', '!=', '').get();
+                const querySnapshot = await db.collection('paquetes').where('paymentCode', '==', paymentCode).get();
 
                 querySnapshot.forEach(async (doc) => {
                     await db.collection('paquetes').doc(doc.id).update({
@@ -247,9 +256,18 @@
                 console.error("Error marcando como pagado:", error);
                 alert('Ocurrió un error marcando los paquetes como pagados.');
             }
+        }
+
+        // Verificación de autenticación y cargar los códigos de pago
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                loadPaymentCodes(); // Cargar todos los paquetes
+            } else {
+                window.location.href = 'login.html'; // Redirigir si no está autenticado
+            }
         });
 
-        // Búsqueda por código de pago o nombre de página
+        // Búsqueda por código de pago, número de seguimiento o nombre de página
         document.getElementById('search-button').addEventListener('click', async function() {
             const searchInput = document.getElementById('search-input').value.toLowerCase();
 
@@ -258,7 +276,9 @@
                 const filteredShipments = [];
                 querySnapshot.forEach(doc => {
                     const packageData = doc.data();
-                    if (packageData.paymentCode.toLowerCase().includes(searchInput) || packageData.nombrePagina.toLowerCase().includes(searchInput)) {
+                    if (packageData.paymentCode.toLowerCase().includes(searchInput) ||
+                        packageData.trackingNumber.toLowerCase().includes(searchInput) ||
+                        packageData.nombrePagina.toLowerCase().includes(searchInput)) {
                         filteredShipments.push(packageData);
                     }
                 });
@@ -274,7 +294,7 @@
             paymentTableBody.innerHTML = '';
 
             if (shipments.length === 0) {
-                paymentTableBody.innerHTML = '<tr><td colspan="9">No hay paquetes con el criterio de búsqueda especificado.</td></tr>';
+                paymentTableBody.innerHTML = '<tr><td colspan="11">No hay paquetes con el criterio de búsqueda especificado.</td></tr>';
                 return;
             }
 
