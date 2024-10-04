@@ -216,24 +216,44 @@
                 });
 
                 for (const [paymentCode, group] of Object.entries(paymentGroups)) {
+                    let allPaid = true;
+
                     group.packages.forEach(packageData => {
                         const rowClass = packageData.status === 'Pagado' ? 'paid-row' : '';
+                        allPaid = allPaid && packageData.status === 'Pagado'; // Verificar si todos están pagados
+
                         paymentTableBody.innerHTML += `
                             <tr class="${rowClass}">
                                 <td>${packageData.trackingNumber ?? 'No disponible'}</td>
                                 <td>${packageData.nombreCliente ?? 'No disponible'}</td>
-                                <td>${packageData.nombrePagina ?? 'No disponible'}</td>
+                                <td>${packageData.nombrePaquete ?? 'No disponible'}</td>
                                 <td>${packageData.destino ?? 'No disponible'}</td>
                                 <td>$${packageData.valor ?? 'No disponible'}</td>
                                 <td>${packageData.fechaEnvio ?? 'No disponible'}</td>
-                                <td>${packageData.fechaEntrega ?? 'No disponible'}</td>
+                                <td>${packageData.diaEntrega ?? 'No disponible'}</td>
                                 <td>${packageData.paymentCode ?? 'No disponible'}</td>
                                 <td>${packageData.status ?? 'No disponible'}</td>
-                                <td>$${group.totalValue.toFixed(2)}</td>
-                                <td><button class="pay-button" onclick="markAsPaid('${paymentCode}')">Pagado</button></td>
                             </tr>
                         `;
                     });
+
+                    // Solo mostrar el botón de pagado si al menos uno no está pagado
+                    if (!allPaid) {
+                        paymentTableBody.innerHTML += `
+                            <tr>
+                                <td colspan="9"><strong>Total del Código de Pago ${paymentCode}: $${group.totalValue.toFixed(2)}</strong></td>
+                                <td colspan="2">
+                                    <button class="pay-button" onclick="markAsPaid('${paymentCode}')">Pagado</button>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        paymentTableBody.innerHTML += `
+                            <tr>
+                                <td colspan="11"><strong>Total del Código de Pago ${paymentCode}: $${group.totalValue.toFixed(2)}</strong> - Todos pagados</td>
+                            </tr>
+                        `;
+                    }
                 }
             } catch (error) {
                 console.error("Error cargando códigos de pago:", error);
@@ -278,7 +298,7 @@
                     const packageData = doc.data();
                     if (packageData.paymentCode.toLowerCase().includes(searchInput) ||
                         packageData.trackingNumber.toLowerCase().includes(searchInput) ||
-                        packageData.nombrePagina.toLowerCase().includes(searchInput)) {
+                        packageData.nombrePaquete.toLowerCase().includes(searchInput)) {
                         filteredShipments.push(packageData);
                     }
                 });
@@ -304,11 +324,11 @@
                     <tr class="${rowClass}">
                         <td>${pkg.trackingNumber ?? 'No disponible'}</td>
                         <td>${pkg.nombreCliente ?? 'No disponible'}</td>
-                        <td>${pkg.nombrePagina ?? 'No disponible'}</td>
+                        <td>${pkg.nombrePaquete ?? 'No disponible'}</td>
                         <td>${pkg.destino ?? 'No disponible'}</td>
                         <td>$${pkg.valor ?? 'No disponible'}</td>
                         <td>${pkg.fechaEnvio ?? 'No disponible'}</td>
-                        <td>${pkg.fechaEntrega ?? 'No disponible'}</td>
+                        <td>${pkg.diaEntrega ?? 'No disponible'}</td>
                         <td>${pkg.paymentCode ?? 'No disponible'}</td>
                         <td>${pkg.status ?? 'No disponible'}</td>
                     </tr>
@@ -318,3 +338,4 @@
     </script>
 </body>
 </html>
+
