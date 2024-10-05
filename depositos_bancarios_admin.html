@@ -14,26 +14,13 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             background-color: #f7f7f7;
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            width: auto;
-            max-width: 1000px;
-            text-align: center;
+            width: 100%;
         }
 
         .logo {
             width: 150px;
-            margin: 0 auto 20px;
+            margin: 20px auto;
             display: block;
         }
 
@@ -41,10 +28,8 @@
             font-size: 24px;
             color: #333;
             font-weight: bold;
+            text-align: center;
             margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 10px;
-            display: inline-block;
         }
 
         table {
@@ -96,6 +81,8 @@
             border-radius: 50px;
             cursor: pointer;
             margin-top: 20px;
+            display: block;
+            margin: 20px auto;
         }
 
         .delete-history-button:hover {
@@ -110,32 +97,29 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
+    <h1>Depósitos Bancarios</h1>
 
-        <img src="logo.png" alt="Logo Estrada Encomiendas" class="logo">
-        <h1>Depósitos Bancarios</h1>
+    <table id="bank-deposits-table">
+        <thead>
+            <tr>
+                <th>Número de Seguimiento</th>
+                <th>Nombre de la Clienta</th>
+                <th>Nombre de la Página</th>
+                <th>Destino</th>
+                <th>Valor</th>
+                <th>Fecha de Envío</th>
+                <th>Fecha de Entrega</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody id="bank-deposits-table-body">
+            <!-- Los datos se llenarán dinámicamente aquí -->
+        </tbody>
+    </table>
 
-        <table id="bank-deposits-table">
-            <thead>
-                <tr>
-                    <th>Número de Seguimiento</th>
-                    <th>Nombre de la Clienta</th>
-                    <th>Nombre de la Página</th>
-                    <th>Destino</th>
-                    <th>Valor</th>
-                    <th>Fecha de Envío</th>
-                    <th>Fecha de Entrega</th>
-                    <th>Estado</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody id="bank-deposits-table-body">
-                <!-- Los datos se llenarán dinámicamente aquí -->
-            </tbody>
-        </table>
-
-        <button id="delete-history" class="delete-history-button">Borrar Historial</button>
-    </div>
+    <button id="delete-history" class="delete-history-button">Borrar Historial</button>
 
     <script>
         // Configuración de Firebase
