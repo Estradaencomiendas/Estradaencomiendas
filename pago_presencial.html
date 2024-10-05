@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Presencial - Admin0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
+    <style>
+        body {
+            font-family: 'Acumin Variable Concept', sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f7f7f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-box input {
+            width: 300px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        .search-box button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .search-box button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f39204;
+            color: white;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #f7f7f7;
+            color: #333;
+            border: 1px solid #EDE309;
+        }
+
+        .pay-button {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .pay-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pago Presencial - Admin0</h1>
+
+    <!-- Cuadro de búsqueda -->
+    <div class="search-box">
+        <input type="text" id="search-input" placeholder="Buscar por Número de Seguimiento, Cliente o Página">
+        <button id="search-button">Buscar</button>
+    </div>
+
+    <!-- Tabla de paquetes retirados -->
+    <table id="package-table">
+        <thead>
+            <tr>
+                <th>Número de Seguimiento</th>
+                <th>Nombre de la Clienta</th>
+                <th>Nombre de la Página</th>
+                <th>Destino</th>
+                <th>Fecha de Envío</th>
+                <th>Fecha de Entrega</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody id="package-table-body">
+            <!-- Los datos se llenarán dinámicamente aquí -->
+        </tbody>
+    </table>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            authDomain: "estradaencomiendas0.firebaseapp.com",
+            projectId: "estradaencomiendas0",
+            storageBucket: "estradaencomiendas0.appspot.com",
+            messagingSenderId: "247979951336",
+            appId: "1:247979951336:web:92b6b4bf615595676755d",
+            measurementId: "G-BRMC9FZBC"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Cargar paquetes con el estado "Paquete retirado"
+        async function loadRetiredPackages() {
+            const packageTableBody = document.getElementById('package-table-body');
+            packageTableBody.innerHTML = ''; // Limpiar la tabla antes de cargar los paquetes
+
+            try {
+                const querySnapshot = await db.collection('paquetes').where('status', '==', 'Paquete retirado').get();
+
+                if (querySnapshot.empty) {
+                    packageTableBody.innerHTML = '<tr><td colspan="8">No hay paquetes retirados almacenados.</td></tr>';
+                    return;
+                }
+
+                querySnapshot.forEach(doc => {
+                    const packageData = doc.data();
+                    packageTableBody.innerHTML += `
+                        <tr>
+                            <td>${packageData.trackingNumber}</td>
+                            <td>${packageData.nombreCliente || 'Cliente Desconocido'}</td>
+                            <td>${packageData.nombrePaquete || 'Nombre Desconocido'}</td>
+                            <td>${packageData.destino || 'Destino Desconocido'}</td>
+                            <td>${packageData.fechaEnvio || 'No Disponible'}</td>
+                            <td>${packageData.diaEntrega || 'No Disponible'}</td>
+                            <td>${packageData.status}</td>
+                            <td><button class="pay-button" onclick="markAsPaid('${packageData.trackingNumber}')">Pagado</button></td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error cargando los paquetes retirados:", error);
+            }
+        }
+
+        // Buscar paquetes basados en los campos de búsqueda
+        document.getElementById('search-button').addEventListener('click', async function() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const packageTableBody = document.getElementById('package-table-body');
+            packageTableBody.innerHTML = ''; // Limpiar la tabla
+
+            try {
+                const querySnapshot = await db.collection('paquetes').where('status', '==', 'Paquete retirado').get();
+                const filteredPackages = [];
+
+                querySnapshot.forEach(doc => {
+                    const packageData = doc.data();
+                    const searchFields = [
+                        packageData.trackingNumber,
+                        packageData.nombreCliente?.toLowerCase(),
+                        packageData.nombrePaquete?.toLowerCase()
+                    ];
+
+                    if (searchFields.some(field => field && field.includes(searchInput))) {
+                        filteredPackages.push(packageData);
+                    }
+                });
+
+                if (filteredPackages.length === 0) {
+                    packageTableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes que coincidan con la búsqueda.</td></tr>';
+                } else {
+                    filteredPackages.forEach(packageData => {
+                        packageTableBody.innerHTML += `
+                            <tr>
+                                <td>${packageData.trackingNumber}</td>
+                                <td>${packageData.nombreCliente || 'Cliente Desconocido'}</td>
+                                <td>${packageData.nombrePaquete || 'Nombre Desconocido'}</td>
+                                <td>${packageData.destino || 'Destino Desconocido'}</td>
+                                <td>${packageData.fechaEnvio || 'No Disponible'}</td>
+                                <td>${packageData.diaEntrega || 'No Disponible'}</td>
+                                <td>${packageData.status}</td>
+                                <td><button class="pay-button" onclick="markAsPaid('${packageData.trackingNumber}')">Pagado</button></td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error("Error buscando los paquetes retirados:", error);
+            }
+        });
+
+        // Función para marcar el paquete como "Pagado"
+        async function markAsPaid(trackingNumber) {
+            try {
+                const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                if (!packageSnapshot.empty) {
+                    packageSnapshot.forEach(async (doc) => {
+                        await db.collection('paquetes').doc(doc.id).update({
+                            status: 'Pagado'
+                        });
+                    });
+                }
+
+                // Enviar notificación a Firestore
+                await sendNotificationToFirestore(trackingNumber);
+
+                alert('El pago ha sido marcado como Pagado y la notificación ha sido enviada.');
+                window.location.href = 'admin0.html'; // Redirigir después de marcar como pagado
+            } catch (error) {
+                console.error("Error marcando el paquete como pagado:", error);
+                alert('Ocurrió un error marcando el pago como Pagado.');
+            }
+        }
+
+        // Función para enviar notificación a Firestore
+        async function sendNotificationToFirestore(trackingNumber) {
+            try {
+                await db.collection('notifications').add({
+                    title: 'Pago recibido',
+                    body: `El paquete con número de seguimiento ${trackingNumber} ha sido marcado como pagado.`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    trackingNumber: trackingNumber
+                });
+                console.log("Notificación enviada a Firestore");
+            } catch (error) {
+                console.error("Error enviando notificación a Firestore:", error);
+            }
+        }
+
+        // Cargar los paquetes al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRetiredPackages();
+        });
+    </script>
+</body>
+</html>
