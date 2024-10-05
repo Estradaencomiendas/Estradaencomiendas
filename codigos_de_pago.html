@@ -165,11 +165,8 @@
         const auth = firebase.auth();
         const messaging = firebase.messaging();
 
-        // Solicitar permisos para notificaciones
-        messaging.requestPermission().then(() => {
-            console.log('Permisos de notificación concedidos');
-            return messaging.getToken();
-        }).then((token) => {
+        // Obtener el token FCM y guardarlo en Firestore
+        messaging.getToken().then((token) => {
             console.log('Token FCM:', token);
 
             // Guardar el token en Firestore si el usuario está autenticado
@@ -360,6 +357,7 @@
     </script>
 </body>
 </html>
+
 
 
 </body>
