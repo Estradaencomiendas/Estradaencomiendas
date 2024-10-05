@@ -116,7 +116,7 @@
             <!-- Aquí se mostrará la información bancaria -->
         </div>
 
-        <button id="mark-paid" class="pay-button">Marcar como Pagado</button>
+        <button id="mark-paid" class="pay-button" style="display:none;">Marcar como Pagado</button>
     </div>
 
     <script>
@@ -166,6 +166,11 @@
                         <p><strong>Correo Electrónico:</strong> ${deposit.email || 'N/A'}</p>
                         <p><strong>Monto a Pagar:</strong> $${deposit.amount.toFixed(2)}</p>
                     `;
+
+                    // Verificar si el paquete ya está pagado y mostrar/ocultar el botón
+                    if (deposit.status !== 'Pagado') {
+                        document.getElementById('mark-paid').style.display = 'inline-block';
+                    }
                 });
             } catch (error) {
                 console.error("Error cargando la información bancaria:", error);
@@ -220,7 +225,7 @@
                 await sendNotificationToFirestore(trackingNumber);
 
                 alert('El pago ha sido marcado como Pagado y la notificación ha sido enviada.');
-                window.location.href = 'depositos_bancarios_admin.html';
+                window.location.href = 'depositos_bancarios_admin.html'; // Redirigir al finalizar
             } catch (error) {
                 console.error("Error actualizando el estado a Pagado:", error);
                 alert('Ocurrió un error marcando el pago como Pagado.');
@@ -234,6 +239,7 @@
     </script>
 </body>
 </html>
+
 
 
     </script>
