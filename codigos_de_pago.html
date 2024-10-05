@@ -145,7 +145,9 @@
             </tbody>
         </table>
     </div>
+
     <script>
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyArUFYUqobSmqu0Em_Z4EbIOZKGF1mRHh4",
             authDomain: "estradaencomiendas0.firebaseapp.com",
@@ -238,10 +240,11 @@
                         status: 'Pagado'
                     });
 
+                    // Enviar notificación push
                     await sendPushNotification(packageData.trackingNumber);
                 });
 
-                loadPaymentCodes();
+                loadPaymentCodes(); // Recargar la tabla después de marcar como pagado
             } catch (error) {
                 console.error("Error marcando como pagado:", error);
                 alert('Ocurrió un error marcando los paquetes como pagados.');
@@ -250,31 +253,20 @@
 
         async function sendPushNotification(trackingNumber) {
             try {
-                const message = {
-                    notification: {
-                        title: 'Pago recibido',
-                        body: `Tu paquete con número de seguimiento ${trackingNumber} ha sido Pagado.`,
-                    },
-                    topic: 'pagos'
-                };
-
-                const response = await fetch('https://fcm.googleapis.com/fcm/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'key=TU_KEY_FCM'
-                    },
-                    body: JSON.stringify(message)
+                // Lógica para enviar la notificación a Firestore (similar a la página anterior)
+                await db.collection('notifications').add({
+                    title: 'Pago recibido',
+                    body: `Tu paquete con número de seguimiento ${trackingNumber} ha sido marcado como pagado.`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    trackingNumber: trackingNumber
                 });
-
-                if (!response.ok) {
-                    console.error('Error enviando la notificación:', response.statusText);
-                }
+                console.log("Notificación enviada a Firestore");
             } catch (error) {
-                console.error('Error enviando la notificación:', error);
+                console.error("Error enviando la notificación a Firestore:", error);
             }
         }
 
+        // Autenticación del usuario
         auth.onAuthStateChanged((user) => {
             if (user) {
                 loadPaymentCodes();
@@ -283,6 +275,7 @@
             }
         });
 
+        // Funcionalidad de búsqueda
         document.getElementById('search-button').addEventListener('click', async function() {
             const searchInput = document.getElementById('search-input').value.toLowerCase();
 
