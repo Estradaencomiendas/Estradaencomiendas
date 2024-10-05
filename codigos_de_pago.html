@@ -80,30 +80,10 @@
             border-radius: 50px;
             border: none;
             cursor: pointer;
-            margin-top: 20px;
         }
 
         .pay-button:hover {
             background-color: #218838;
-        }
-
-        .delete-history-button {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 15px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .delete-history-button:hover {
-            background-color: #c82333;
-        }
-
-        .paid-row {
-            background-color: #d4edda !important;
         }
 
         .search-box {
@@ -158,8 +138,6 @@
                     <th>Fecha de Entrega</th>
                     <th>Código de Pago</th>
                     <th>Estado</th>
-                    <th>Valor Total</th>
-                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody id="payment-table-body">
@@ -211,7 +189,9 @@
                         };
                     }
 
-                    paymentGroups[paymentCode].totalValue += parseFloat(packageData.valor ?? 0);
+                    if (packageData.status !== 'Pagado') {
+                        paymentGroups[paymentCode].totalValue += parseFloat(packageData.valor ?? 0);
+                    }
                     paymentGroups[paymentCode].packages.push(packageData);
                 });
 
@@ -241,8 +221,7 @@
                     if (!allPaid) {
                         paymentTableBody.innerHTML += `
                             <tr>
-                                <td colspan="9"><strong>Total del Código de Pago ${paymentCode}: $${group.totalValue.toFixed(2)}</strong></td>
-                                <td colspan="2">
+                                <td colspan="9" style="text-align: right;"><strong>Total del Código de Pago ${paymentCode}: $${group.totalValue.toFixed(2)}</strong>
                                     <button class="pay-button" onclick="markAsPaid('${paymentCode}')">Pagado</button>
                                 </td>
                             </tr>
@@ -250,7 +229,7 @@
                     } else {
                         paymentTableBody.innerHTML += `
                             <tr>
-                                <td colspan="11"><strong>Total del Código de Pago ${paymentCode}: $${group.totalValue.toFixed(2)}</strong> - Todos pagados</td>
+                                <td colspan="9" style="text-align: right;"><strong>Total del Código de Pago ${paymentCode}: $${group.totalValue.toFixed(2)}</strong> - Todos pagados</td>
                             </tr>
                         `;
                     }
@@ -294,22 +273,26 @@
             try {
                 const querySnapshot = await db.collection('paquetes').where('paymentCode', '!=', '').get();
                 const filteredShipments = [];
+                let totalValue = 0;
                 querySnapshot.forEach(doc => {
                     const packageData = doc.data();
                     if (packageData.paymentCode.toLowerCase().includes(searchInput) ||
                         packageData.trackingNumber.toLowerCase().includes(searchInput) ||
                         packageData.nombrePaquete.toLowerCase().includes(searchInput)) {
                         filteredShipments.push(packageData);
+                        if (packageData.status !== 'Pagado') {
+                            totalValue += parseFloat(packageData.valor ?? 0);
+                        }
                     }
                 });
-                displayShipments(filteredShipments);
+                displayShipments(filteredShipments, totalValue);
             } catch (error) {
                 console.error("Error buscando paquetes:", error);
             }
         });
 
         // Mostrar los paquetes filtrados
-        function displayShipments(shipments) {
+        function displayShipments(shipments, totalValue) {
             const paymentTableBody = document.getElementById('payment-table-body');
             paymentTableBody.innerHTML = '';
 
@@ -318,8 +301,11 @@
                 return;
             }
 
+            let allPaid = true;
+
             shipments.forEach(pkg => {
                 const rowClass = pkg.status === 'Pagado' ? 'paid-row' : '';
+                allPaid = allPaid && pkg.status === 'Pagado';
                 paymentTableBody.innerHTML += `
                     <tr class="${rowClass}">
                         <td>${pkg.trackingNumber ?? 'No disponible'}</td>
@@ -334,7 +320,21 @@
                     </tr>
                 `;
             });
+
+            // Mostrar el total y el botón de pago si es necesario
+            if (!allPaid) {
+                paymentTableBody.innerHTML += `
+                    <tr>
+                        <td colspan="9" style="text-align: right;"><strong>Total de los paquetes: $${totalValue.toFixed(2)}</strong>
+                            <button class="pay-button" onclick="markAsPaid('${shipments[0].paymentCode}')">Pagado</button>
+                        </td>
+                    </tr>
+                `;
+            }
         }
     </script>
+</body>
+</html>
+
 </body>
 </html>
