@@ -1,9 +1,25 @@
 const twilio = require('twilio');
 
-// Configura tus credenciales de Twilio
+// Configura tus credenciales de Twilio con un timeout aumentado
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = twilio(accountSid, authToken);
+const client = twilio(accountSid, authToken, {
+    httpClient: {
+        request: function(opts) {
+            return new Promise((resolve, reject) => {
+                opts.timeout = 15000; // Aumenta el timeout a 15 segundos
+                const request = require('https').request(opts, (res) => {
+                    let body = '';
+                    res.setEncoding('utf8');
+                    res.on('data', (chunk) => { body += chunk; });
+                    res.on('end', () => resolve(body));
+                });
+                request.on('error', (e) => reject(e));
+                request.end();
+            });
+        }
+    }
+});
 
 exports.handler = async function(event, context) {
     const data = JSON.parse(event.body);
@@ -30,6 +46,7 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({ success: true, message })
         };
     } catch (error) {
+        console.error('Error enviando mensaje de WhatsApp: ', error.message);
         return {
             statusCode: 500,
             body: JSON.stringify({ success: false, error: error.message })
