@@ -7,7 +7,7 @@ const client = twilio(accountSid, authToken);
 
 exports.handler = async function(event, context) {
     const data = JSON.parse(event.body);
-    const { to, trackingNumber, nombreCliente, destino, valor, nombrePaquete, qrUrl } = data; // Datos enviados desde el evento
+    const { to, trackingNumber, nombreCliente, destino, valor, nombrePaquete } = data; // Quitar 'qrUrl' ya que es estática
 
     try {
         // Enviar mensaje usando la nueva plantilla aprobada
@@ -22,7 +22,8 @@ exports.handler = async function(event, context) {
                 '4': valor,              // Variable 4: valor del paquete
                 '5': nombrePaquete       // Variable 5: nombre de la página/paquete
             }),
-            mediaUrl: [qrUrl] // Enviar la imagen del código QR como media
+            // Usa una URL estática temporalmente para el archivo del código QR
+            mediaUrl: ['https://firebasestorage.googleapis.com/v0/b/estradaencomiendas0.appspot.com/o/qr_codes%2FPKG-1729052703886.png?alt=media'] 
         });
 
         return {
