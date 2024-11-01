@@ -28,7 +28,7 @@ exports.handler = async function(event, context) {
         const message = await client.messages.create({
             from: 'whatsapp:+50369228310', // Número de WhatsApp de Twilio
             to: `whatsapp:${to}`, // Número de la vendedora en formato de WhatsApp
-            contentSid: 'HX5abb859370c97a6a19e758a53cc9626e', // Usa el nuevo contentSid de tu plantilla aprobada
+            contentSid: 'HX34e45ef0709243277d712d38aa243f44', // Usa el nuevo contentSid de tu plantilla aprobada
             contentVariables: JSON.stringify({
                 '1': trackingNumber,   // Número de seguimiento
                 '2': nombreCliente,    // Nombre de la clienta
