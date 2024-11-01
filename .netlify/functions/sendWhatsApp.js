@@ -16,7 +16,7 @@ exports.handler = async function(event, context) {
         nombrePaquete,
         fechaEnvio,
         pinSeguridad,
-        qrUrl // Añadir la variable qrUrl que contiene la URL completa del código QR
+        qrUrl // URL del código QR
     } = data;
 
     // Agregar logs para depuración
@@ -24,11 +24,16 @@ exports.handler = async function(event, context) {
     console.log('URL del QR recibida:', qrUrl);
 
     try {
+        // Verificar que la URL del QR sea válida y no contenga concatenaciones erróneas
+        if (!qrUrl.startsWith('https://')) {
+            throw new Error('URL del QR no es válida');
+        }
+
         // Enviar mensaje usando la nueva plantilla aprobada
         const message = await client.messages.create({
             from: 'whatsapp:+50369228310', // Número de WhatsApp de Twilio
             to: `whatsapp:${to}`, // Número de la vendedora en formato de WhatsApp
-            contentSid: 'HX34e45ef0709243277d712d38aa243f44', // Usa el nuevo contentSid de tu plantilla aprobada
+            contentSid: 'HX34e45ef0709243277d712d38aa243f44', // Nuevo contentSid de la plantilla aprobada
             contentVariables: JSON.stringify({
                 '1': trackingNumber,   // Número de seguimiento
                 '2': nombreCliente,    // Nombre de la clienta
@@ -38,8 +43,7 @@ exports.handler = async function(event, context) {
                 '6': fechaEnvio,       // Fecha de envío
                 '7': pinSeguridad,     // PIN de seguridad
                 '8': qrUrl             // URL del código QR
-            }),
-            mediaUrl: [qrUrl] // Usar la URL del código QR como media en el mensaje
+            })
         });
 
         console.log('Mensaje enviado con éxito:', message);
