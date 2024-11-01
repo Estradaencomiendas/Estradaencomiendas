@@ -7,7 +7,17 @@ const client = twilio(accountSid, authToken);
 
 exports.handler = async function(event, context) {
     const data = JSON.parse(event.body);
-    const { to, trackingNumber, nombreCliente, destino, valor, nombrePaquete, qrUrl } = data; // Agregar 'nombrePaquete' y 'qrUrl'
+    const {
+        to,
+        trackingNumber,
+        nombreCliente,
+        destino,
+        valor,
+        nombrePaquete,
+        fechaEnvio,
+        pinSeguridad,
+        qrUrl // Añadir la variable qrUrl que contiene la URL completa del código QR
+    } = data;
 
     // Agregar logs para depuración
     console.log('Datos recibidos:', data);
@@ -20,13 +30,16 @@ exports.handler = async function(event, context) {
             to: `whatsapp:${to}`, // Número de la vendedora en formato de WhatsApp
             contentSid: 'HX5abb859370c97a6a19e758a53cc9626e', // Usa el nuevo contentSid de tu plantilla aprobada
             contentVariables: JSON.stringify({
-                '1': trackingNumber,     // Variable 1 es el número de seguimiento
-                '2': nombreCliente,      // Variable 2 es el nombre de la clienta
-                '3': destino,            // Variable 3 es el destino
-                '4': valor,              // Variable 4 es el valor del paquete
-                '5': nombrePaquete       // Nueva variable: Nombre de la Página
+                '1': trackingNumber,   // Número de seguimiento
+                '2': nombreCliente,    // Nombre de la clienta
+                '3': destino,          // Destino
+                '4': valor,            // Valor del paquete
+                '5': nombrePaquete,    // Nombre de la Página
+                '6': fechaEnvio,       // Fecha de envío
+                '7': pinSeguridad,     // PIN de seguridad
+                '8': qrUrl             // URL del código QR
             }),
-            mediaUrl: [qrUrl] // Enviar la imagen del código QR como media
+            mediaUrl: [qrUrl] // Usar la URL del código QR como media en el mensaje
         });
 
         console.log('Mensaje enviado con éxito:', message);
@@ -43,3 +56,4 @@ exports.handler = async function(event, context) {
         };
     }
 };
+
