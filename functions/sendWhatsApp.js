@@ -9,6 +9,10 @@ exports.handler = async function(event, context) {
     const data = JSON.parse(event.body);
     const { to, trackingNumber, nombreCliente, destino, valor, nombrePaquete, qrUrl } = data; // Agregar 'nombrePaquete' y 'qrUrl'
 
+    // Agregar logs para depuración
+    console.log('Datos recibidos:', data);
+    console.log('URL del QR recibida:', qrUrl);
+
     try {
         // Enviar mensaje usando la nueva plantilla aprobada
         const message = await client.messages.create({
@@ -24,6 +28,8 @@ exports.handler = async function(event, context) {
             }),
             mediaUrl: [qrUrl] // Enviar la imagen del código QR como media
         });
+
+        console.log('Mensaje enviado con éxito:', message);
 
         return {
             statusCode: 200,
