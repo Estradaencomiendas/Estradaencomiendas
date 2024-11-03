@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Acumin+Variable+Concept&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth-compat.js"></script>
     <style>
         body {
             font-family: 'Acumin Variable Concept', sans-serif;
@@ -36,32 +37,32 @@
             margin-bottom: 20px;
         }
 
-        .search-box {
+        .filter-box {
             margin-bottom: 20px;
             display: flex;
             justify-content: center;
+            align-items: center;
         }
 
-        .search-box input {
-            width: 300px;
+        .filter-box select {
             padding: 10px;
             border-radius: 8px;
             border: 1px solid #ccc;
             font-size: 15px;
+            margin-right: 10px;
         }
 
-        .search-box button {
+        .filter-box button {
             background-color: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
-            margin-left: 10px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 15px;
         }
 
-        .search-box button:hover {
+        .filter-box button:hover {
             background-color: #0056b3;
         }
 
@@ -96,10 +97,52 @@
     <div class="container">
         <h1>Paquetes No Retirados</h1>
 
-        <!-- Cuadro de búsqueda -->
-        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Buscar por Número de Seguimiento, Nombre de Cliente o Nombre de Página">
-            <button id="search-button">Buscar</button>
+        <!-- Filtro de destino -->
+        <div class="filter-box">
+            <select id="destination-filter">
+                <option value="all">Todos los Destinos</option>
+                <option value="Metrogalerias">Metrogalerias</option>
+                <option value="Local 1 Santa Ana">Local 1 Santa Ana</option>
+                <option value="Local 2 Santa Ana">Local 2 Santa Ana</option>
+                <option value="Local 3 Santa Ana">Local 3 Santa Ana</option>
+                <option value="Metrolourdes">Metrolourdes</option>
+                <option value="El Congo">El Congo</option>
+                <option value="Santa Ana MC Donald">Santa Ana MC Donald</option>
+                <option value="Metapan">Metapan</option>
+                <option value="Cel Guajoyo">Cel Guajoyo</option>
+                <option value="Conchagua">Conchagua</option>
+                <option value="Masahuat">Masahuat</option>
+                <option value="Ciudad Real">Ciudad Real</option>
+                <option value="Chalchuapa">Chalchuapa</option>
+                <option value="Candelaria de la Frontera">Candelaria de la Frontera</option>
+                <option value="Ahuachapán">Ahuachapán</option>
+                <option value="Atiquizaya">Atiquizaya</option>
+                <option value="Ataco">Ataco</option>
+                <option value="Apaneca">Apaneca</option>
+                <option value="Ciudad Versalles">Ciudad Versalles</option>
+                <option value="Quezaltepeque">Quezaltepeque</option>
+                <option value="Nejapa">Nejapa</option>
+                <option value="Ciudad Arce">Ciudad Arce</option>
+                <option value="Tacachico">Tacachico</option>
+                <option value="San Rafael Cedros">San Rafael Cedros</option>
+                <option value="Cojutepeque">Cojutepeque</option>
+                <option value="Sonsonate">Sonsonate</option>
+                <option value="Izalco">Izalco</option>
+                <option value="Nahuizalco">Nahuizalco</option>
+                <option value="Juayua">Juayua</option>
+                <option value="Chalatenango">Chalatenango</option>
+                <option value="Aguilares">Aguilares</option>
+                <option value="Desvio de Amayo">Desvio de Amayo</option>
+                <option value="San Vicente">San Vicente</option>
+                <option value="Apastepeque">Apastepeque</option>
+                <option value="Texistepeque">Texistepeque</option>
+                <option value="Soyapango">Soyapango</option>
+                <option value="Mejicanos">Mejicanos</option>
+                <option value="Cuscatancingo">Cuscatancingo</option>
+                <option value="Personalizado">Personalizado</option>
+                <option value="Coordinado">Coordinado</option>
+            </select>
+            <button id="filter-button">Filtrar</button>
         </div>
 
         <table id="no-retirado-table">
@@ -137,20 +180,24 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Función para cargar los paquetes con estado "No Retirado"
-        async function loadNoRetiradoPackages() {
+        // Función para cargar los paquetes "No Retirado" y filtrar por destino
+        async function loadPackages(destination = 'all') {
             const tableBody = document.getElementById('no-retirado-table-body');
             tableBody.innerHTML = ''; // Limpiar la tabla
 
             try {
-                const querySnapshot = await db.collection('paquetes').where('status', '==', 'No Retirado').get();
+                const querySnapshot = await db.collection('paquetes').where('status', '==', 'Paquete No Retirado').get();
+                const filteredPackages = querySnapshot.docs.filter(doc => {
+                    const packageData = doc.data();
+                    return destination === 'all' || packageData.destino === destination;
+                });
 
-                if (querySnapshot.empty) {
-                    tableBody.innerHTML = '<tr><td colspan="8">No hay paquetes con estado "No Retirado".</td></tr>';
+                if (filteredPackages.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes "No Retirado" para el destino seleccionado.</td></tr>';
                     return;
                 }
 
-                querySnapshot.forEach(doc => {
+                filteredPackages.forEach(doc => {
                     const packageData = doc.data();
                     tableBody.innerHTML += `
                         <tr>
@@ -166,62 +213,22 @@
                     `;
                 });
             } catch (error) {
-                console.error("Error cargando paquetes 'No Retirado':", error);
+                console.error("Error cargando paquetes:", error);
                 tableBody.innerHTML = '<tr><td colspan="8">Error al cargar los datos.</td></tr>';
             }
         }
 
-        // Función para buscar paquetes por cualquier campo
-        async function searchPackages() {
-            const searchInput = document.getElementById('search-input').value.toLowerCase();
-            const tableBody = document.getElementById('no-retirado-table-body');
-            tableBody.innerHTML = ''; // Limpiar la tabla
-
-            try {
-                const querySnapshot = await db.collection('paquetes').where('status', '==', 'No Retirado').get();
-                const filteredPackages = [];
-
-                querySnapshot.forEach(doc => {
-                    const packageData = doc.data();
-                    if (packageData.trackingNumber.toLowerCase().includes(searchInput) ||
-                        packageData.nombreCliente.toLowerCase().includes(searchInput) ||
-                        packageData.nombrePaquete.toLowerCase().includes(searchInput)) {
-                        filteredPackages.push(packageData);
-                    }
-                });
-
-                if (filteredPackages.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes con el criterio de búsqueda.</td></tr>';
-                    return;
-                }
-
-                filteredPackages.forEach(packageData => {
-                    tableBody.innerHTML += `
-                        <tr>
-                            <td>${packageData.trackingNumber || 'No disponible'}</td>
-                            <td>${packageData.nombreCliente || 'No disponible'}</td>
-                            <td>${packageData.nombrePaquete || 'No disponible'}</td>
-                            <td>${packageData.destino || 'No disponible'}</td>
-                            <td>$${parseFloat(packageData.valor || 0).toFixed(2)}</td>
-                            <td>${packageData.fechaEnvio || 'No disponible'}</td>
-                            <td>${packageData.diaEntrega || 'No disponible'}</td>
-                            <td>${packageData.status || 'No disponible'}</td>
-                        </tr>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error buscando paquetes:", error);
-                tableBody.innerHTML = '<tr><td colspan="8">Error al buscar los datos.</td></tr>';
-            }
-        }
+        // Evento de filtrado por destino
+        document.getElementById('filter-button').addEventListener('click', function() {
+            const selectedDestination = document.getElementById('destination-filter').value;
+            loadPackages(selectedDestination);
+        });
 
         // Cargar paquetes al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
-            loadNoRetiradoPackages();
-
-            // Añadir evento al botón de búsqueda
-            document.getElementById('search-button').addEventListener('click', searchPackages);
+            loadPackages(); // Cargar todos los paquetes al inicio
         });
     </script>
 </body>
 </html>
+
