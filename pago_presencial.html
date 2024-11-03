@@ -95,6 +95,20 @@
         .pay-button:hover {
             background-color: #218838;
         }
+
+        .resend-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .resend-button:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -145,14 +159,14 @@
         // Verificar la autenticación del usuario y cargar los paquetes
         auth.onAuthStateChanged((user) => {
             if (user) {
-                loadRetiredPackages(); // Cargar los paquetes si el usuario está autenticado
+                loadPackages(); // Cargar los paquetes si el usuario está autenticado
             } else {
                 window.location.href = 'login.html'; // Redirigir al login si no está autenticado
             }
         });
 
         // Cargar todos los paquetes sin filtro
-        async function loadRetiredPackages() {
+        async function loadPackages() {
             const packageTableBody = document.getElementById('package-table-body');
             packageTableBody.innerHTML = ''; // Limpiar la tabla antes de cargar los paquetes
 
@@ -176,6 +190,14 @@
 
             docs.forEach(doc => {
                 const packageData = doc.data();
+                let actionButton = '';
+
+                if (packageData.status === 'Paquete Retirado') {
+                    actionButton = `<button class="pay-button" onclick="markAsPaid('${packageData.trackingNumber}')">Pagado</button>`;
+                } else if (packageData.status === 'Paquete No Retirado') {
+                    actionButton = `<button class="resend-button" onclick="markForResend('${packageData.trackingNumber}')">Reenvío</button>`;
+                }
+
                 packageTableBody.innerHTML += `
                     <tr>
                         <td>${packageData.trackingNumber}</td>
@@ -185,7 +207,7 @@
                         <td>${packageData.fechaEnvio || 'No Disponible'}</td>
                         <td>${packageData.diaEntrega || 'No Disponible'}</td>
                         <td>${packageData.status}</td>
-                        <td><button class="pay-button" onclick="markAsPaid('${packageData.trackingNumber}')">Pagado</button></td>
+                        <td>${actionButton}</td>
                     </tr>
                 `;
             });
@@ -233,17 +255,24 @@
                 }
 
                 alert('El pago ha sido marcado como Pagado.');
-                loadRetiredPackages(); // Recargar los paquetes después de actualizar el estado
+                loadPackages(); // Recargar los paquetes después de actualizar el estado
             } catch (error) {
                 console.error("Error marcando el paquete como pagado:", error);
                 alert('Ocurrió un error marcando el pago como Pagado.');
             }
         }
 
+        // Función para marcar el paquete para "Reenvío"
+        async function markForResend(trackingNumber) {
+            alert(`El paquete con número de seguimiento ${trackingNumber} ha sido marcado para reenvío.`);
+            console.log(`Paquete con trackingNumber ${trackingNumber} marcado para reenvío.`);
+        }
+
         // Cargar los paquetes al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
-            loadRetiredPackages();
+            loadPackages();
         });
     </script>
 </body>
 </html>
+
