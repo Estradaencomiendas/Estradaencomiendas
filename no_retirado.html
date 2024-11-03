@@ -18,7 +18,7 @@
             align-items: center;
             min-height: 100vh;
             background-color: #f7f7f7;
-            width: 100%; /* Asegura que el cuerpo ocupe todo el ancho */
+            width: 100%;
         }
 
         .container {
@@ -26,10 +26,10 @@
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            width: 100%; /* Ajusta para que el contenedor ocupe todo el ancho */
-            max-width: 100%; /* Limita a todo el ancho de la pantalla */
-            overflow-x: auto; /* Añade desplazamiento horizontal si es necesario */
-            text-align: center; /* Centra el contenido de texto */
+            width: 100%;
+            max-width: 1200px;
+            overflow-x: auto;
+            text-align: center;
         }
 
         h1 {
@@ -37,15 +37,16 @@
             color: #333;
             font-weight: bold;
             margin-bottom: 20px;
-            text-align: center; /* Centra el texto del título */
+            text-align: center;
         }
 
         .filter-box {
-            margin-bottom: 20px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* Espacio entre los elementos */
+            margin-bottom: 20px;
         }
 
         .filter-box select, .filter-box input {
@@ -53,7 +54,6 @@
             border-radius: 8px;
             border: 1px solid #ccc;
             font-size: 15px;
-            margin: 5px;
         }
 
         .filter-box button {
@@ -64,7 +64,6 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 15px;
-            margin: 5px;
         }
 
         .filter-box button:hover {
@@ -72,7 +71,7 @@
         }
 
         table {
-            width: 100%; /* Ocupa todo el ancho del contenedor */
+            width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
         }
@@ -82,7 +81,7 @@
             text-align: center;
             border: 1px solid #ddd;
             font-size: 14px;
-            word-wrap: break-word; /* Evita que las celdas se expandan demasiado */
+            word-wrap: break-word;
         }
 
         th {
@@ -147,7 +146,7 @@
                 <option value="Personalizado">Personalizado</option>
                 <option value="Coordinado">Coordinado</option>
             </select>
-            <input type="date" id="date-filter" placeholder="Filtrar por fecha de envío">
+            <input type="date" id="date-filter" placeholder="Filtrar por fecha de entrega">
             <button id="filter-button">Filtrar</button>
         </div>
 
@@ -186,7 +185,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Función para cargar los paquetes "No Retirado" y filtrar por destino y fecha
+        // Función para cargar los paquetes "No Retirado" y filtrar por destino y fecha de entrega
         async function loadPackages(destination = 'all', date = null) {
             const tableBody = document.getElementById('no-retirado-table-body');
             tableBody.innerHTML = ''; // Limpiar la tabla
@@ -196,7 +195,7 @@
                 const filteredPackages = querySnapshot.docs.filter(doc => {
                     const packageData = doc.data();
                     const matchesDestination = destination === 'all' || packageData.destino === destination;
-                    const matchesDate = !date || (packageData.fechaEnvio && packageData.fechaEnvio === date);
+                    const matchesDate = !date || (packageData.diaEntrega && packageData.diaEntrega === date);
                     return matchesDestination && matchesDate;
                 });
 
@@ -240,4 +239,3 @@
     </script>
 </body>
 </html>
-
