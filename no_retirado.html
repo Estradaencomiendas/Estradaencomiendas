@@ -296,18 +296,23 @@
             const link = `${baseURL}?destino=${encodeURIComponent(selectedDestination)}&fechaEntrega=${encodeURIComponent(formattedDate)}`;
             document.getElementById('generated-link').value = link;
 
-            // Guardar la tabla en Firestore para compartirla
-            try {
-                await db.collection('paquetesCompartidos').add({
-                    destino: selectedDestination,
-                    fechaEntrega: formattedDate,
-                    tableHTML: tableHTML,
-                    createdAt: new Date().toISOString()
-                });
-                alert('Tabla guardada y enlace generado correctamente.');
-            } catch (error) {
-                console.error('Error al guardar la tabla en Firestore:', error);
-                alert('Error al guardar la tabla. Intente de nuevo.');
+            // Verificar si el usuario está autenticado antes de guardar en Firestore
+            if (firebase.auth().currentUser) {
+                try {
+                    await db.collection('paquetesCompartidos').add({
+                        destino: selectedDestination,
+                        fechaEntrega: formattedDate,
+                        tableHTML: tableHTML,
+                        createdAt: new Date().toISOString(),
+                        userId: firebase.auth().currentUser.uid // Agregar el ID de usuario para identificar al autor
+                    });
+                    alert('Tabla guardada y enlace generado correctamente.');
+                } catch (error) {
+                    console.error('Error al guardar la tabla en Firestore:', error);
+                    alert('Error al guardar la tabla. Intente de nuevo.');
+                }
+            } else {
+                alert('Debe iniciar sesión para guardar la tabla.');
             }
         });
 
@@ -325,6 +330,15 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Ejemplo de inicio de sesión para la autenticación
+            firebase.auth().signInWithEmailAndPassword('tu-email@ejemplo.com', 'tu-contraseña')
+                .then(userCredential => {
+                    console.log('Usuario autenticado:', userCredential.user);
+                })
+                .catch(error => {
+                    console.error('Error de autenticación:', error);
+                });
+
             loadPackages(); // Cargar todos los paquetes al inicio
         });
     </script>
