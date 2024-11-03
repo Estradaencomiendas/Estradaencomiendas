@@ -45,7 +45,7 @@
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            gap: 10px; /* Espacio entre los elementos */
+            gap: 10px;
             margin-bottom: 20px;
         }
 
@@ -95,6 +95,41 @@
             color: #333;
             border: 1px solid #EDE309;
         }
+
+        .share-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .share-container input {
+            width: 80%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .share-container button {
+            margin-right: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .share-container button:last-child {
+            background-color: #4267B2;
+        }
+
+        .share-container button:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -105,8 +140,8 @@
         <div class="filter-box">
             <select id="destination-filter">
                 <option value="all">Todos los Destinos</option>
-                <option value="Ahuachapán">Ahuachapán</option>
                 <option value="Aguilares">Aguilares</option>
+                <option value="Ahuachapán">Ahuachapán</option>
                 <option value="Apaneca">Apaneca</option>
                 <option value="Apastepeque">Apastepeque</option>
                 <option value="Ataco">Ataco</option>
@@ -118,9 +153,9 @@
                 <option value="Ciudad Arce">Ciudad Arce</option>
                 <option value="Ciudad Real">Ciudad Real</option>
                 <option value="Ciudad Versalles">Ciudad Versalles</option>
+                <option value="Cojutepeque">Cojutepeque</option>
                 <option value="Conchagua">Conchagua</option>
                 <option value="Coordinado">Coordinado</option>
-                <option value="Cojutepeque">Cojutepeque</option>
                 <option value="Cuscatancingo">Cuscatancingo</option>
                 <option value="Desvio de Amayo">Desvio de Amayo</option>
                 <option value="El Congo">El Congo</option>
@@ -131,9 +166,9 @@
                 <option value="Local 3 Santa Ana">Local 3 Santa Ana</option>
                 <option value="Masahuat">Masahuat</option>
                 <option value="Mejicanos">Mejicanos</option>
-                <option value="Metrogalerias">Metrogalerias</option>
                 <option value="Metapan">Metapan</option>
                 <option value="Metrolourdes">Metrolourdes</option>
+                <option value="Metrogalerias">Metrogalerias</option>
                 <option value="Nahuizalco">Nahuizalco</option>
                 <option value="Nejapa">Nejapa</option>
                 <option value="Personalizado">Personalizado</option>
@@ -146,7 +181,7 @@
                 <option value="Tacachico">Tacachico</option>
                 <option value="Texistepeque">Texistepeque</option>
             </select>
-            <input type="text" id="date-filter" placeholder="DD-MM-YYYY" pattern="\d{2}-\d{2}-\d{4}">
+            <input type="date" id="date-filter" placeholder="Filtrar por fecha de entrega">
             <button id="filter-button">Filtrar</button>
         </div>
 
@@ -167,6 +202,14 @@
                 <!-- Los datos se llenarán dinámicamente aquí -->
             </tbody>
         </table>
+
+        <!-- Sección de compartir -->
+        <div class="share-container">
+            <button id="generate-link-button">Generar link para compartir</button>
+            <input type="text" id="generated-link" readonly>
+            <button onclick="copyLink()">Copiar enlace</button>
+            <button onclick="shareOnFacebook()">Compartir en Facebook</button>
+        </div>
     </div>
 
     <script>
@@ -185,7 +228,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Función para cargar los paquetes "No Retirado" y filtrar por destino y fecha de entrega en formato DD-MM-YYYY
         async function loadPackages(destination = 'all', date = null) {
             const tableBody = document.getElementById('no-retirado-table-body');
             tableBody.innerHTML = ''; // Limpiar la tabla
@@ -225,14 +267,33 @@
             }
         }
 
-        // Evento de filtrado por destino y fecha
         document.getElementById('filter-button').addEventListener('click', function() {
             const selectedDestination = document.getElementById('destination-filter').value;
             const selectedDate = document.getElementById('date-filter').value;
             loadPackages(selectedDestination, selectedDate);
         });
 
-        // Cargar paquetes al cargar la página
+        document.getElementById('generate-link-button').addEventListener('click', function() {
+            const selectedDestination = document.getElementById('destination-filter').value;
+            const selectedDate = document.getElementById('date-filter').value;
+            const baseURL = "https://tu-dominio.com/paquetes_compartidos.html";
+            const link = `${baseURL}?destino=${encodeURIComponent(selectedDestination)}&fechaEntrega=${encodeURIComponent(selectedDate)}`;
+            document.getElementById('generated-link').value = link;
+        });
+
+        function copyLink() {
+            const linkField = document.getElementById('generated-link');
+            linkField.select();
+            document.execCommand('copy');
+            alert('Enlace copiado al portapapeles');
+        }
+
+        function shareOnFacebook() {
+            const link = document.getElementById('generated-link').value;
+            const facebookURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
+            window.open(facebookURL, '_blank');
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             loadPackages(); // Cargar todos los paquetes al inicio
         });
