@@ -110,30 +110,19 @@
             const tableBody = document.getElementById('shared-table-body');
 
             try {
-                let query = db.collection('paquetes').where('status', '==', 'Paquete No Retirado');
-                if (destino !== 'all') query = query.where('destino', '==', destino);
-                if (fechaEntrega) query = query.where('diaEntrega', '==', fechaEntrega);
+                const querySnapshot = await db.collection('paquetesCompartidos')
+                    .where('destino', '==', destino)
+                    .where('fechaEntrega', '==', fechaEntrega)
+                    .get();
 
-                const querySnapshot = await query.get();
                 if (querySnapshot.empty) {
                     tableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes para el criterio seleccionado.</td></tr>';
                     return;
                 }
 
                 querySnapshot.forEach(doc => {
-                    const packageData = doc.data();
-                    tableBody.innerHTML += `
-                        <tr>
-                            <td>${packageData.trackingNumber || 'No disponible'}</td>
-                            <td>${packageData.nombreCliente || 'No disponible'}</td>
-                            <td>${packageData.nombrePaquete || 'No disponible'}</td>
-                            <td>${packageData.destino || 'No disponible'}</td>
-                            <td>$${parseFloat(packageData.valor || 0).toFixed(2)}</td>
-                            <td>${packageData.fechaEnvio || 'No disponible'}</td>
-                            <td>${packageData.diaEntrega || 'No disponible'}</td>
-                            <td>${packageData.status || 'No disponible'}</td>
-                        </tr>
-                    `;
+                    const { tableHTML } = doc.data();
+                    tableBody.innerHTML = tableHTML; // Insertar la tabla recibida
                 });
             } catch (error) {
                 console.error("Error cargando paquetes compartidos:", error);
