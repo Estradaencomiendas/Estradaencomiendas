@@ -142,6 +142,15 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        // Verificar la autenticación del usuario y cargar los paquetes
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                loadRetiredPackages(); // Cargar los paquetes si el usuario está autenticado
+            } else {
+                window.location.href = 'login.html'; // Redirigir al login si no está autenticado
+            }
+        });
+
         // Cargar paquetes con el estado "Paquete retirado"
         async function loadRetiredPackages() {
             const packageTableBody = document.getElementById('package-table-body');
@@ -278,4 +287,5 @@
     </script>
 </body>
 </html>
+
 
