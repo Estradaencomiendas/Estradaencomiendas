@@ -106,7 +106,7 @@
         <button id="search-button">Buscar</button>
     </div>
 
-    <!-- Tabla de paquetes retirados -->
+    <!-- Tabla de paquetes -->
     <table id="package-table">
         <thead>
             <tr>
@@ -151,17 +151,17 @@
             }
         });
 
-        // Cargar paquetes con el estado "Paquete retirado"
+        // Cargar todos los paquetes sin filtro
         async function loadRetiredPackages() {
             const packageTableBody = document.getElementById('package-table-body');
             packageTableBody.innerHTML = ''; // Limpiar la tabla antes de cargar los paquetes
 
             try {
-                const querySnapshot = await db.collection('paquetes').where('status', '==', 'Paquete retirado').get();
-                console.log("Documentos encontrados (estado 'Paquete retirado'):", querySnapshot.docs.map(doc => doc.data()));
+                const querySnapshot = await db.collection('paquetes').get();
+                console.log("Documentos encontrados:", querySnapshot.docs.map(doc => doc.data()));
 
                 if (querySnapshot.empty) {
-                    packageTableBody.innerHTML = '<tr><td colspan="8">No hay paquetes retirados almacenados.</td></tr>';
+                    packageTableBody.innerHTML = '<tr><td colspan="8">No hay paquetes almacenados.</td></tr>';
                     return;
                 }
 
@@ -183,100 +183,7 @@
                     `;
                 });
             } catch (error) {
-                console.error("Error cargando los paquetes retirados:", error);
-            }
-        }
-
-        // Buscar paquetes basados en los campos de búsqueda
-        document.getElementById('search-button').addEventListener('click', async function() {
-            const searchInput = document.getElementById('search-input').value.toLowerCase();
-            const packageTableBody = document.getElementById('package-table-body');
-            packageTableBody.innerHTML = ''; // Limpiar la tabla
-
-            try {
-                const querySnapshot = await db.collection('paquetes').where('status', '==', 'Paquete retirado').get();
-                console.log("Documentos encontrados para búsqueda (estado 'Paquete retirado'):", querySnapshot.docs.map(doc => doc.data()));
-
-                const filteredPackages = [];
-
-                querySnapshot.forEach(doc => {
-                    const packageData = doc.data();
-                    console.log("Datos del paquete para filtrar:", packageData);
-
-                    const searchFields = [
-                        packageData.trackingNumber,
-                        packageData.nombreCliente?.toLowerCase(),
-                        packageData.nombrePaquete?.toLowerCase()
-                    ];
-
-                    if (searchFields.some(field => field && field.includes(searchInput))) {
-                        filteredPackages.push(packageData);
-                        console.log("Paquete que coincide con la búsqueda:", packageData);
-                    }
-                });
-
-                if (filteredPackages.length === 0) {
-                    console.log("No se encontraron paquetes que coincidan con la búsqueda.");
-                    packageTableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes que coincidan con la búsqueda.</td></tr>';
-                } else {
-                    filteredPackages.forEach(packageData => {
-                        packageTableBody.innerHTML += `
-                            <tr>
-                                <td>${packageData.trackingNumber}</td>
-                                <td>${packageData.nombreCliente || 'Cliente Desconocido'}</td>
-                                <td>${packageData.nombrePaquete || 'Nombre Desconocido'}</td>
-                                <td>${packageData.destino || 'Destino Desconocido'}</td>
-                                <td>${packageData.fechaEnvio || 'No Disponible'}</td>
-                                <td>${packageData.diaEntrega || 'No Disponible'}</td>
-                                <td>${packageData.status}</td>
-                                <td><button class="pay-button" onclick="markAsPaid('${packageData.trackingNumber}')">Pagado</button></td>
-                            </tr>
-                        `;
-                    });
-                }
-            } catch (error) {
-                console.error("Error buscando los paquetes retirados:", error);
-            }
-        });
-
-        // Función para marcar el paquete como "Pagado"
-        async function markAsPaid(trackingNumber) {
-            try {
-                const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
-                console.log("Documentos encontrados para actualizar:", packageSnapshot.docs.map(doc => doc.data()));
-
-                if (!packageSnapshot.empty) {
-                    packageSnapshot.forEach(async (doc) => {
-                        await db.collection('paquetes').doc(doc.id).update({
-                            status: 'Pagado'
-                        });
-                        console.log(`Paquete con trackingNumber ${trackingNumber} marcado como 'Pagado'.`);
-                    });
-                }
-
-                // Enviar notificación a Firestore
-                await sendNotificationToFirestore(trackingNumber);
-
-                alert('El pago ha sido marcado como Pagado y la notificación ha sido enviada.');
-                window.location.href = 'admin0.html'; // Redirigir después de marcar como pagado
-            } catch (error) {
-                console.error("Error marcando el paquete como pagado:", error);
-                alert('Ocurrió un error marcando el pago como Pagado.');
-            }
-        }
-
-        // Función para enviar notificación a Firestore
-        async function sendNotificationToFirestore(trackingNumber) {
-            try {
-                await db.collection('notifications').add({
-                    title: 'Pago recibido',
-                    body: `El paquete con número de seguimiento ${trackingNumber} ha sido marcado como pagado.`,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    trackingNumber: trackingNumber
-                });
-                console.log("Notificación enviada a Firestore");
-            } catch (error) {
-                console.error("Error enviando notificación a Firestore:", error);
+                console.error("Error cargando los paquetes:", error);
             }
         }
 
@@ -287,5 +194,4 @@
     </script>
 </body>
 </html>
-
 
