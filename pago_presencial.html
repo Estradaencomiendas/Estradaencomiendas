@@ -149,6 +149,7 @@
 
             try {
                 const querySnapshot = await db.collection('paquetes').where('status', '==', 'Paquete retirado').get();
+                console.log("Documentos encontrados (estado 'Paquete retirado'):", querySnapshot.docs.map(doc => doc.data()));
 
                 if (querySnapshot.empty) {
                     packageTableBody.innerHTML = '<tr><td colspan="8">No hay paquetes retirados almacenados.</td></tr>';
@@ -157,6 +158,8 @@
 
                 querySnapshot.forEach(doc => {
                     const packageData = doc.data();
+                    console.log("Datos del paquete:", packageData);
+
                     packageTableBody.innerHTML += `
                         <tr>
                             <td>${packageData.trackingNumber}</td>
@@ -183,10 +186,14 @@
 
             try {
                 const querySnapshot = await db.collection('paquetes').where('status', '==', 'Paquete retirado').get();
+                console.log("Documentos encontrados para búsqueda (estado 'Paquete retirado'):", querySnapshot.docs.map(doc => doc.data()));
+
                 const filteredPackages = [];
 
                 querySnapshot.forEach(doc => {
                     const packageData = doc.data();
+                    console.log("Datos del paquete para filtrar:", packageData);
+
                     const searchFields = [
                         packageData.trackingNumber,
                         packageData.nombreCliente?.toLowerCase(),
@@ -195,10 +202,12 @@
 
                     if (searchFields.some(field => field && field.includes(searchInput))) {
                         filteredPackages.push(packageData);
+                        console.log("Paquete que coincide con la búsqueda:", packageData);
                     }
                 });
 
                 if (filteredPackages.length === 0) {
+                    console.log("No se encontraron paquetes que coincidan con la búsqueda.");
                     packageTableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes que coincidan con la búsqueda.</td></tr>';
                 } else {
                     filteredPackages.forEach(packageData => {
@@ -225,11 +234,14 @@
         async function markAsPaid(trackingNumber) {
             try {
                 const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                console.log("Documentos encontrados para actualizar:", packageSnapshot.docs.map(doc => doc.data()));
+
                 if (!packageSnapshot.empty) {
                     packageSnapshot.forEach(async (doc) => {
                         await db.collection('paquetes').doc(doc.id).update({
                             status: 'Pagado'
                         });
+                        console.log(`Paquete con trackingNumber ${trackingNumber} marcado como 'Pagado'.`);
                     });
                 }
 
@@ -266,3 +278,4 @@
     </script>
 </body>
 </html>
+
