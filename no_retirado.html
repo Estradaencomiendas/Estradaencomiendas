@@ -270,14 +270,30 @@
         document.getElementById('filter-button').addEventListener('click', function() {
             const selectedDestination = document.getElementById('destination-filter').value;
             const selectedDate = document.getElementById('date-filter').value;
-            loadPackages(selectedDestination, selectedDate);
+
+            // Convertir la fecha de 'YYYY-MM-DD' a 'DD/MM/YYYY'
+            if (selectedDate) {
+                const dateParts = selectedDate.split('-');
+                const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+                loadPackages(selectedDestination, formattedDate);
+            } else {
+                loadPackages(selectedDestination, null);
+            }
         });
 
         document.getElementById('generate-link-button').addEventListener('click', function() {
             const selectedDestination = document.getElementById('destination-filter').value;
             const selectedDate = document.getElementById('date-filter').value;
             const baseURL = "https://tu-dominio.com/paquetes_compartidos.html";
-            const link = `${baseURL}?destino=${encodeURIComponent(selectedDestination)}&fechaEntrega=${encodeURIComponent(selectedDate)}`;
+
+            // Convertir la fecha de 'YYYY-MM-DD' a 'DD/MM/YYYY'
+            let formattedDate = '';
+            if (selectedDate) {
+                const dateParts = selectedDate.split('-');
+                formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+            }
+
+            const link = `${baseURL}?destino=${encodeURIComponent(selectedDestination)}&fechaEntrega=${encodeURIComponent(formattedDate)}`;
             document.getElementById('generated-link').value = link;
         });
 
@@ -300,3 +316,4 @@
     </script>
 </body>
 </html>
+
