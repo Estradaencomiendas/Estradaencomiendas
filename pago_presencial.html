@@ -102,7 +102,7 @@
 
     <!-- Cuadro de búsqueda -->
     <div class="search-box">
-        <input type="text" id="search-input" placeholder="Buscar por Número de Seguimiento, Cliente o Página">
+        <input type="text" id="search-input" placeholder="Buscar por Número de Seguimiento o Nombre de la Página">
         <button id="search-button">Buscar</button>
     </div>
 
@@ -128,7 +128,7 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            apiKey: "API_KEY",
             authDomain: "estradaencomiendas0.firebaseapp.com",
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
@@ -158,32 +158,85 @@
 
             try {
                 const querySnapshot = await db.collection('paquetes').get();
-                console.log("Documentos encontrados:", querySnapshot.docs.map(doc => doc.data()));
-
-                if (querySnapshot.empty) {
-                    packageTableBody.innerHTML = '<tr><td colspan="8">No hay paquetes almacenados.</td></tr>';
-                    return;
-                }
-
-                querySnapshot.forEach(doc => {
-                    const packageData = doc.data();
-                    console.log("Datos del paquete:", packageData);
-
-                    packageTableBody.innerHTML += `
-                        <tr>
-                            <td>${packageData.trackingNumber}</td>
-                            <td>${packageData.nombreCliente || 'Cliente Desconocido'}</td>
-                            <td>${packageData.nombrePaquete || 'Nombre Desconocido'}</td>
-                            <td>${packageData.destino || 'Destino Desconocido'}</td>
-                            <td>${packageData.fechaEnvio || 'No Disponible'}</td>
-                            <td>${packageData.diaEntrega || 'No Disponible'}</td>
-                            <td>${packageData.status}</td>
-                            <td><button class="pay-button" onclick="markAsPaid('${packageData.trackingNumber}')">Pagado</button></td>
-                        </tr>
-                    `;
-                });
+                displayPackages(querySnapshot.docs);
             } catch (error) {
                 console.error("Error cargando los paquetes:", error);
+            }
+        }
+
+        // Mostrar los paquetes en la tabla
+        function displayPackages(docs) {
+            const packageTableBody = document.getElementById('package-table-body');
+            packageTableBody.innerHTML = '';
+
+            if (docs.length === 0) {
+                packageTableBody.innerHTML = '<tr><td colspan="8">No hay paquetes almacenados.</td></tr>';
+                return;
+            }
+
+            docs.forEach(doc => {
+                const packageData = doc.data();
+                packageTableBody.innerHTML += `
+                    <tr>
+                        <td>${packageData.trackingNumber}</td>
+                        <td>${packageData.nombreCliente || 'Cliente Desconocido'}</td>
+                        <td>${packageData.nombrePaquete || 'Nombre Desconocido'}</td>
+                        <td>${packageData.destino || 'Destino Desconocido'}</td>
+                        <td>${packageData.fechaEnvio || 'No Disponible'}</td>
+                        <td>${packageData.diaEntrega || 'No Disponible'}</td>
+                        <td>${packageData.status}</td>
+                        <td><button class="pay-button" onclick="markAsPaid('${packageData.trackingNumber}')">Pagado</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Buscar paquetes por Número de Seguimiento o Nombre de la Página
+        document.getElementById('search-button').addEventListener('click', async function() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const packageTableBody = document.getElementById('package-table-body');
+            packageTableBody.innerHTML = ''; // Limpiar la tabla
+
+            try {
+                const querySnapshot = await db.collection('paquetes').get();
+                const filteredPackages = querySnapshot.docs.filter(doc => {
+                    const packageData = doc.data();
+                    const trackingNumber = packageData.trackingNumber?.toLowerCase() || '';
+                    const nombrePaquete = packageData.nombrePaquete?.toLowerCase() || '';
+
+                    return trackingNumber.includes(searchInput) || nombrePaquete.includes(searchInput);
+                });
+
+                if (filteredPackages.length === 0) {
+                    packageTableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes que coincidan con la búsqueda.</td></tr>';
+                } else {
+                    displayPackages(filteredPackages);
+                }
+            } catch (error) {
+                console.error("Error buscando los paquetes:", error);
+            }
+        });
+
+        // Función para marcar el paquete como "Pagado"
+        async function markAsPaid(trackingNumber) {
+            try {
+                const packageSnapshot = await db.collection('paquetes').where('trackingNumber', '==', trackingNumber).get();
+                console.log("Documentos encontrados para actualizar:", packageSnapshot.docs.map(doc => doc.data()));
+
+                if (!packageSnapshot.empty) {
+                    packageSnapshot.forEach(async (doc) => {
+                        await db.collection('paquetes').doc(doc.id).update({
+                            status: 'Pagado'
+                        });
+                        console.log(`Paquete con trackingNumber ${trackingNumber} marcado como 'Pagado'.`);
+                    });
+                }
+
+                alert('El pago ha sido marcado como Pagado.');
+                loadRetiredPackages(); // Recargar los paquetes después de actualizar el estado
+            } catch (error) {
+                console.error("Error marcando el paquete como pagado:", error);
+                alert('Ocurrió un error marcando el pago como Pagado.');
             }
         }
 
