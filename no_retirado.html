@@ -29,6 +29,7 @@
             width: 100%; /* Ajusta para que el contenedor ocupe todo el ancho */
             max-width: 100%; /* Limita a todo el ancho de la pantalla */
             overflow-x: auto; /* Añade desplazamiento horizontal si es necesario */
+            text-align: center; /* Centra el contenido de texto */
         }
 
         h1 {
@@ -36,22 +37,23 @@
             color: #333;
             font-weight: bold;
             margin-bottom: 20px;
+            text-align: center; /* Centra el texto del título */
         }
 
         .filter-box {
             margin-bottom: 20px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            width: 100%; /* Asegura que el filtro ocupe todo el ancho */
+            flex-wrap: wrap;
         }
 
-        .filter-box select {
+        .filter-box select, .filter-box input {
             padding: 10px;
             border-radius: 8px;
             border: 1px solid #ccc;
             font-size: 15px;
-            margin-right: 10px;
+            margin: 5px;
         }
 
         .filter-box button {
@@ -62,6 +64,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 15px;
+            margin: 5px;
         }
 
         .filter-box button:hover {
@@ -99,7 +102,7 @@
     <div class="container">
         <h1>Paquetes No Retirados</h1>
 
-        <!-- Filtro de destino -->
+        <!-- Filtro de destino y fecha -->
         <div class="filter-box">
             <select id="destination-filter">
                 <option value="all">Todos los Destinos</option>
@@ -144,6 +147,7 @@
                 <option value="Personalizado">Personalizado</option>
                 <option value="Coordinado">Coordinado</option>
             </select>
+            <input type="date" id="date-filter" placeholder="Filtrar por fecha de envío">
             <button id="filter-button">Filtrar</button>
         </div>
 
@@ -169,7 +173,7 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyA42b2B9K4J8BMWa9FfHXFu2sAR0aFYm-M",
+            apiKey: "API_KEY_AQUÍ",
             authDomain: "estradaencomiendas0.firebaseapp.com",
             projectId: "estradaencomiendas0",
             storageBucket: "estradaencomiendas0.appspot.com",
@@ -182,8 +186,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Función para cargar los paquetes "No Retirado" y filtrar por destino
-        async function loadPackages(destination = 'all') {
+        // Función para cargar los paquetes "No Retirado" y filtrar por destino y fecha
+        async function loadPackages(destination = 'all', date = null) {
             const tableBody = document.getElementById('no-retirado-table-body');
             tableBody.innerHTML = ''; // Limpiar la tabla
 
@@ -191,11 +195,13 @@
                 const querySnapshot = await db.collection('paquetes').where('status', '==', 'Paquete No Retirado').get();
                 const filteredPackages = querySnapshot.docs.filter(doc => {
                     const packageData = doc.data();
-                    return destination === 'all' || packageData.destino === destination;
+                    const matchesDestination = destination === 'all' || packageData.destino === destination;
+                    const matchesDate = !date || (packageData.fechaEnvio && packageData.fechaEnvio === date);
+                    return matchesDestination && matchesDate;
                 });
 
                 if (filteredPackages.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes "No Retirado" para el destino seleccionado.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="8">No se encontraron paquetes "No Retirado" para los filtros seleccionados.</td></tr>';
                     return;
                 }
 
@@ -220,10 +226,11 @@
             }
         }
 
-        // Evento de filtrado por destino
+        // Evento de filtrado por destino y fecha
         document.getElementById('filter-button').addEventListener('click', function() {
             const selectedDestination = document.getElementById('destination-filter').value;
-            loadPackages(selectedDestination);
+            const selectedDate = document.getElementById('date-filter').value;
+            loadPackages(selectedDestination, selectedDate);
         });
 
         // Cargar paquetes al cargar la página
@@ -233,3 +240,4 @@
     </script>
 </body>
 </html>
+
